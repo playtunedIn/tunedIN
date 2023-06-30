@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
+    "build": "vite build",
+    "start": "vite preview",
     "______TESTING_________________": "",
     "test": "vitest run --coverage=false",
     "test:coverage": "vitest run --coverage=true",

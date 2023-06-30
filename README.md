@@ -44,3 +44,8 @@ pnpm dev
 
 Once the app is running, you can explore the SpotiSpy trivia game and enjoy testing your music knowledge based on your
 Spotify data. Follow the on-screen instructions to play the game and have fun!
+
+To access the following services in your local environment use the following links:
+
+- client - http://localhost:3000
+- server - http://localhost:3001
