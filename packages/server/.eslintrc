@@ -1,0 +1,23 @@
+{
+  "extends": ["eslint:recommended", "prettier"],
+  "plugins": ["@typescript-eslint"],
+  "parser": "@typescript-eslint/parser",
+  "env": { "es2020": true, "node": true },
+  "parserOptions": { "ecmaVersion": "latest", "sourceType": "module" },
+  "rules": {},
+  "overrides": [
+    {
+      "files": ["**/*.ts", "**/*.tsx"],
+      "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"]
+    },
+    {
+      "files": [".*", "*.config.*"],
+      "env": { "node": true }
+    },
+    {
+      "files": ["__tests__/**", "*.test.*"],
+      "env": { "es6": true }
+    }
+  ],
+  "ignorePatterns": ["build/", "coverage/", "dist/", "legacy-types/", "node_modules/"]
+}

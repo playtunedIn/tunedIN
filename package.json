@@ -1,19 +1,24 @@
 {
   "name": "spotispy",
-  "version": "1.0.0",
-  "description": "",
+  "description": "A Monorepo for spotispy project",
+  "private": true,
   "engines": {
     "node": ">=20.0.0"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently \"pnpm -F server dev\" \"pnpm -F client dev\"",
+    "______CI COMMANDS_____________": "",
+    "lint": "pnpm --filter \"...[origin/main]\" --if-present lint",
+    "test": "pnpm --filter \"...[origin/main]\" --if-present test",
+    "______LIFECYCLE COMMANDS______": "",
+    "preinstall": "npx only-allow pnpm",
+    "postinstall": "git config core.hooksPath ./git-hooks",
+    "git:pre-push": "pnpm --filter \"...[origin/main]\" --if-present git:pre-push"
   },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.18.2"
-  }
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "lint-staged": "^13.2.3",
+    "prettier": "^2.8.8"
+  },
+  "license": "UNLICENSED"
 }
