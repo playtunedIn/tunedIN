@@ -34,7 +34,19 @@ cd SpotiSpy
 pnpm install
 ```
 
-4. Start project:
+4. Generate Server SSL Cert:
+
+```bash
+pnpm -F server generate-cert
+```
+
+5. Setup Redis instance (**note** you will need docker, docker runtime, and the redis image setup):
+
+```bash
+docker run -d -p 6379:6379 --name myredis redis
+```
+
+6. Start project:
 
 ```bash
 pnpm dev
