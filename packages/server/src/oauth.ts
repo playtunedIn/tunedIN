@@ -1,10 +1,19 @@
+/**
+ * This is an example of a basic node.js script that performs
+ * the Authorization Code oAuth2 flow to authenticate against
+ * the Spotify Accounts.
+ *
+ * For more information, read
+ * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
+ */
+
 import querystring from 'querystring';
 import fetch from 'node-fetch';
 
-const CLIENT_ID = process.env.CLIENT_ID; // Your client id
-const CLIENT_SECRET = process.env.CLIENT_SECRET; // Your secret
-const REDIRECT_URI = process.env.REDIRECT_URI; // Your redirect uri
-const POST_LOGIN_URL = process.env.POST_LOGIN_URL; // After success auth
+const CLIENT_ID = process.env.CLIENT_ID || ''; // Your client id
+const CLIENT_SECRET = process.env.CLIENT_SECRET || ''; // Your secret
+const REDIRECT_URI = process.env.REDIRECT_URI || ''; // Your redirect uri
+const POST_LOGIN_URL = process.env.POST_LOGIN_URL || ''; // After success auth
 
 type OauthResponse = {
   access_token: string;
@@ -57,7 +66,7 @@ export const setupOauthRoutes = (app: any) => {
     const code = req.query.code || null;
     const state = req.query.state || null;
     const storedState = req.cookies ? req.cookies[stateKey] : null;
-
+    console.log({ code, state, storedState });
     if (state === null || state !== storedState) {
       console.log('state mismatch');
       // res.redirect('/#' +
@@ -66,20 +75,19 @@ export const setupOauthRoutes = (app: any) => {
       //   }));
     } else {
       res.clearCookie(stateKey);
+      const params = new URLSearchParams();
+      params.append('code', code);
+      params.append('redirect_uri', REDIRECT_URI);
+      params.append('grant_type', 'authorization_code');
       const authOptions = {
         method: 'POST',
-        form: {
-          code: code,
-          redirect_uri: REDIRECT_URI,
-          grant_type: 'authorization_code',
-        },
+
+        body: params,
         headers: {
-          Authorization: 'Basic ' + new Buffer(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
+          Authorization: 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
         },
       };
-
       const tokenResponse = await fetch('https://accounts.spotify.com/api/token', authOptions);
-
       if (tokenResponse.status === 200) {
         const body = (await tokenResponse.json()) as OauthResponse;
         const access_token = body.access_token;
