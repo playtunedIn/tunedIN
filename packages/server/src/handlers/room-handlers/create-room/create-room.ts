@@ -1,10 +1,10 @@
 import { WebSocket } from 'ws';
 
-import { redisPub } from '../../clients/redis/redis-client';
-import validator from '../message.validator';
+import { setValue } from '../../../clients/redis/redis-client';
+import validator from '../../message.validator';
 import { CREATE_ROOM_SCHEMA_NAME, CreateRoomReq } from './create-room.validator';
 
-export const createRoomHandler = (ws: WebSocket, data: CreateRoomReq) => {
+export const createRoomHandler = async (ws: WebSocket, data: CreateRoomReq) => {
   if (!isValidCreateRoomReq(data)) {
     return ws.send('Error');
   }
@@ -16,7 +16,8 @@ export const createRoomHandler = (ws: WebSocket, data: CreateRoomReq) => {
     questions: [],
   };
 
-  redisPub(data.roomId, JSON.stringify(defaultGameState));
+  await setValue(defaultGameState.roomId, JSON.stringify(defaultGameState));
+  ws.send(`Created room: ${defaultGameState.roomId}`);
 };
 
 const isValidCreateRoomReq = (data: CreateRoomReq) => {

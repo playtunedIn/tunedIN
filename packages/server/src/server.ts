@@ -1,10 +1,11 @@
 import express from 'express';
-import { WebSocketServer } from 'ws';
+import { WebSocket, WebSocketServer } from 'ws';
 import https from 'https';
 import { readFileSync } from 'fs';
 
 import { messageHandler } from './handlers/message-handler';
 import { validatorInit } from './handlers/message.validator';
+import { unsubscribeChannel } from './clients/redis/redis-client';
 
 const key = readFileSync('./.cert/private.key');
 const cert = readFileSync('./.cert/certificate.crt');
@@ -29,8 +30,14 @@ server.on('error', err => {
 
 const wsServer = new WebSocketServer({ server });
 
-wsServer.on('connection', ws => {
+wsServer.on('connection', (ws: WebSocket) => {
   ws.on('message', (data: string) => {
     messageHandler(ws, data);
+  });
+
+  ws.on('close', () => {
+    if (ws.channelListener) {
+      unsubscribeChannel(ws.channelListener);
+    }
   });
 });

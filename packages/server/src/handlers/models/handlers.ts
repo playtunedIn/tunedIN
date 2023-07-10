@@ -1,5 +1,6 @@
-import { createRoomHandler } from '../create-room/create-room';
-import { joinRoomHandler } from '../join-room/join-room';
+import { createRoomHandler } from '../room-handlers/create-room/create-room';
+import { joinRoomHandler } from '../room-handlers/join-room/join-room';
+import { unsubscribeRoomHandler } from '../room-handlers/unsubscribe-room/unsubscribe-room';
 
 export interface SocketMessage {
   type: keyof typeof messageHandlers;
@@ -12,6 +13,7 @@ export interface SocketResponse {
 }
 
 export const messageHandlers = {
-  CreateRoom: createRoomHandler,
-  JoinRoom: joinRoomHandler,
+  createRoom: createRoomHandler,
+  joinRoom: joinRoomHandler,
+  unsubscribeRoom: unsubscribeRoomHandler,
 };

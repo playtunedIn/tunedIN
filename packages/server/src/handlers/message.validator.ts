@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 
-import createRoomReqSchema, { CREATE_ROOM_SCHEMA_NAME } from './create-room/create-room.validator';
-import joinRoomReqSchema, { JOIN_ROOM_SCHEMA_NAME } from './join-room/join-room.validator';
+import createRoomReqSchema, { CREATE_ROOM_SCHEMA_NAME } from './room-handlers/create-room/create-room.validator';
+import joinRoomReqSchema, { JOIN_ROOM_SCHEMA_NAME } from './room-handlers/join-room/join-room.validator';
 
 const validator = new Ajv();
 
