@@ -1,28 +1,28 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import App from "./App";
-import Login from "./components/Login/Login";
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import App from './App';
+import Login from './components/Login/Login';
+import LoginSuccess from './components/Login/LoginSuccess';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/login',
+    element: <Login />,
+  },
+  {
+    path: '/login_success',
+    element: <LoginSuccess />,
+  },
+  {
+    path: '/',
     element: <App />,
     children: [
-      {
-        path: "login",
-        element: <Login />
-      },
-      {
-        path: "authorization-success",
-        element: <Team />
-      }
+      //   {
+      //     path: "authorization-success",
+      //     element: <AuthSuccess />
+      //   }
     ],
   },
 ]);
-const Router = <RouterProvider router={router} />;
+const Router = () => <RouterProvider router={router} />;
 
 export default Router;

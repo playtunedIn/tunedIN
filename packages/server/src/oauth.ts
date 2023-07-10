@@ -91,7 +91,6 @@ export const setupOauthRoutes = (app: any) => {
       if (tokenResponse.status === 200) {
         const body = (await tokenResponse.json()) as OauthResponse;
         const access_token = body.access_token;
-        const refresh_token = body.refresh_token;
 
         // use the access token to access the Spotify Web API
         // const options = {
@@ -108,7 +107,6 @@ export const setupOauthRoutes = (app: any) => {
           POST_LOGIN_URL +
             querystring.stringify({
               access_token: access_token,
-              refresh_token: refresh_token,
             })
         );
       } else {

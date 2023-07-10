@@ -1,13 +1,13 @@
-import * as React from "react";
+const authUrl = 'http://localhost:3001/login';
 
 export const Login = () => {
-    
-    return (
-        <>
-            <h2>Log in with Spotify</h2>
-            
-        </>
-    )
-}
+  const redirectToAuth = () => (window.location.href = authUrl);
+
+  return (
+    <>
+      <button onClick={redirectToAuth}>Log in with Spotify</button>
+    </>
+  );
+};
 
 export default Login;
