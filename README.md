@@ -61,3 +61,7 @@ To access the following services in your local environment use the following lin
 
 - client - http://localhost:3000
 - server - http://localhost:3001
+
+### FAQ
+
+For more information on the game state and redis see this confluence doc: https://spotispy.atlassian.net/l/cp/Sy0QuvWs
