@@ -15,14 +15,19 @@
     "lint:js": "eslint . --max-warnings=0",
     "lint:types": "tsc --noEmit",
     "______LIFECYCLE COMMANDS______": "",
+    "generate-cert": "../../scripts/generateDevSSLCert.sh",
     "git:pre-push": "pnpm run test"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "ajv": "^8.12.0",
+    "express": "^4.18.2",
+    "redis": "^4.6.7",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
     "@types/node": "^20.3.2",
+    "@types/ws": "^8.5.5",
     "@typescript-eslint/eslint-plugin": "^5.59.0",
     "@typescript-eslint/parser": "^5.59.0",
     "concurrently": "^8.2.0",

@@ -34,7 +34,19 @@ cd SpotiSpy
 pnpm install
 ```
 
-4. Start project:
+4. Generate Server SSL Cert:
+
+```bash
+pnpm -F server generate-cert
+```
+
+5. Setup Redis instance (**note** you will need docker, docker runtime, and the redis image setup):
+
+```bash
+docker run -d -p 6379:6379 --name myredis redis
+```
+
+6. Start project:
 
 ```bash
 pnpm dev
@@ -49,3 +61,7 @@ To access the following services in your local environment use the following lin
 
 - client - http://localhost:3000
 - server - http://localhost:3001
+
+### FAQ
+
+For more information on the game state and redis see this confluence doc: https://spotispy.atlassian.net/l/cp/Sy0QuvWs
