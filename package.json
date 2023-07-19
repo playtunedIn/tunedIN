@@ -8,12 +8,12 @@
   "scripts": {
     "dev": "concurrently \"pnpm -F server dev\" \"pnpm -F client dev\"",
     "______CI COMMANDS_____________": "",
-    "lint": "pnpm --filter \"...[origin/main]\" --if-present lint",
-    "test": "pnpm --filter \"...[origin/main]\" --if-present test",
+    "lint": "pnpm --filter \"[origin/main]...\" --if-present lint",
+    "test": "pnpm --filter \"[origin/main]...\" --if-present test",
     "______LIFECYCLE COMMANDS______": "",
     "preinstall": "npx only-allow pnpm",
     "postinstall": "git config core.hooksPath ./git-hooks",
-    "git:pre-push": "pnpm --filter \"...[origin/main]\" --if-present git:pre-push"
+    "git:pre-push": "pnpm --filter \"[origin/main]...\" --if-present git:pre-push"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",

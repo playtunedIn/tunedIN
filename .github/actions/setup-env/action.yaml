@@ -4,13 +4,17 @@ runs:
   using: 'composite'
   steps:
     - uses: pnpm/action-setup@v2
-      name: 'Setup PNPM'
+      name: Setup PNPM
       with:
         version: 8
     - uses: actions/setup-node@v3
-      name: 'Setup Node'
+      name: Setup Node
       with:
         node-version: 20
         cache: 'pnpm'
+    - run: git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/origin/main
+      shell: bash
+      name: Setup Monorepo main branch reference
     - run: pnpm install --frozen-lockfile --prefer-offline
       shell: bash
+      name: Install dependencies
