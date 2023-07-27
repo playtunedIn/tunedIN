@@ -22,8 +22,6 @@ const port = process.env.PORT || 3001;
 const app = express();
 app.use(cookieParser());
 
-setupOauthRoutes(app);
-
 const server = https.createServer({ key, cert }, app);
 server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
@@ -32,6 +30,14 @@ server.listen(port, () => {
 server.on('error', err => {
   console.error(err);
 });
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+app.get('/test', function (_: any, res: any) {
+  console.log('test');
+  res.send({ test: 'good' });
+});
+
+setupOauthRoutes(app);
 
 const wsServer = new WebSocketServer({ server });
 
