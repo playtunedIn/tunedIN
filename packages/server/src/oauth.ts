@@ -41,7 +41,6 @@ const stateKey = 'spotify_auth_state';
 export const setupOauthRoutes = (app: any) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   app.get('/login', function (_: any, res: any) {
-    console.log('in login');
     const state = generateRandomString(16);
     res.cookie(stateKey, state);
 
@@ -67,7 +66,6 @@ export const setupOauthRoutes = (app: any) => {
     const code = req.query.code || null;
     const state = req.query.state || null;
     const storedState = req.cookies ? req.cookies[stateKey] : null;
-    console.log({ code, state, storedState });
     if (state === null || state !== storedState) {
       console.log('state mismatch');
       // res.redirect('/#' +
