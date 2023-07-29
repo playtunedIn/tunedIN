@@ -1,29 +1,44 @@
 /// <reference types="vitest" />
 
-import { defineConfig } from 'vite';
+import fs from 'fs';
+import { defineConfig, loadEnv, UserConfig } from 'vite';
 import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 3000,
-  },
-  preview: {
-    port: 3000,
-  },
-  test: {
-    environment: 'jsdom',
-    coverage: {
-      provider: 'istanbul',
-      exclude: [...configDefaults.exclude, '**/__tests__/**', '**/dist/**', '**/public/**'],
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70,
-      reporter: ['lcov', 'json', 'html'],
+export default ({ mode }: UserConfig) => {
+  process.env = { ...process.env, ...loadEnv(mode ?? '', process.cwd()) };
+
+  const isCI = process.env.NODE_ENV === 'ci';
+  const isProd = process.env.NODE_ENV === 'production';
+
+  return defineConfig({
+    plugins: [react()],
+    envDir: 'configs',
+    build: {
+      outDir: `./${process.env.BUILD_PATH}`,
+      sourcemap: true,
+      manifest: true,
     },
-    reporters: ['default'],
-  },
-});
+    server: {
+      https:
+        isCI || isProd
+          ? false
+          : { key: fs.readFileSync('./.cert/private.key'), cert: fs.readFileSync('./.cert/certificate.crt') },
+      port: 8080,
+      strictPort: true,
+    },
+    test: {
+      environment: 'jsdom',
+      coverage: {
+        provider: 'istanbul',
+        exclude: [...configDefaults.exclude, '**/__tests__/**', '**/dist/**', '**/public/**'],
+        branches: 70,
+        functions: 70,
+        lines: 70,
+        statements: 70,
+        reporter: ['lcov', 'json', 'html'],
+      },
+      reporters: ['default'],
+    },
+  });
+};

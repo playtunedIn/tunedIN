@@ -11,6 +11,9 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+
+# Ignore anthing that ends in .env (backend) or anything that ends in .local (ie: .env.local) (frontend)
+*.env
 *.local
 
 # Editor directories and files
@@ -23,5 +26,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-.env

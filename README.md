@@ -34,10 +34,10 @@ cd SpotiSpy
 pnpm install
 ```
 
-4. Generate Server SSL Cert:
+4. Generate Server SSL Certs:
 
 ```bash
-pnpm -F server generate-cert
+pnpm generate-certs
 ```
 
 5. Setup Redis instance (**note** you will need docker, docker runtime, and the redis image setup):
