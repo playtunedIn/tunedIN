@@ -1,0 +1,16 @@
+name: TunedIn CI
+
+on: pull_request
+
+jobs:
+  Unit-Tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout Branch
+      - uses: ./.github/actions/setup-env
+        name: Setup Environment
+      - run: pnpm test
+        shell: bash
+        name: Run Unit Tests

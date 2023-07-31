@@ -12,8 +12,8 @@ import { messageHandler } from './handlers/message-handler';
 import { validatorInit } from './handlers/message.validator';
 import { unsubscribeChannel } from './clients/redis/redis-client';
 
-const key = readFileSync('./.cert/private.key');
-const cert = readFileSync('./.cert/certificate.crt');
+const key = readFileSync('./.cert/server.key');
+const cert = readFileSync('./.cert/server.crt');
 
 validatorInit();
 

@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --mode=dev --host=local.tunedin-test.com",
+    "dev": "vite --mode=dev --host=local.playtunedin-test.com",
     "build": "vite build --mode=prod",
-    "start": "vite preview --mode=prod --host=local.tunedin-test.com",
+    "start": "vite preview --mode=prod --host=local.playtunedin-test.com",
     "______TESTING_________________": "",
     "test": "vitest run --coverage=false",
     "test:coverage": "vitest run --coverage=true",

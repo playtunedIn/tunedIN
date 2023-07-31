@@ -24,7 +24,7 @@ export default ({ mode }: UserConfig) => {
       https:
         isCI || isProd
           ? false
-          : { key: fs.readFileSync('./.cert/private.key'), cert: fs.readFileSync('./.cert/certificate.crt') },
+          : { key: fs.readFileSync('./.cert/server.key'), cert: fs.readFileSync('./.cert/server.crt') },
       port: 8080,
       strictPort: true,
     },

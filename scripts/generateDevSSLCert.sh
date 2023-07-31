@@ -18,7 +18,8 @@ LOCAL_CERT_PATH=$CWD/.cert
 CERT_NAME='localhost (Dev SSL Cert)'
 ORG_NAME='TunedIN Test'
 
-DNS_1='local.tunedin-test.com'
+DNS_1='playtunedin-test.com'
+DNS_2='local.playtunedin-test.com'
 
 # Ask user permission to run the script
 CONTINUE="n/a"
@@ -112,6 +113,7 @@ subjectAltName = @alt_names
 [alt_names]
 DNS.1 = localhost
 DNS.2 = $DNS_1
+DNS.3 = $DNS_2
 EOM
 printf '✅\n'
 
