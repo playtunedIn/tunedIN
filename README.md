@@ -59,7 +59,7 @@ Spotify data. Follow the on-screen instructions to play the game and have fun!
 
 To access the following services in your local environment use the following links:
 
-- client - http://localhost:3000
+- client - http://localhost:8080
 - server - http://localhost:3001
 
 ### FAQ

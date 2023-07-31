@@ -1,6 +1,7 @@
 /// <reference types="vitest" />
 
 import fs from 'fs';
+import path from 'path';
 import { defineConfig, loadEnv, UserConfig } from 'vite';
 import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
@@ -30,7 +31,7 @@ export default ({ mode }: UserConfig) => {
     test: {
       environment: 'jsdom',
       coverage: {
-        provider: 'istanbul',
+        provider: 'v8',
         exclude: [...configDefaults.exclude, '**/__tests__/**', '**/dist/**', '**/public/**'],
         branches: 70,
         functions: 70,
@@ -39,6 +40,16 @@ export default ({ mode }: UserConfig) => {
         reporter: ['lcov', 'json', 'html'],
       },
       reporters: ['default'],
+      setupFiles: './setup-tests.ts',
+    },
+    resolve: {
+      alias: {
+        src: path.resolve(__dirname, './src'),
+        '@assets': path.resolve(__dirname, './src/assets'),
+        '@components': path.resolve(__dirname, './src/components'),
+        '@hooks': path.resolve(__dirname, './src/hooks'),
+        '@testing': path.resolve(__dirname, './src/testing'),
+      },
     },
   });
 };

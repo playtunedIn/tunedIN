@@ -16,7 +16,7 @@
       object-src 'none';
       media-src 'self';
       frame-src 'none';
-      connect-src 'self';
+      connect-src 'self' https://%VITE_BACKEND_HOST% wss://%VITE_BACKEND_HOST%;
       form-action 'self';
       base-uri 'self';
       child-src 'self';

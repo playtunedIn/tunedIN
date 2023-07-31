@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     coverage: {
-      provider: 'istanbul',
+      provider: 'v8',
       exclude: [...configDefaults.exclude, '**/__tests__/**', '**/dist/**'],
       branches: 70,
       functions: 70,

@@ -39,7 +39,10 @@
     },
     {
       "files": ["__tests__/**", "*.test.*"],
-      "env": { "es6": true }
+      "env": { "es6": true },
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+      }
     }
   ],
   "ignorePatterns": ["build/", "coverage/", "dist/", "legacy-types/", "node_modules/"]

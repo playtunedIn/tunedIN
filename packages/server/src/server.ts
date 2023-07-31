@@ -39,7 +39,7 @@ app.get('/test', function (_: any, res: any) {
 
 setupOauthRoutes(app);
 
-const wsServer = new WebSocketServer({ server });
+const wsServer = new WebSocketServer({ server, path: '/ws/multiplayer' });
 
 wsServer.on('connection', (ws: WebSocket) => {
   ws.on('message', (data: string) => {
