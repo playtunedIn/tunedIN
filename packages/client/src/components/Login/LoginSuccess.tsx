@@ -11,19 +11,22 @@ export const Login = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setToken(params.get('access_token')?.toString());
+    const encodedToken = params.get('token')?.toString();
+    setToken(encodedToken);
   }, []);
   useEffect(() => {
     const fetchMe = async () => {
-      const accessResponse = await fetch('https://api.spotify.com/v1/me', {
+      const accessResponse = await fetch('https://localhost:3001/self', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       const body = await accessResponse.json();
-      setUser(body);
+      setUser(body.user);
     };
-    fetchMe();
+    if (token) {
+      fetchMe();
+    }
   }, [token]);
   return (
     <>

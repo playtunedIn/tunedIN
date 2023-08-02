@@ -6,18 +6,28 @@
  * For more information, read
  * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
  */
+/* https://www.digitalocean.com/community/tutorials/nodejs-jwt-expressjs */
 
 import querystring from 'querystring';
 import fetch from 'node-fetch';
+import jwt from 'jsonwebtoken';
+import { encrypt } from './authenticate';
+import { getSelf } from '../clients/spotispy/spotify-client';
 
 const CLIENT_ID = process.env.CLIENT_ID || ''; // Your client id
 const CLIENT_SECRET = process.env.CLIENT_SECRET || ''; // Your secret
+const JWT_SIGNING_HASH = process.env.JWT_SIGNING_HASH || '';
 const REDIRECT_URI = process.env.REDIRECT_URI || ''; // Your redirect uri
 const POST_LOGIN_URL = process.env.POST_LOGIN_URL || ''; // After success auth
+
+const stateKey = 'spotify_auth_state';
 
 type OauthResponse = {
   access_token: string;
   refresh_token: string;
+  token_type: string;
+  expires_in: number;
+  scope: string;
 };
 
 /**
@@ -35,7 +45,10 @@ const generateRandomString = function (length: number) {
   return text;
 };
 
-const stateKey = 'spotify_auth_state';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function generateAccessToken(data: Record<any, any>, expirySeconds: number): string {
+  return jwt.sign(data, JWT_SIGNING_HASH, { expiresIn: `${expirySeconds}s` });
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const setupOauthRoutes = (app: any) => {
@@ -89,23 +102,31 @@ export const setupOauthRoutes = (app: any) => {
       const tokenResponse = await fetch('https://accounts.spotify.com/api/token', authOptions);
       if (tokenResponse.status === 200) {
         const body = (await tokenResponse.json()) as OauthResponse;
+        console.log(tokenResponse);
         const access_token = body.access_token;
 
-        // use the access token to access the Spotify Web API
-        // const options = {
-        //     method: "GET",
-        //     headers: { 'Authorization': 'Bearer ' + access_token },
-        //     json: true
-        // };
-        //const accessResponse = await fetch('https://api.spotify.com/v1/me', options)
+        const profileBody = await getSelf(access_token);
+        console.log({ profileBody });
+        console.log({ body });
 
-        // we can also pass the token to the browser to make requests from there
-        console.log({ access_token });
-        // TODO: store token in DB, don't pass to client
+        const encryptedAccessToken = encrypt(access_token);
+        const encryptedRefreshToken = encrypt(body.refresh_token);
+        const jwt = generateAccessToken(
+          {
+            spotifyToken: encryptedAccessToken,
+            refresh: encryptedRefreshToken,
+            userId: profileBody.uri,
+            name: profileBody.display_name,
+          },
+          body.expires_in
+        );
+
+        console.log({ jwt });
+
         res.redirect(
           POST_LOGIN_URL +
             querystring.stringify({
-              access_token: access_token,
+              token: jwt,
             })
         );
       } else {

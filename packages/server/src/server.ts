@@ -3,14 +3,17 @@ import dotenv from 'dotenv';
 dotenv.config();
 import cookieParser from 'cookie-parser';
 import express from 'express';
+import cors from 'cors';
 import { WebSocket, WebSocketServer } from 'ws';
 import https from 'https';
 import { readFileSync } from 'fs';
 
-import { setupOauthRoutes } from './oauth';
+import { setupOauthRoutes } from './auth/oauth';
 import { messageHandler } from './handlers/message-handler';
 import { validatorInit } from './handlers/message.validator';
 import { unsubscribeChannel } from './clients/redis/redis-client';
+import { authenticateToken } from './auth/authenticate';
+import { getSelf } from './clients/spotispy/spotify-client';
 
 const key = readFileSync('./.cert/server.key');
 const cert = readFileSync('./.cert/server.crt');
@@ -21,6 +24,7 @@ const port = process.env.PORT || 3001;
 
 const app = express();
 app.use(cookieParser());
+app.use(cors({ origin: 'http://localhost:3000' }));
 
 const server = https.createServer({ key, cert }, app);
 server.listen(port, () => {
@@ -35,6 +39,13 @@ server.on('error', err => {
 app.get('/test', function (_: any, res: any) {
   console.log('test');
   res.send({ test: 'good' });
+});
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+app.get('/self', authenticateToken, async function (req: any, res: any) {
+  const user = await getSelf(req.token);
+  console.log({ user });
+  res.send({ user });
 });
 
 setupOauthRoutes(app);
