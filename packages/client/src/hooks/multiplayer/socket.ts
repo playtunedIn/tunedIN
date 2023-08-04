@@ -1,8 +1,10 @@
 import { useContext } from 'react';
+
 import { SocketContext } from './MultiplayerProvider';
+import { SOCKET_READY_STATES } from './handlers/socket-handlers.constants';
 
 export const useSocket = () => {
-  const socket = useContext(SocketContext);
+  const { socket, status, setStatus } = useContext(SocketContext);
 
   const sendMessage = (message: Record<string, unknown>) => {
     let messageStr: string;
@@ -20,7 +22,14 @@ export const useSocket = () => {
     }
   };
 
+  const closeConnection = () => {
+    setStatus(SOCKET_READY_STATES.CLOSING);
+    socket.close();
+  };
+
   return {
+    status,
     sendMessage,
+    closeConnection,
   };
 };

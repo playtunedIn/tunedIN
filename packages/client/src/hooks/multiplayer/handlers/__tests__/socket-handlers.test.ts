@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as MockWebSocketWrapper from '../../websocket-wrapper';
 import * as MockUseSocketMessageHandlers from '../socket-message-handlers';
 import { useSocketHandlers } from '../socket-handlers';
+import { SOCKET_READY_STATES } from '../socket-handlers.constants';
 
 const originalConsoleError = console.error;
 
@@ -18,55 +19,73 @@ describe('Socket Handlers', () => {
     vi.restoreAllMocks();
   });
 
-  it('should call console error (onError)', () => {
-    const { onError } = useSocketHandlers(vi.fn());
+  describe('onOpen', () => {
+    it('should call console error (onError)', () => {
+      const socketReadySpy = vi.fn();
+      const { onOpen } = useSocketHandlers(vi.fn(), socketReadySpy);
 
-    onError(new Event('TestSocketError'));
+      onOpen();
 
-    expect(console.error).toHaveBeenCalled();
+      expect(socketReadySpy).toHaveBeenCalledWith(SOCKET_READY_STATES.OPEN);
+    });
   });
 
-  it('should recreate websocket session (onClose)', () => {
-    const { onClose } = useSocketHandlers(vi.fn());
+  describe('onError', () => {
+    it('should call console error (onError)', () => {
+      const { onError } = useSocketHandlers(vi.fn(), vi.fn());
 
-    onClose();
-    vi.runAllTimers();
+      onError(new Event('TestSocketError'));
 
-    expect(MockWebSocketWrapper.WebSocketWrapper).toHaveBeenCalled();
+      expect(console.error).toHaveBeenCalled();
+    });
   });
 
-  it('should error when JSON is non-parsable', () => {
-    const { onMessage } = useSocketHandlers(vi.fn());
+  describe('onClose', () => {
+    it('should recreate websocket session (onClose)', () => {
+      const { onClose, onError } = useSocketHandlers(vi.fn(), vi.fn());
 
-    const message = new MessageEvent('message', { data: 'not a parsable string' });
-    onMessage(message);
+      onError(new Event('TestSocketError'));
+      onClose();
+      vi.runAllTimers();
 
-    expect(console.error).toHaveBeenCalled();
+      expect(MockWebSocketWrapper.WebSocketWrapper).toHaveBeenCalled();
+    });
   });
 
-  it('should error when unknown handler type', () => {
-    const { onMessage } = useSocketHandlers(vi.fn());
+  describe('onMessage', () => {
+    it('should error when JSON is non-parsable', () => {
+      const { onMessage } = useSocketHandlers(vi.fn(), vi.fn());
 
-    const messageData = { type: 'unknownMessage' };
-    const message = new MessageEvent('message', { data: JSON.stringify(messageData) });
-    onMessage(message);
+      const message = new MessageEvent('message', { data: 'not a parsable string' });
+      onMessage(message);
 
-    expect(console.error).toHaveBeenCalled();
-  });
+      expect(console.error).toHaveBeenCalled();
+    });
 
-  it('should call the correct message handler', () => {
-    const createRoomResponseSpy = vi.fn();
-    vi.spyOn(MockUseSocketMessageHandlers, 'useSocketMessageHandlers').mockImplementation(() => ({
-      messageHandlers: {
-        createRoomResponse: createRoomResponseSpy,
-      } as any,
-    }));
-    const { onMessage } = useSocketHandlers(vi.fn());
+    it('should error when unknown handler type', () => {
+      const { onMessage } = useSocketHandlers(vi.fn(), vi.fn());
 
-    const messageData = { type: 'createRoomResponse', data: { roomId: 'test' } };
-    const message = new MessageEvent('message', { data: JSON.stringify(messageData) });
-    onMessage(message);
+      const messageData = { type: 'unknownMessage' };
+      const message = new MessageEvent('message', { data: JSON.stringify(messageData) });
+      onMessage(message);
 
-    expect(createRoomResponseSpy).toHaveBeenCalled();
+      expect(console.error).toHaveBeenCalled();
+    });
+
+    it('should call the correct message handler', () => {
+      const createRoomResponseSpy = vi.fn();
+      vi.spyOn(MockUseSocketMessageHandlers, 'useSocketMessageHandlers').mockImplementation(() => ({
+        messageHandlers: {
+          createRoomResponse: createRoomResponseSpy,
+        } as any,
+      }));
+      const { onMessage } = useSocketHandlers(vi.fn(), vi.fn());
+
+      const messageData = { type: 'createRoomResponse', data: { roomId: 'test' } };
+      const message = new MessageEvent('message', { data: JSON.stringify(messageData) });
+      onMessage(message);
+
+      expect(createRoomResponseSpy).toHaveBeenCalled();
+    });
   });
 });

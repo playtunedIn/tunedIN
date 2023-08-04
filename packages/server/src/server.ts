@@ -51,4 +51,8 @@ wsServer.on('connection', (ws: WebSocket) => {
       unsubscribeChannel(ws.channelListener);
     }
   });
+
+  ws.on('close', () => {
+    ws.close();
+  });
 });

@@ -17,12 +17,11 @@ describe('Multiplayer Client', () => {
   });
 
   it('should send exitRoom message', () => {
-    const resultStr = JSON.stringify({ type: 'exitRoom', data: { roomId: 'test' } });
     const { result, unmount } = renderHook(() => useMultiplayerClient(), { wrapper });
 
     result.current.exitRoom();
 
-    expect(MockWebSocketWrapper.prototype.send).toHaveBeenCalledWith(resultStr);
+    expect(MockWebSocketWrapper.prototype.close).toHaveBeenCalled();
     unmount();
   });
 });

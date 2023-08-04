@@ -4,7 +4,7 @@ import { useSocket } from './socket';
  * This can only be called from a component within the context of the MultiplayerProvider
  */
 export const useMultiplayerClient = () => {
-  const { sendMessage } = useSocket();
+  const { closeConnection, sendMessage, status } = useSocket();
 
   const createRoom = () => {
     // TODO: Implement in SPOT-46
@@ -13,10 +13,11 @@ export const useMultiplayerClient = () => {
 
   const exitRoom = () => {
     // TODO: Implement in SPOT-49
-    sendMessage({ type: 'exitRoom', data: { roomId: 'test' } });
+    closeConnection();
   };
 
   return {
+    connectionStatus: status,
     createRoom,
     exitRoom,
   };

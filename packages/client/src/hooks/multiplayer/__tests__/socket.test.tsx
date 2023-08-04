@@ -51,4 +51,15 @@ describe('Socket', () => {
       unmount();
     });
   });
+
+  describe('closeConnection', () => {
+    it('should close connection', () => {
+      const { result, unmount } = renderHook(() => useSocket(), { wrapper });
+
+      act(() => result.current.closeConnection());
+
+      expect(MockWebSocketWrapper.prototype.close).toHaveBeenCalled();
+      unmount();
+    });
+  });
 });
