@@ -1,13 +1,11 @@
-import { ReactElement, createContext, useEffect, useState } from 'react';
+import type { PropsWithChildren } from 'react';
+import { createContext, useEffect, useState } from 'react';
 
 import { createSocket, useSocketHandlers } from './handlers/socket-handlers';
-import { SOCKET_READY_STATES, SocketReadyState } from './handlers/socket-handlers.constants';
+import type { SocketReadyState } from './handlers/socket-handlers.constants';
+import { SOCKET_READY_STATES } from './handlers/socket-handlers.constants';
 
 const _socket = createSocket();
-
-interface MultiplayerProviderProps {
-  children: ReactElement;
-}
 
 interface SocketContextValues {
   socket: WebSocket;
@@ -25,7 +23,7 @@ export const SocketContext = createContext<SocketContextValues>({
 /**
  * Creates a socket and shares that socket with any multiplayer client within its context
  */
-const MultiplayerProvider = ({ children }: MultiplayerProviderProps) => {
+const MultiplayerProvider = ({ children }: PropsWithChildren) => {
   const [socket, setSocket] = useState(_socket);
 
   // We don't have reactivity around socket.readyState so need to create our own

@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { renderHook } from '@testing-library/react';
 
+import { wrapMultiplayerProvider } from '@testing/helpers/multiplayer-helpers';
 import * as MockWebSocketWrapper from '../../websocket-wrapper';
 import * as MockUseSocketMessageHandlers from '../socket-message-handlers';
 import { useSocketHandlers } from '../socket-handlers';
@@ -22,54 +24,69 @@ describe('Socket Handlers', () => {
   describe('onOpen', () => {
     it('should call console error (onError)', () => {
       const socketReadySpy = vi.fn();
-      const { onOpen } = useSocketHandlers(vi.fn(), socketReadySpy);
+      const { result, unmount } = renderHook(() => useSocketHandlers(vi.fn(), socketReadySpy), {
+        wrapper: wrapMultiplayerProvider(),
+      });
 
-      onOpen();
+      result.current.onOpen();
 
       expect(socketReadySpy).toHaveBeenCalledWith(SOCKET_READY_STATES.OPEN);
+      unmount();
     });
   });
 
   describe('onError', () => {
     it('should call console error (onError)', () => {
-      const { onError } = useSocketHandlers(vi.fn(), vi.fn());
+      const { result, unmount } = renderHook(() => useSocketHandlers(vi.fn(), vi.fn()), {
+        wrapper: wrapMultiplayerProvider(),
+      });
 
-      onError(new Event('TestSocketError'));
+      result.current.onError(new Event('TestSocketError'));
 
       expect(console.error).toHaveBeenCalled();
+      unmount();
     });
   });
 
   describe('onClose', () => {
     it('should recreate websocket session (onClose)', () => {
-      const { onClose, onError } = useSocketHandlers(vi.fn(), vi.fn());
+      const { result, unmount } = renderHook(() => useSocketHandlers(vi.fn(), vi.fn()), {
+        wrapper: wrapMultiplayerProvider(),
+      });
 
-      onError(new Event('TestSocketError'));
-      onClose();
+      result.current.onError(new Event('TestSocketError'));
+      result.current.onClose();
       vi.runAllTimers();
 
       expect(MockWebSocketWrapper.WebSocketWrapper).toHaveBeenCalled();
+      unmount();
     });
   });
 
   describe('onMessage', () => {
     it('should error when JSON is non-parsable', () => {
-      const { onMessage } = useSocketHandlers(vi.fn(), vi.fn());
+      const { result, unmount } = renderHook(() => useSocketHandlers(vi.fn(), vi.fn()), {
+        wrapper: wrapMultiplayerProvider(),
+      });
 
       const message = new MessageEvent('message', { data: 'not a parsable string' });
-      onMessage(message);
+      result.current.onMessage(message);
 
       expect(console.error).toHaveBeenCalled();
+      unmount();
     });
 
     it('should error when unknown handler type', () => {
-      const { onMessage } = useSocketHandlers(vi.fn(), vi.fn());
+      const { result, unmount } = renderHook(() => useSocketHandlers(vi.fn(), vi.fn()), {
+        wrapper: wrapMultiplayerProvider(),
+      });
 
       const messageData = { type: 'unknownMessage' };
       const message = new MessageEvent('message', { data: JSON.stringify(messageData) });
-      onMessage(message);
+      result.current.onMessage(message);
 
       expect(console.error).toHaveBeenCalled();
+      unmount();
     });
 
     it('should call the correct message handler', () => {
@@ -79,13 +96,16 @@ describe('Socket Handlers', () => {
           createRoomResponse: createRoomResponseSpy,
         } as any,
       }));
-      const { onMessage } = useSocketHandlers(vi.fn(), vi.fn());
+      const { result, unmount } = renderHook(() => useSocketHandlers(vi.fn(), vi.fn()), {
+        wrapper: wrapMultiplayerProvider(),
+      });
 
       const messageData = { type: 'createRoomResponse', data: { roomId: 'test' } };
       const message = new MessageEvent('message', { data: JSON.stringify(messageData) });
-      onMessage(message);
+      result.current.onMessage(message);
 
       expect(createRoomResponseSpy).toHaveBeenCalled();
+      unmount();
     });
   });
 });

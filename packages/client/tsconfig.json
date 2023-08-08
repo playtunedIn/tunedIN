@@ -25,11 +25,14 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "src/*": ["./src/*"],
       "@assets/*": ["./src/assets/*"],
       "@components/*": ["./src/components/*"],
       "@hooks/*": ["./src/hooks/*"],
-      "@testing/*": ["src/testing/*"]
+      "@store/*": ["./src/store/*"],
+      "@testing/*": ["./src/testing/*"],
+
+      // Catch-all/root alias (keep at bottom)
+      "src/*": ["./src/*"]
     }
   },
   "exclude": ["node_modules"],
