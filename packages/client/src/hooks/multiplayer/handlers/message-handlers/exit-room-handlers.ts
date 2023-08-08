@@ -2,6 +2,9 @@
  * TODO: These types are not accurate. Implement exit room handler in SPOT-49
  */
 
+import { useAppDispatch } from '@hooks/store/app-store';
+import { updateRoomId } from '@store/multiplayer/room-slice';
+
 interface ExitRoomResponse {
   roomId: string;
 }
@@ -11,8 +14,10 @@ interface ExitRoomErrorResponse {
 }
 
 export const useExitRoomResponseHandlers = () => {
+  const dispatch = useAppDispatch();
+
   const exitRoomResponseHandler = (data: ExitRoomResponse) => {
-    console.log(data);
+    dispatch(updateRoomId(data.roomId));
   };
 
   const exitRoomErrorResponseHandler = (data: ExitRoomErrorResponse) => {

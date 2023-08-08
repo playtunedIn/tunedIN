@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
-import { multiplayerProviderWrapper as wrapper } from '@testing/helpers/multiplayer-helpers';
+import { wrapMultiplayerProvider } from '@testing/helpers/multiplayer-helpers';
 import { WebSocketWrapper as MockWebSocketWrapper } from '../websocket-wrapper';
 import { useMultiplayerClient } from '..';
 
 describe('Multiplayer Client', () => {
   it('should send createRoom message', () => {
     const resultStr = JSON.stringify({ type: 'createRoom', data: { roomId: 'test' } });
-    const { result, unmount } = renderHook(() => useMultiplayerClient(), { wrapper });
+    const { result, unmount } = renderHook(() => useMultiplayerClient(), { wrapper: wrapMultiplayerProvider() });
 
     result.current.createRoom();
 
@@ -17,7 +17,7 @@ describe('Multiplayer Client', () => {
   });
 
   it('should send exitRoom message', () => {
-    const { result, unmount } = renderHook(() => useMultiplayerClient(), { wrapper });
+    const { result, unmount } = renderHook(() => useMultiplayerClient(), { wrapper: wrapMultiplayerProvider() });
 
     result.current.exitRoom();
 

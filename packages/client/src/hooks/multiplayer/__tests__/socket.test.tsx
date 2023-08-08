@@ -1,7 +1,8 @@
-import { Mock, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 
-import { multiplayerProviderWrapper as wrapper } from '@testing/helpers/multiplayer-helpers';
+import { wrapMultiplayerProvider } from '@testing/helpers/multiplayer-helpers';
 import { useSocket } from '../socket';
 import { WebSocketWrapper as MockWebSocketWrapper } from '../websocket-wrapper';
 
@@ -19,7 +20,7 @@ describe('Socket', () => {
 
   describe('sendMessage', () => {
     it('should error for non-stringable data', () => {
-      const { result, unmount } = renderHook(() => useSocket(), { wrapper });
+      const { result, unmount } = renderHook(() => useSocket(), { wrapper: wrapMultiplayerProvider() });
 
       const message: Record<string, unknown> = {};
       message.circularRef = message;
@@ -34,7 +35,7 @@ describe('Socket', () => {
         throw new Error('test');
       });
 
-      const { result, unmount } = renderHook(() => useSocket(), { wrapper });
+      const { result, unmount } = renderHook(() => useSocket(), { wrapper: wrapMultiplayerProvider() });
 
       act(() => result.current.sendMessage({}));
 
@@ -43,7 +44,7 @@ describe('Socket', () => {
     });
 
     it('should send message', () => {
-      const { result, unmount } = renderHook(() => useSocket(), { wrapper });
+      const { result, unmount } = renderHook(() => useSocket(), { wrapper: wrapMultiplayerProvider() });
 
       act(() => result.current.sendMessage({}));
 
@@ -54,7 +55,7 @@ describe('Socket', () => {
 
   describe('closeConnection', () => {
     it('should close connection', () => {
-      const { result, unmount } = renderHook(() => useSocket(), { wrapper });
+      const { result, unmount } = renderHook(() => useSocket(), { wrapper: wrapMultiplayerProvider() });
 
       act(() => result.current.closeConnection());
 

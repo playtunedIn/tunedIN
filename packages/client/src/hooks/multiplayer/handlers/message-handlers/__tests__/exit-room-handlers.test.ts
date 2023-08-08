@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { renderHook } from '@testing-library/react';
 
+import { setupStore } from '@store/store';
+import { wrapMultiplayerProvider } from '@testing/helpers/multiplayer-helpers';
 import { useExitRoomResponseHandlers } from '../exit-room-handlers';
 
 const originalConsoleLog = console.log;
@@ -18,16 +21,26 @@ describe('Create Room Handlers', () => {
   });
 
   it('should call console log', () => {
-    const { exitRoomResponseHandler } = useExitRoomResponseHandlers();
+    const store = setupStore();
+    const { result, unmount } = renderHook(() => useExitRoomResponseHandlers(), {
+      wrapper: wrapMultiplayerProvider({ store }),
+    });
 
-    exitRoomResponseHandler({ roomId: 'test' });
-    expect(console.log).toHaveBeenCalled();
+    result.current.exitRoomResponseHandler({ roomId: 'test' });
+
+    expect(store.getState().room.roomId).toEqual('test');
+    unmount();
   });
 
   it('should call console error', () => {
-    const { exitRoomErrorResponseHandler } = useExitRoomResponseHandlers();
+    const store = setupStore();
+    const { result, unmount } = renderHook(() => useExitRoomResponseHandlers(), {
+      wrapper: wrapMultiplayerProvider({ store }),
+    });
 
-    exitRoomErrorResponseHandler({ errorCode: 'test' });
+    result.current.exitRoomErrorResponseHandler({ errorCode: 'test' });
+
     expect(console.error).toHaveBeenCalled();
+    unmount();
   });
 });

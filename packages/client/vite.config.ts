@@ -2,6 +2,7 @@
 
 import fs from 'fs';
 import path from 'path';
+
 import { defineConfig, loadEnv, UserConfig } from 'vite';
 import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
@@ -44,11 +45,14 @@ export default ({ mode }: UserConfig) => {
     },
     resolve: {
       alias: {
-        src: path.resolve(__dirname, './src'),
         '@assets': path.resolve(__dirname, './src/assets'),
         '@components': path.resolve(__dirname, './src/components'),
         '@hooks': path.resolve(__dirname, './src/hooks'),
+        '@store': path.resolve(__dirname, './src/store'),
         '@testing': path.resolve(__dirname, './src/testing'),
+
+        // Catch-all/root alias (keep at bottom)
+        src: path.resolve(__dirname, './src'),
       },
     },
   });
