@@ -8,7 +8,7 @@ import { GameState, PlayerState } from 'src/clients/redis/models/game-state';
 
 export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   if (!isValidJoinRoomReq(data)) {
-    return ws.send('Error');
+    return ws.send('Error: Invalid Room Req');
   }
 
   const gameStateJson = await getValue(data.roomId);
@@ -18,8 +18,12 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   }
   const gameState: GameState = JSON.parse(gameStateJson);
 
+  if (gameState.players.length >= 4) {
+    return ws.send('Room is full. Unable to join.');
+  }
+
   if (gameState.players.some(player => player.playerId === data.playerId)) {
-    return ws.send('Player with ID ${data.playerId} is already in the room');
+    return ws.send(`Player: ${data.playerId}, is already in the room.`);
   }
 
   const newPlayer: PlayerState = {
@@ -30,7 +34,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
 
   gameState.players.push(newPlayer);
 
-  if (gameState.players.length === 0) {
+  if (gameState.players.length === 1) {
     gameState.host = newPlayer.playerId;
   }
 
@@ -39,6 +43,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   await setValue(gameState.roomId, gameStateStr);
   await publishChannel(gameState.roomId, gameStateStr);
   await subscribeGameHandler(ws, gameState.roomId);
+  ws.send(`Joined Room: ${data.roomId}`);
 };
 
 const isValidJoinRoomReq = (data: JoinRoomReq) => {
