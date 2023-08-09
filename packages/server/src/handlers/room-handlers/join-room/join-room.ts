@@ -44,6 +44,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   await publishChannel(gameState.roomId, gameStateStr);
   await subscribeGameHandler(ws, gameState.roomId);
   ws.send(`Joined Room: ${data.roomId}`);
+  ws.send(`Room Information: ${gameStateStr}`);
 };
 
 const isValidJoinRoomReq = (data: JoinRoomReq) => {
