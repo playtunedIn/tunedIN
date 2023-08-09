@@ -12,8 +12,8 @@ import { messageHandler } from './handlers/message-handler';
 import { validatorInit } from './handlers/message.validator';
 import { unsubscribeChannel } from './clients/redis/redis-client';
 
-const key = readFileSync('./.cert/private.key');
-const cert = readFileSync('./.cert/certificate.crt');
+const key = readFileSync('./.cert/server.key');
+const cert = readFileSync('./.cert/server.crt');
 
 validatorInit();
 
@@ -39,7 +39,7 @@ app.get('/test', function (_: any, res: any) {
 
 setupOauthRoutes(app);
 
-const wsServer = new WebSocketServer({ server });
+const wsServer = new WebSocketServer({ server, path: '/ws/multiplayer' });
 
 wsServer.on('connection', (ws: WebSocket) => {
   ws.on('message', (data: string) => {
@@ -50,5 +50,9 @@ wsServer.on('connection', (ws: WebSocket) => {
     if (ws.channelListener) {
       unsubscribeChannel(ws.channelListener);
     }
+  });
+
+  ws.on('close', () => {
+    ws.close();
   });
 });

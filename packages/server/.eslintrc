@@ -4,7 +4,9 @@
   "parser": "@typescript-eslint/parser",
   "env": { "es2020": true, "node": true },
   "parserOptions": { "ecmaVersion": "latest", "sourceType": "module" },
-  "rules": {},
+  "rules": {
+    "@typescript-eslint/consistent-type-imports": "error"
+  },
   "overrides": [
     {
       "files": ["**/*.ts", "**/*.tsx"],
@@ -16,7 +18,10 @@
     },
     {
       "files": ["__tests__/**", "*.test.*"],
-      "env": { "es6": true }
+      "env": { "es6": true },
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+      }
     }
   ],
   "ignorePatterns": ["build/", "coverage/", "dist/", "legacy-types/", "node_modules/"]

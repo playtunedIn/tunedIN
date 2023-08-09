@@ -34,10 +34,10 @@ cd SpotiSpy
 pnpm install
 ```
 
-4. Generate Server SSL Cert:
+4. Generate Server SSL Certs:
 
 ```bash
-pnpm -F server generate-cert
+pnpm generate-certs
 ```
 
 5. Setup Redis instance (**note** you will need docker, docker runtime, and the redis image setup):
@@ -59,7 +59,7 @@ Spotify data. Follow the on-screen instructions to play the game and have fun!
 
 To access the following services in your local environment use the following links:
 
-- client - http://localhost:3000
+- client - http://localhost:8080
 - server - http://localhost:3001
 
 ### FAQ
