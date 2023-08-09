@@ -19,7 +19,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   const gameState: GameState = JSON.parse(gameStateJson);
 
   if (gameState.players.length >= 4) {
-    return ws.send('Room is full. Unable to join.');
+    return ws.send('Unable to join, room is full.');
   }
 
   if (gameState.players.some(player => player.playerId === data.playerId)) {
@@ -43,12 +43,12 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   await setValue(gameState.roomId, gameStateStr);
   await publishChannel(gameState.roomId, gameStateStr);
   await subscribeGameHandler(ws, gameState.roomId);
+
   ws.send(`Joined Room: ${data.roomId}`);
   ws.send(`Room Information: ${gameStateStr}`);
 };
 
 const isValidJoinRoomReq = (data: JoinRoomReq) => {
   const validate = validator.getSchema<JoinRoomReq>(JOIN_ROOM_SCHEMA_NAME);
-
   return Boolean(validate?.(data));
 };
