@@ -4,12 +4,12 @@
         {
             "Effect": "Allow",
             "Principal": {
-                "Federated": "arn:aws:iam::<ACCOUNT_NUMBER>:oidc-provider/token.actions.githubusercontent.com"
+                "Federated": "arn:aws:iam::078744127834:oidc-provider/token.actions.githubusercontent.com"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
                 "StringLike": {
-                    "token.actions.githubusercontent.com:sub": "repo:<GITHUB_USERNAME/REPO_NAME>:*"
+                    "token.actions.githubusercontent.com:sub": "repo:eyeofthezeiger/Spotispy:*"
                 }
             }
         }
