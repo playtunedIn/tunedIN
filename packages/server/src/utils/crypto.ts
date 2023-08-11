@@ -1,27 +1,10 @@
-import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
 const secret = process.env.JWT_SIGNING_HASH || '';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const authenticateToken = (req: any, res: any, next: () => void) => {
-  const authHeader = req.headers['authorization'] || req.headers['Authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  console.log({ authHeader, token });
-  if (token == null) return res.sendStatus(401);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  jwt.verify(token, process.env.JWT_SIGNING_HASH as string, (err: any, user: any) => {
-    console.log(err, user);
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    req.token = decrypt(user.spotifyToken);
-    console.log(req.token);
-    next();
-  });
-};
-
-export const encrypt = (plainText: string): string => {
+if (secret === '') {
+  throw new Error('JWT_SIGNING_HASH not found');
+}
+export const encrypt = (plainText: string): string | undefined => {
   try {
     const iv = crypto.randomBytes(16);
     const key = crypto.createHash('sha256').update(secret).digest('base64').substr(0, 32);
@@ -33,10 +16,10 @@ export const encrypt = (plainText: string): string => {
   } catch (error) {
     console.log(error);
   }
-  return '';
+  return undefined;
 };
 
-export const decrypt = (encryptedText: string) => {
+export const decrypt = (encryptedText: string): string | undefined => {
   try {
     const textParts = encryptedText.split(':');
     const firstPart = textParts.shift() || '';
@@ -52,5 +35,5 @@ export const decrypt = (encryptedText: string) => {
   } catch (error) {
     console.log(error);
   }
-  return '';
+  return undefined;
 };

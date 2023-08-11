@@ -11,8 +11,9 @@
 import querystring from 'querystring';
 import fetch from 'node-fetch';
 import jwt from 'jsonwebtoken';
-import { encrypt } from './authenticate';
-import { getSelf } from '../clients/spotispy/spotify-client';
+import { encrypt } from '../../utils/crypto';
+import { getSelf } from '../../clients/spotify/spotify-client';
+import { Request, Response } from 'express';
 
 const CLIENT_ID = process.env.CLIENT_ID || ''; // Your client id
 const CLIENT_SECRET = process.env.CLIENT_SECRET || ''; // Your secret
@@ -30,6 +31,13 @@ type OauthResponse = {
   scope: string;
 };
 
+export type TunedInJwtPayload = {
+  spotifyToken: string;
+  refresh: string;
+  userId: string;
+  name: string;
+};
+
 /**
  * Generates a random string containing numbers and letters
  * @param  {number} length The length of the string
@@ -45,15 +53,13 @@ const generateRandomString = function (length: number) {
   return text;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function generateAccessToken(data: Record<any, any>, expirySeconds: number): string {
+function generateAccessToken(data: TunedInJwtPayload, expirySeconds: number): string {
   return jwt.sign(data, JWT_SIGNING_HASH, { expiresIn: `${expirySeconds}s` });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const setupOauthRoutes = (app: any) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  app.get('/login', function (_: any, res: any) {
+  app.get('/login', function (_: Request, res: Response) {
     const state = generateRandomString(16);
     res.cookie(stateKey, state);
 
@@ -71,15 +77,16 @@ export const setupOauthRoutes = (app: any) => {
     );
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  app.get('/callback', async function (req: any, res: any) {
+  app.get('/callback', async function (req: Request, res: Response) {
     // your application requests refresh and access tokens
     // after checking the state parameter
 
-    const code = req.query.code || null;
-    const state = req.query.state || null;
+    const code = req.query.code;
+    const state = req.query.state;
     const storedState = req.cookies ? req.cookies[stateKey] : null;
-    if (state === null || state !== storedState) {
+    if (!code) {
+      console.log('no code received');
+    } else if (state === null || state !== storedState) {
       console.log('state mismatch');
       // res.redirect('/#' +
       //   querystring.stringify({
@@ -88,7 +95,7 @@ export const setupOauthRoutes = (app: any) => {
     } else {
       res.clearCookie(stateKey);
       const params = new URLSearchParams();
-      params.append('code', code);
+      params.append('code', code.toString());
       params.append('redirect_uri', REDIRECT_URI);
       params.append('grant_type', 'authorization_code');
       const authOptions = {
@@ -102,33 +109,30 @@ export const setupOauthRoutes = (app: any) => {
       const tokenResponse = await fetch('https://accounts.spotify.com/api/token', authOptions);
       if (tokenResponse.status === 200) {
         const body = (await tokenResponse.json()) as OauthResponse;
-        console.log(tokenResponse);
         const access_token = body.access_token;
 
         const profileBody = await getSelf(access_token);
-        console.log({ profileBody });
-        console.log({ body });
 
         const encryptedAccessToken = encrypt(access_token);
         const encryptedRefreshToken = encrypt(body.refresh_token);
-        const jwt = generateAccessToken(
-          {
-            spotifyToken: encryptedAccessToken,
-            refresh: encryptedRefreshToken,
-            userId: profileBody.uri,
-            name: profileBody.display_name,
-          },
-          body.expires_in
-        );
+        if (encryptedAccessToken && encryptedRefreshToken) {
+          const jwt = generateAccessToken(
+            {
+              spotifyToken: encryptedAccessToken,
+              refresh: encryptedRefreshToken,
+              userId: profileBody.uri,
+              name: profileBody.display_name,
+            },
+            body.expires_in
+          );
 
-        console.log({ jwt });
-
-        res.redirect(
-          POST_LOGIN_URL +
-            querystring.stringify({
-              token: jwt,
-            })
-        );
+          res.redirect(
+            POST_LOGIN_URL +
+              querystring.stringify({
+                token: jwt,
+              })
+          );
+        }
       } else {
         console.log('invalid token');
         // res.redirect('/#' +
