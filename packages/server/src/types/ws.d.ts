@@ -7,4 +7,11 @@ declare module 'ws' {
       listener: (message: string) => void;
     };
   }
+
+
+  // export interface IncomingMessage {
+  //   user?: TunedInJwtPayload;
+  // }
 }
+
+export {}

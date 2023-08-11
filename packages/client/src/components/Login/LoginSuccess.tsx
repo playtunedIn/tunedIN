@@ -16,7 +16,7 @@ export const Login = () => {
   }, []);
   useEffect(() => {
     const fetchMe = async () => {
-      const accessResponse = await fetch('https://localhost:3001/self', {
+      const accessResponse = await fetch('https://local.playtunedin-test.com:3001/self', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

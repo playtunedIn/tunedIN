@@ -13,12 +13,13 @@ import { messageHandler } from './handlers/message-handler';
 import { authenticateToken } from './middleware/authenticate';
 import { getSelf } from './clients/spotify/spotify-client';
 import { gameStateSubscriberClient } from './clients/redis';
+import { verifyToken } from './utils/auth';
 
 const port = process.env.PORT || 3001;
 
 const app = express();
 app.use(cookieParser());
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: 'https://local.playtunedin-test.com:8080/*' }));
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 app.get('/test', function (_: any, res: any) {
@@ -66,7 +67,22 @@ app.get('/self', authenticateToken, async function (req: Request, res: Response)
 
 setupOauthRoutes(app);
 
-const wsServer = new WebSocketServer({ server, path: '/ws/multiplayer' });
+const wsServer = new WebSocketServer({ 
+    server, 
+    path: '/ws/multiplayer',
+    verifyClient: (info, cb) => {
+        const token = info.req.headers.token as string;
+        if (!token) {
+            cb(false, 401, 'Unauthorized')
+        }
+        verifyToken(token)
+            .then(payload => {
+                console.log({payload})
+                //info.req.user = payload
+                cb(true)
+            })
+            .catch(() => cb(false, 401, 'Unauthorized'))
+    } });
 
 wsServer.on('connection', (ws: WebSocket) => {
   ws.on('message', (data: string) => {
