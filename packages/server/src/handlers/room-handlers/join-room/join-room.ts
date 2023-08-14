@@ -7,8 +7,9 @@ import { JOIN_ROOM_SCHEMA_NAME } from './join-room.validator';
 import type { GameState, PlayerState } from 'src/clients/redis/models/game-state';
 import { JoinRoomErrorCode } from './join-room.errors';
 
+const playerLimit = 4;
+
 export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
-  try {
     if (!isValidJoinRoomReq(data)) {
       return generateErrorResponse(ws, JoinRoomErrorCode.InvalidRoomReq);
     }
@@ -25,7 +26,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
       return generateErrorResponse(ws, JoinRoomErrorCode.GameStateParsingError);
     }
 
-    if (gameState.players.length >= 4) {
+    if (gameState.players.length >= playerLimit) {
       generateErrorResponse(ws, JoinRoomErrorCode.RoomFull);
       return;
     }
@@ -47,19 +48,20 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
       return generateErrorResponse(ws, JoinRoomErrorCode.GameStateStringifyingError);
     }
 
-    await Promise.all([
-      setValue(gameState.roomId, newGameState),
-      publishChannel(gameState.roomId, newGameState),
-      subscribeGameHandler(ws, gameState.roomId),
-    ]);
+    try {
+      await Promise.all([
+        setValue(gameState.roomId, newGameState),
+        publishChannel(gameState.roomId, newGameState),
+        subscribeGameHandler(ws, gameState.roomId),
+      ]);
+    } catch (error) {
+      generateErrorResponse(ws, JoinRoomErrorCode.HandlerError);
+    }
 
     generateResponse(ws, newGameState);
-  } catch (error) {
-    generateErrorResponse(ws, JoinRoomErrorCode.HandlerError);
-  }
 };
 
-const isValidJoinRoomReq = (data: JoinRoomReq) => {
+export const isValidJoinRoomReq = (data: JoinRoomReq) => {
   const validate = validator.getSchema<JoinRoomReq>(JOIN_ROOM_SCHEMA_NAME);
   return Boolean(validate?.(data));
 };
@@ -86,7 +88,7 @@ const generateResponse = (ws: WebSocket, gameState: string): void => {
   }
 };
 
-const generateErrorResponse = (ws: WebSocket, errorCode: JoinRoomErrorCode): void => {
+export const generateErrorResponse = (ws: WebSocket, errorCode: JoinRoomErrorCode): void => {
   const errorResponse = {
     type: 'joinRoomErrorResponse',
     data: errorCode,

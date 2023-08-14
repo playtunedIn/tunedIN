@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import { WebSocket, WebSocketServer } from 'ws';
+import type { WebSocket} from 'ws';
+import { WebSocketServer } from 'ws';
 import https from 'https';
 import { readFileSync } from 'fs';
 
@@ -42,6 +43,7 @@ setupOauthRoutes(app);
 const wsServer = new WebSocketServer({ server, path: '/ws/multiplayer' });
 
 wsServer.on('connection', (ws: WebSocket) => {
+  
   ws.on('message', (data: string) => {
     messageHandler(ws, data);
   });
