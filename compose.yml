@@ -1,0 +1,12 @@
+# Docker compose file to spin up dev services
+
+services:
+  server:
+    env_file:
+      - packages/server/.env
+    build:
+      dockerfile: ./server.Dockerfile
+    ports:
+      - '3000:3000'
+  redis:
+    image: 'redis:alpine'
