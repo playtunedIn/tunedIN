@@ -3,20 +3,17 @@ import dotenv from 'dotenv';
 dotenv.config();
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import type { WebSocket} from 'ws';
+import type { WebSocket } from 'ws';
 import { WebSocketServer } from 'ws';
 import https from 'https';
 import { readFileSync } from 'fs';
 
 import { setupOauthRoutes } from './oauth';
 import { messageHandler } from './handlers/message-handler';
-import { validatorInit } from './handlers/message.validator';
 import { unsubscribeChannel } from './clients/redis/redis-client';
 
 const key = readFileSync('./.cert/server.key');
 const cert = readFileSync('./.cert/server.crt');
-
-validatorInit();
 
 const port = process.env.PORT || 3001;
 
@@ -43,7 +40,6 @@ setupOauthRoutes(app);
 const wsServer = new WebSocketServer({ server, path: '/ws/multiplayer' });
 
 wsServer.on('connection', (ws: WebSocket) => {
-  
   ws.on('message', (data: string) => {
     messageHandler(ws, data);
   });
