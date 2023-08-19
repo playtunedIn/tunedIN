@@ -1,6 +1,3 @@
-import dotenv from 'dotenv';
-// needs to run before imports
-dotenv.config();
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import type { WebSocket } from 'ws';
@@ -12,7 +9,7 @@ import { readFileSync } from 'fs';
 import { setupOauthRoutes } from './oauth';
 import { messageHandler } from './handlers/message-handler';
 import { validatorInit } from './handlers/message.validator';
-import { unsubscribeChannel } from './clients/redis/redis-client';
+import { gameStateSubscriberClient } from './clients/redis';
 
 validatorInit();
 
@@ -23,7 +20,6 @@ app.use(cookieParser());
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 app.get('/test', function (_: any, res: any) {
-  console.log('test');
   res.send({ test: 'good' });
 });
 
@@ -64,7 +60,7 @@ wsServer.on('connection', (ws: WebSocket) => {
 
   ws.on('close', () => {
     if (ws.channelListener) {
-      unsubscribeChannel(ws.channelListener);
+      gameStateSubscriberClient.unsubscribeFromChanges(ws.channelListener);
     }
   });
 

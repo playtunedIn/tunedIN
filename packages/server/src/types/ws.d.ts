@@ -1,4 +1,4 @@
-import ws from 'ws';
+import type ws from 'ws';
 
 declare module 'ws' {
   export interface WebSocket extends ws {
