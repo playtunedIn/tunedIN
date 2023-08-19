@@ -1,15 +1,19 @@
 import cookieParser from 'cookie-parser';
+import type { Request, Response } from 'express';
 import express from 'express';
+import cors from 'cors';
 import type { WebSocket } from 'ws';
 import { WebSocketServer } from 'ws';
 import http from 'http';
 import https from 'https';
 import { readFileSync } from 'fs';
 
-import { setupOauthRoutes } from './oauth';
+import { setupOauthRoutes } from './handlers/auth/oauth-handler';
 import { messageHandler } from './handlers/message-handler';
 import { validatorInit } from './handlers/message.validator';
 import { gameStateSubscriberClient } from './clients/redis';
+import { authenticateToken } from './middleware/authenticate';
+import { getSelf } from './clients/spotify/spotify-client';
 
 validatorInit();
 
@@ -17,6 +21,7 @@ const port = process.env.PORT || 3001;
 
 const app = express();
 app.use(cookieParser());
+app.use(cors({ origin: 'http://localhost:3000' }));
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 app.get('/test', function (_: any, res: any) {
@@ -47,6 +52,19 @@ server.listen(port, () => {
 
 server.on('error', err => {
   console.error(err);
+});
+
+app.get('/test', function (_: Request, res: Response) {
+  res.send({ test: 'good' });
+});
+
+app.get('/self', authenticateToken, async function (req: Request, res: Response) {
+  if (req.token) {
+    const user = await getSelf(req.token);
+    res.send({ user });
+  } else {
+    res.sendStatus(401);
+  }
 });
 
 setupOauthRoutes(app);
