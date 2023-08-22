@@ -6,7 +6,7 @@ import { subscribeGameHandler } from '../../game-handlers/subscribe-game/subscri
 import type { JoinRoomReq } from './join-room.validator';
 import { JOIN_ROOM_SCHEMA_NAME } from './join-room.validator';
 import type { GameState, PlayerState } from 'src/clients/redis/models/game-state';
-import { JoinRoomErrorCode } from './join-room.errors';
+import { JOIN_ROOM_ERROR_CODES } from './join-room.errors';
 import { sendResponse } from '../../../utils/websocket-response';
 import { JOIN_ROOM_ERROR_RESPONSE, JOIN_ROOM_RESPONSE } from '../../../handlers/room-handlers/types/response';
 
@@ -14,28 +14,28 @@ const PLAYER_LIMIT = 4;
 
 export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   if (!isValidSchema(data, JOIN_ROOM_SCHEMA_NAME)) {
-    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JoinRoomErrorCode.InvalidRoomReq });
+    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.InvalidRoomReq });
   }
 
   const gameStateJson = await getValue(data.roomId);
   if (!gameStateJson) {
-    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JoinRoomErrorCode.RoomNotFound });
+    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.RoomNotFound });
   }
 
   let gameState: GameState;
   try {
     gameState = JSON.parse(gameStateJson);
   } catch (parseError) {
-    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JoinRoomErrorCode.GameStateParsingError });
+    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.GameStateParsingError });
   }
 
   if (gameState.players.length >= PLAYER_LIMIT) {
-    sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JoinRoomErrorCode.RoomFull });
+    sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.RoomFull });
     return;
   }
 
   if (gameState.players.some(player => player.playerId === data.playerId)) {
-    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JoinRoomErrorCode.PlayerAlreadyInRoom });
+    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.PlayerAlreadyInRoom });
   }
 
   const newPlayer: PlayerState = createNewPlayerState(data);
@@ -48,7 +48,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   try {
     newGameState = JSON.stringify(gameState);
   } catch (stringifyError) {
-    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JoinRoomErrorCode.GameStateStringifyingError });
+    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.GameStateStringifyingError });
   }
 
   try {
@@ -58,7 +58,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
       subscribeGameHandler(ws, gameState.roomId),
     ]);
   } catch (error) {
-    sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JoinRoomErrorCode.HandlerError });
+    sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.HandlerError });
   }
 
   sendResponse(ws, JOIN_ROOM_RESPONSE, gameState);
