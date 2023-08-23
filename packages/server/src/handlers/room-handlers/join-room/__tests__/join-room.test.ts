@@ -48,7 +48,6 @@ describe('Join Room Handler', () => {
   });
 
   it('should return with an error of room not found', async () => {
-    // const mockGameState = createMockGameState();
     const mockWebSocket = createMockWebSocket();
     (mockRedisClient.getValue as Mock).mockReturnValue('');
     await joinRoomHandler(mockWebSocket, { roomId: 'test', playerId: 'test' });
