@@ -10,12 +10,9 @@ import { readFileSync } from 'fs';
 
 import { setupOauthRoutes } from './handlers/auth/oauth-handler';
 import { messageHandler } from './handlers/message-handler';
-import { validatorInit } from './handlers/message.validator';
-import { gameStateSubscriberClient } from './clients/redis';
 import { authenticateToken } from './middleware/authenticate';
 import { getSelf } from './clients/spotify/spotify-client';
-
-validatorInit();
+import { gameStateSubscriberClient } from './clients/redis';
 
 const port = process.env.PORT || 3001;
 

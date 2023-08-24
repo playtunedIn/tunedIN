@@ -1,6 +1,6 @@
 {
   "name": "client",
-  "description": "Frontend for TunedIn.",
+  "description": "Frontend for tunedIN.",
   "private": true,
   "type": "module",
   "scripts": {

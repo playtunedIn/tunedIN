@@ -4,6 +4,7 @@ import type { GameState } from 'src/clients/redis/models/game-state';
 
 export const createMockGameState = (): GameState => ({
   roomId: '',
+  host: '',
   players: [],
   questions: [],
 });

@@ -12,6 +12,7 @@ export interface PlayerState {
 
 export interface GameState {
   roomId: string;
+  host: string;
   players: PlayerState[];
   questions: Question[]; // We might not want to come up with all the questions right away so this array will grow as the game progresses.
 }
