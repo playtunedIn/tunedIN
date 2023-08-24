@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "description": "Backend for TunedIn.",
+  "description": "Backend for TunedIN.",
   "private": true,
   "main": "dist/src/server.js",
   "scripts": {
