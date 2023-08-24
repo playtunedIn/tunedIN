@@ -2,23 +2,22 @@ import dotenv from 'dotenv';
 // needs to run before imports
 dotenv.config();
 import cookieParser from 'cookie-parser';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { WebSocket, WebSocketServer } from 'ws';
 import https from 'https';
 import { readFileSync } from 'fs';
 
 import { setupOauthRoutes } from './handlers/auth/oauth-handler';
 import { messageHandler } from './handlers/message-handler';
-import { validatorInit } from './handlers/message.validator';
 import { unsubscribeChannel } from './clients/redis/redis-client';
 import { authenticateToken } from './middleware/authenticate';
 import { getSelf } from './clients/spotify/spotify-client';
 
 const key = readFileSync('./.cert/server.key');
 const cert = readFileSync('./.cert/server.crt');
-
-validatorInit();
 
 const port = process.env.PORT || 3001;
 

@@ -13,5 +13,6 @@ export default defineConfig({
       reporter: ['lcov', 'json', 'html'],
     },
     reporters: ['default'],
+    setupFiles: './setup-tests.ts',
   },
 });
