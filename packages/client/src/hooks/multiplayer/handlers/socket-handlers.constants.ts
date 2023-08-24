@@ -13,3 +13,4 @@ export type SocketReadyState =
   | typeof SOCKET_READY_STATES.CLOSED;
 
 export const SOCKET_RECONNECT_TIMEOUT = 2000;
+export const SOCKET_PING_TIMEOUT = 31000;

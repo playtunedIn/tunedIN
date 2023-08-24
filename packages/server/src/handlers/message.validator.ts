@@ -1,3 +1,5 @@
+// TODO: UPDATE THIS BEFORE MERGING TO ADDRESS MERGE CONFLICTS
+
 import Ajv from 'ajv';
 
 import createRoomReqSchema, { CREATE_ROOM_SCHEMA_NAME } from './room-handlers/create-room/create-room.validator';

@@ -6,5 +6,6 @@ declare module 'ws' {
       channel: string;
       listener: (message: string) => void;
     };
+    isAlive: boolean;
   }
 }
