@@ -2,26 +2,28 @@ import dotenv from 'dotenv';
 // needs to run before imports
 dotenv.config();
 import cookieParser from 'cookie-parser';
-import express from 'express';
-import type { WebSocket} from 'ws';
-import { WebSocketServer } from 'ws';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import { WebSocket, WebSocketServer } from 'ws';
 import https from 'https';
 import { readFileSync } from 'fs';
 
-import { setupOauthRoutes } from './oauth';
+import { setupOauthRoutes } from './handlers/auth/oauth-handler';
 import { messageHandler } from './handlers/message-handler';
-import { validatorInit } from './handlers/message.validator';
 import { unsubscribeChannel } from './clients/redis/redis-client';
+import { authenticateToken } from './middleware/authenticate';
+import { getSelf } from './clients/spotify/spotify-client';
 
 const key = readFileSync('./.cert/server.key');
 const cert = readFileSync('./.cert/server.crt');
-
-validatorInit();
 
 const port = process.env.PORT || 3001;
 
 const app = express();
 app.use(cookieParser());
+app.use(cors({ origin: 'http://localhost:3000' }));
 
 const server = https.createServer({ key, cert }, app);
 server.listen(port, () => {
@@ -32,10 +34,17 @@ server.on('error', err => {
   console.error(err);
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-app.get('/test', function (_: any, res: any) {
-  console.log('test');
+app.get('/test', function (_: Request, res: Response) {
   res.send({ test: 'good' });
+});
+
+app.get('/self', authenticateToken, async function (req: Request, res: Response) {
+  if (req.token) {
+    const user = await getSelf(req.token);
+    res.send({ user });
+  } else {
+    res.sendStatus(401);
+  }
 });
 
 setupOauthRoutes(app);

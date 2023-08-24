@@ -103,16 +103,6 @@ const generateResponse = (ws: WebSocket, gameState: string): void => {
   }
 };
 
-export const generateErrorResponse = (ws: WebSocket, errorCode: CreateRoomErrorCode): void => {
-  const errorResponse = {
-    type: 'CreateRoomErrorResponse',
-    data: errorCode,
-  };
-
-  try {
-    const responseJson = JSON.stringify(errorResponse);
-    ws.send(responseJson);
-  } catch (stringifyError) {
-    console.error('Error while stringifying response JSON:', stringifyError);
-  }
+  await setValue(defaultGameState.roomId, JSON.stringify(defaultGameState));
+  ws.send(`Created room: ${defaultGameState.roomId}`);
 };

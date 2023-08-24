@@ -1,9 +1,8 @@
-import { createClient } from 'redis';
-import { afterEach, beforeEach, describe, it, expect, vi, Mock } from 'vitest';
+import type { Mock } from 'vitest';
+import * as mockRedis from 'redis';
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
 
 import { publishChannel, subscribeChannel, unsubscribeChannel, getValue, setValue } from './redis-client';
-
-vi.mock('redis');
 
 describe('Redis Client Suite', () => {
   const publishSpy = vi.fn();
@@ -13,7 +12,7 @@ describe('Redis Client Suite', () => {
   const setSpy = vi.fn();
 
   beforeEach(() => {
-    (createClient as Mock).mockImplementation(() => ({
+    (mockRedis.createClient as Mock).mockImplementation(() => ({
       connect: vi.fn(),
       publish: publishSpy,
       subscribe: subscribeSpy,
