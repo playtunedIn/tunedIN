@@ -1,6 +1,6 @@
 import type { WebSocket } from 'ws';
 
-import { setValue } from '../../../clients/redis/redis-client';
+import { gameStatePublisherClient } from '../../../clients/redis';
 import { isValidSchema } from '../../message.validator';
 import type { CreateRoomReq } from './create-room.validator';
 import { CREATE_ROOM_SCHEMA_NAME } from './create-room.validator';
@@ -17,6 +17,6 @@ export const createRoomHandler = async (ws: WebSocket, data: CreateRoomReq) => {
     questions: [],
   };
 
-  await setValue(defaultGameState.roomId, JSON.stringify(defaultGameState));
+  await gameStatePublisherClient.set(defaultGameState.roomId, JSON.stringify(defaultGameState));
   ws.send(`Created room: ${defaultGameState.roomId}`);
 };

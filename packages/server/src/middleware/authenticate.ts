@@ -1,6 +1,7 @@
-import jwt, { VerifyErrors, Secret, Jwt, JwtPayload } from 'jsonwebtoken';
+import type { VerifyErrors, Secret, Jwt, JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { decrypt } from '../utils/crypto';
-import { TunedInJwtPayload } from 'src/handlers/auth/oauth-handler';
+import type { TunedInJwtPayload } from 'src/handlers/auth/oauth-handler';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const authenticateToken = (req: any, res: any, next: () => void) => {

@@ -1,23 +1,18 @@
-import dotenv from 'dotenv';
-// needs to run before imports
-dotenv.config();
 import cookieParser from 'cookie-parser';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import express, { Request, Response } from 'express';
+import type { Request, Response } from 'express';
+import express from 'express';
 import cors from 'cors';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { WebSocket, WebSocketServer } from 'ws';
+import type { WebSocket } from 'ws';
+import { WebSocketServer } from 'ws';
+import http from 'http';
 import https from 'https';
 import { readFileSync } from 'fs';
 
 import { setupOauthRoutes } from './handlers/auth/oauth-handler';
 import { messageHandler } from './handlers/message-handler';
-import { unsubscribeChannel } from './clients/redis/redis-client';
 import { authenticateToken } from './middleware/authenticate';
 import { getSelf } from './clients/spotify/spotify-client';
-
-const key = readFileSync('./.cert/server.key');
-const cert = readFileSync('./.cert/server.crt');
+import { gameStateSubscriberClient } from './clients/redis';
 
 const port = process.env.PORT || 3001;
 
@@ -25,7 +20,29 @@ const app = express();
 app.use(cookieParser());
 app.use(cors({ origin: 'http://localhost:3000' }));
 
-const server = https.createServer({ key, cert }, app);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+app.get('/test', function (_: any, res: any) {
+  res.send({ test: 'good' });
+});
+
+let server: https.Server | http.Server;
+if (process.env.NODE_ENV === 'development') {
+  const key = readFileSync('./.cert/server.key');
+  const cert = readFileSync('./.cert/server.crt');
+
+  server = https.createServer({ key, cert }, app);
+} else {
+  // TODO: update comment with correct wording if need be for api gateway
+  /**
+   * In production https credentials and keys will be handled by our api gateway allowing backend services
+   * to not have to worry about expiring certificates
+   */
+  server = http.createServer(app);
+}
+
+server.keepAliveTimeout = 90000;
+server.headersTimeout = 95000;
+
 server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
@@ -58,7 +75,7 @@ wsServer.on('connection', (ws: WebSocket) => {
 
   ws.on('close', () => {
     if (ws.channelListener) {
-      unsubscribeChannel(ws.channelListener);
+      gameStateSubscriberClient.unsubscribeFromChanges(ws.channelListener);
     }
   });
 

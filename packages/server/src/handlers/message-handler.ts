@@ -1,6 +1,7 @@
-import { WebSocket } from 'ws';
+import type { WebSocket } from 'ws';
 
-import { SocketMessage, messageHandlers } from './models/handlers';
+import type { SocketMessage } from './models/handlers';
+import { messageHandlers } from './models/handlers';
 
 export const messageHandler = (ws: WebSocket, dataStr: string) => {
   let data: SocketMessage;

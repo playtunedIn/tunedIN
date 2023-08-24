@@ -1,19 +1,11 @@
-import type { Mock } from 'vitest';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import * as mockRedisClient from '../../../../clients/redis/redis-client';
 import { joinRoomHandler } from 'src/handlers/room-handlers/join-room/join-room';
-import { createMockGameState } from 'src/testing/mocks/redis-client.mock';
+import { createMockGameState, redisClientMock } from 'src/testing/mocks/redis-client.mock';
 import { createMockWebSocket } from '../../../../testing/mocks/websocket.mock';
 import { JOIN_ROOM_ERROR_RESPONSE, JOIN_ROOM_RESPONSE } from 'src/handlers/room-handlers/types/response';
 import { JOIN_ROOM_ERROR_CODES } from '../join-room.errors';
 import type { JoinRoomReq } from '../join-room.validator';
-
-vi.mock('../../../../clients/redis/redis-client', () => ({
-  publishChannel: vi.fn(),
-  getValue: vi.fn(),
-  setValue: vi.fn(),
-}));
 
 describe('Join Room Handler', () => {
   afterEach(() => {
@@ -23,7 +15,7 @@ describe('Join Room Handler', () => {
   it('should return the happy path of the join room', async () => {
     const mockGameState = createMockGameState();
     const mockWebSocket = createMockWebSocket();
-    (mockRedisClient.getValue as Mock).mockReturnValue(JSON.stringify(mockGameState));
+    redisClientMock.get.mockReturnValue(JSON.stringify(mockGameState));
     await joinRoomHandler(mockWebSocket, { roomId: 'test', playerId: 'test' });
     expect(mockWebSocket.send).toHaveBeenCalledWith(
       JSON.stringify({
@@ -37,7 +29,7 @@ describe('Join Room Handler', () => {
     const mockGameState = createMockGameState();
     const mockWebSocket = createMockWebSocket();
     const invalidReq = { roomId: 'test', grape: 'yoeoo' } as unknown as JoinRoomReq;
-    (mockRedisClient.getValue as Mock).mockReturnValue(JSON.stringify(mockGameState));
+    redisClientMock.get.mockReturnValue(JSON.stringify(mockGameState));
     await joinRoomHandler(mockWebSocket, invalidReq);
     expect(mockWebSocket.send).toHaveBeenCalledWith(
       JSON.stringify({
@@ -49,7 +41,7 @@ describe('Join Room Handler', () => {
 
   it('should return with an error of room not found', async () => {
     const mockWebSocket = createMockWebSocket();
-    (mockRedisClient.getValue as Mock).mockReturnValue('');
+    redisClientMock.get.mockReturnValue('');
     await joinRoomHandler(mockWebSocket, { roomId: 'test', playerId: 'test' });
     expect(mockWebSocket.send).toHaveBeenCalledWith(
       JSON.stringify({
@@ -92,7 +84,7 @@ describe('Join Room Handler', () => {
     mockGameState.players.push(newPlayer3);
     mockGameState.players.push(newPlayer4);
 
-    (mockRedisClient.getValue as Mock).mockReturnValue(JSON.stringify(mockGameState));
+    redisClientMock.get.mockReturnValue(JSON.stringify(mockGameState));
     await joinRoomHandler(mockWebSocket, { roomId: 'test', playerId: 'test' });
     expect(mockWebSocket.send).toHaveBeenCalledWith(
       JSON.stringify({
@@ -112,7 +104,7 @@ describe('Join Room Handler', () => {
     mockGameState.players.push(newPlayer); // Assume `newPlayer` has already joined the room
     const mockWebSocket = createMockWebSocket();
 
-    (mockRedisClient.getValue as Mock).mockReturnValue(JSON.stringify(mockGameState));
+    redisClientMock.get.mockReturnValue(JSON.stringify(mockGameState));
     await joinRoomHandler(mockWebSocket, { roomId: 'test', playerId: 'newPlayerId' });
 
     expect(mockWebSocket.send).toHaveBeenCalledWith(
@@ -139,7 +131,7 @@ describe('Join Room Handler', () => {
     const data = { roomId: 'test', playerId: 'test' };
 
     mockGameState.roomId = 'test';
-    (mockRedisClient.getValue as Mock).mockReturnValue(expectedGameState);
+    redisClientMock.get.mockReturnValue(expectedGameState);
     await joinRoomHandler(mockWebSocket, data);
     expect(mockWebSocket.send).toHaveBeenCalledWith(
       JSON.stringify({

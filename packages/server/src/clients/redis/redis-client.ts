@@ -1,66 +1,69 @@
 import { createClient } from 'redis';
 
-export type RedisClient = ReturnType<typeof createClient>;
+type RedisClientType = ReturnType<typeof createClient>;
 
 export interface ChannelListener {
   channel: string;
   listener: (message: string) => void;
 }
 
-let redisPubClient: RedisClient;
-let redisSubClient: RedisClient;
+const REDIS_HOSTNAME = process.env.REDIS_HOSTNAME || 'redis://local.playtunedin-test.com:6379';
+export const REDIS_DB_MAP = {
+  gameState: 0,
+  playerState: 1,
+} as const;
 
-const getRedisClient = async (): Promise<RedisClient> => {
-  if (!redisPubClient) {
-    redisPubClient = createClient({
-      url: 'redis://localhost:6379',
+class RedisClient {
+  protected client: RedisClientType;
+
+  constructor(database: (typeof REDIS_DB_MAP)[keyof typeof REDIS_DB_MAP], name: string) {
+    this.client = createClient({
+      name,
+      url: REDIS_HOSTNAME,
+      database,
     });
-    await redisPubClient.connect();
+
+    this.client.addListener('error', (error: Error) => {
+      console.error(`redis client: ${name} encountered error: ${error}`);
+    });
+
+    this.client.addListener('end', () => {
+      this.client.removeAllListeners();
+    });
+
+    this.connect();
   }
 
-  return redisPubClient;
-};
+  private connect = async () => {
+    await this.client.connect();
+  };
+}
 
-const getRedisSubscriberClient = async (): Promise<RedisClient> => {
-  if (!redisSubClient) {
-    redisSubClient = createClient({
-      url: 'redis://localhost:6379',
-    });
-    await redisSubClient.connect();
+export class RedisPublisherClient extends RedisClient {
+  constructor(database: (typeof REDIS_DB_MAP)[keyof typeof REDIS_DB_MAP], name: string) {
+    super(database, name);
   }
 
-  return redisSubClient;
-};
+  publishChanges = async (channel: string, data: string) => {
+    await this.client.publish(channel, data);
+  };
 
-const publishChannel = async (channel: string, data: string) => {
-  const client = await getRedisClient();
+  get = (key: string) => this.client.get(key);
 
-  await client.publish(channel, data);
-};
+  set = (key: string, value: string) => this.client.set(key, value);
+}
 
-/**
- * NOTE: This must be passed in by reference (passing in the whole object). Or else the listener will lose its connection to the websocket
- */
-const subscribeChannel = async (channelListener: ChannelListener) => {
-  const client = await getRedisSubscriberClient();
+export class RedisSubscriberClient extends RedisClient {
+  constructor(database: (typeof REDIS_DB_MAP)[keyof typeof REDIS_DB_MAP], name: string) {
+    super(database, name);
+  }
 
-  return client.subscribe(channelListener.channel, channelListener.listener);
-};
+  /**
+   * NOTE: This must be passed in by reference (passing in the whole object). Or else the listener will lose its connection to the websocket
+   */
+  subscribeToChanges = (channelListener: ChannelListener) =>
+    this.client.subscribe(channelListener.channel, channelListener.listener);
 
-const unsubscribeChannel = async (channelListener: ChannelListener) => {
-  const client = await getRedisSubscriberClient();
-
-  return client.unsubscribe(channelListener.channel, channelListener.listener);
-};
-
-const getValue = async (key: string) => {
-  const client = await getRedisClient();
-  return client.get(key);
-};
-
-const setValue = async (key: string, value: string) => {
-  const client = await getRedisClient();
-  await client.set(key, value);
-};
-
-export { publishChannel, subscribeChannel, unsubscribeChannel, getValue, setValue };
+  unsubscribeFromChanges = (channelListener: ChannelListener) =>
+    this.client.unsubscribe(channelListener.channel, channelListener.listener);
+}

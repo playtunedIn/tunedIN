@@ -13,7 +13,7 @@ import fetch from 'node-fetch';
 import jwt from 'jsonwebtoken';
 import { encrypt } from '../../utils/crypto';
 import { getSelf } from '../../clients/spotify/spotify-client';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 const CLIENT_ID = process.env.CLIENT_ID || ''; // Your client id
 const CLIENT_SECRET = process.env.CLIENT_SECRET || ''; // Your secret
