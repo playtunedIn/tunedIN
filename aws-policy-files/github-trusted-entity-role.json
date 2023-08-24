@@ -9,7 +9,7 @@
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
                 "StringLike": {
-                    "token.actions.githubusercontent.com:sub": "repo:eyeofthezeiger/Spotispy:*"
+                    "token.actions.githubusercontent.com:sub": "repo:playtunedIn/tunedIN:*"
                 }
             }
         }
