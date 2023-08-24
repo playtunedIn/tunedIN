@@ -123,31 +123,8 @@ describe('Join Room Handler', () => {
     );
   });
 
-  //todo
+  //TODO
   // it('should return with a handler error', async () => {
-  //   const mockGameState = createMockGameState();
-  //   const mockWebSocket = createMockWebSocket();
-
-  //   const mockReject = vi.fn().mockRejectedValue(new Error('Publish error'));
-
-  //   const spy = vi.spyOn(mockRedisClient.publishChannel('', ''))
-
-  //   const spy = vi.spyOn(mockRedisClient.publishChannel(mockGameState.roomId, JSON.stringify(mockWebSocket)).mockImplementation(async()=>{
-  //     throw new Error('workload.json creating failed.')));
-
-  //   (mockRedisClient.getValue as Mock).mockReturnValue(JSON.stringify(mockGameState));
-  //   (mockRedisClient.publishChannel as Mock).mockImplementation; // Set the mockReject function here
-
-  //   await joinRoomHandler(mockWebSocket, { roomId: 'test', playerId: 'test' });
-
-  //   expect(mockRedisClient.publishChannel).toBeCalledTimes(1);
-
-  //   expect(mockWebSocket.send).toHaveBeenCalledWith(
-  //     JSON.stringify({
-  //       type: JOIN_ROOM_RESPONSE,
-  //       data: { ...mockGameState, host: 'test', players: [{ playerId: 'test', score: 0, answers: [] }] },
-  //     })
-  //   );
   // });
 
   it('should expect that there is a parsing error', async () => {
@@ -172,23 +149,7 @@ describe('Join Room Handler', () => {
     );
   });
 
-  //todo
+  //TODO
   // it('should expect that the game state has changed', async () => {
-  //   const mockWebSocket = createMockWebSocket();
-  //   const mockGameState = createMockGameState();
-  //   const expectedGameState = { roomId: 'test', host: 'test', players: [{
-  //     playerId: 'newPlayerId3',
-  //     score: 0,
-  //     answers: [],
-  //   }], questions: [] };
-
-  //   const data = { roomId: 'test', playerId: 'test' };
-
-  //   mockGameState.roomId = 'test';
-  //   (mockRedisClient.getValue as Mock).mockReturnValue(expectedGameState);
-  //   await joinRoomHandler(mockWebSocket, data);
-  //   expect(mockGameState).not.toEqual(expectedGameState);
-  //   console.log(mockGameState);
-  //   console.log(mockRedisClient.getValue(data.roomId));
   // });
 });
