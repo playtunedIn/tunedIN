@@ -10,15 +10,13 @@ import { readFileSync } from 'fs';
 
 import { setupOauthRoutes } from './handlers/auth/oauth-handler';
 import { messageHandler } from './handlers/message-handler';
-import { validatorInit } from './handlers/message.validator';
 import { heartbeat } from './handlers/websocket/websocket-handlers';
 import { gameStateSubscriberClient } from './clients/redis';
 import { authenticateToken } from './middleware/authenticate';
 import { getSelf } from './clients/spotify/spotify-client';
 
-validatorInit();
-
 const WS_HEARTBEAT_INTERVAL = parseInt(process.env.WS_HEARTBEAT_INTERVAL || '30000');
+
 const port = process.env.PORT || 3001;
 
 const app = express();
