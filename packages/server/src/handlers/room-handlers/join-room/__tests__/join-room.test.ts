@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { joinRoomHandler } from 'src/handlers/room-handlers/join-room/join-room';
-import { createMockGameState, redisClientMock } from '../../../../testing/mocks/redis-client.mock';
+import { createMockGameState, redisClientMock } from 'src/testing/mocks/redis-client.mock';
 import { createMockWebSocket } from '../../../../testing/mocks/websocket.mock';
-import { JOIN_ROOM_ERROR_RESPONSE, JOIN_ROOM_RESPONSE } from '../../../room-handlers/types/response';
+import { JOIN_ROOM_ERROR_RESPONSE, JOIN_ROOM_RESPONSE } from 'src/handlers/room-handlers/types/response';
 import { JOIN_ROOM_ERROR_CODES } from '../join-room.errors';
 import type { JoinRoomReq } from '../join-room.validator';
 
