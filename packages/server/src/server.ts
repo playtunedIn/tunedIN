@@ -2,8 +2,10 @@ import dotenv from 'dotenv';
 // needs to run before imports
 dotenv.config();
 import cookieParser from 'cookie-parser';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { WebSocket, WebSocketServer } from 'ws';
 import https from 'https';
 import { readFileSync } from 'fs';
