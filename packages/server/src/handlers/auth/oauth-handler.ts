@@ -6,18 +6,36 @@
  * For more information, read
  * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
  */
+/* https://www.digitalocean.com/community/tutorials/nodejs-jwt-expressjs */
 
 import querystring from 'querystring';
 import fetch from 'node-fetch';
+import jwt from 'jsonwebtoken';
+import { encrypt } from '../../utils/crypto';
+import { getSelf } from '../../clients/spotify/spotify-client';
+import { Request, Response } from 'express';
 
 const CLIENT_ID = process.env.CLIENT_ID || ''; // Your client id
 const CLIENT_SECRET = process.env.CLIENT_SECRET || ''; // Your secret
+const JWT_SIGNING_HASH = process.env.JWT_SIGNING_HASH || '';
 const REDIRECT_URI = process.env.REDIRECT_URI || ''; // Your redirect uri
 const POST_LOGIN_URL = process.env.POST_LOGIN_URL || ''; // After success auth
+
+const stateKey = 'spotify_auth_state';
 
 type OauthResponse = {
   access_token: string;
   refresh_token: string;
+  token_type: string;
+  expires_in: number;
+  scope: string;
+};
+
+export type TunedInJwtPayload = {
+  spotifyToken: string;
+  refresh: string;
+  userId: string;
+  name: string;
 };
 
 /**
@@ -35,12 +53,13 @@ const generateRandomString = function (length: number) {
   return text;
 };
 
-const stateKey = 'spotify_auth_state';
+function generateAccessToken(data: TunedInJwtPayload, expirySeconds: number): string {
+  return jwt.sign(data, JWT_SIGNING_HASH, { expiresIn: `${expirySeconds}s` });
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const setupOauthRoutes = (app: any) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  app.get('/login', function (_: any, res: any) {
+  app.get('/login', function (_: Request, res: Response) {
     const state = generateRandomString(16);
     res.cookie(stateKey, state);
 
@@ -58,15 +77,16 @@ export const setupOauthRoutes = (app: any) => {
     );
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  app.get('/callback', async function (req: any, res: any) {
+  app.get('/callback', async function (req: Request, res: Response) {
     // your application requests refresh and access tokens
     // after checking the state parameter
 
-    const code = req.query.code || null;
-    const state = req.query.state || null;
+    const code = req.query.code;
+    const state = req.query.state;
     const storedState = req.cookies ? req.cookies[stateKey] : null;
-    if (state === null || state !== storedState) {
+    if (!code) {
+      console.log('no code received');
+    } else if (state === null || state !== storedState) {
       console.log('state mismatch');
       // res.redirect('/#' +
       //   querystring.stringify({
@@ -75,7 +95,7 @@ export const setupOauthRoutes = (app: any) => {
     } else {
       res.clearCookie(stateKey);
       const params = new URLSearchParams();
-      params.append('code', code);
+      params.append('code', code.toString());
       params.append('redirect_uri', REDIRECT_URI);
       params.append('grant_type', 'authorization_code');
       const authOptions = {
@@ -91,23 +111,28 @@ export const setupOauthRoutes = (app: any) => {
         const body = (await tokenResponse.json()) as OauthResponse;
         const access_token = body.access_token;
 
-        // use the access token to access the Spotify Web API
-        // const options = {
-        //     method: "GET",
-        //     headers: { 'Authorization': 'Bearer ' + access_token },
-        //     json: true
-        // };
-        //const accessResponse = await fetch('https://api.spotify.com/v1/me', options)
+        const profileBody = await getSelf(access_token);
 
-        // we can also pass the token to the browser to make requests from there
-        console.log({ access_token });
-        // TODO: store token in DB, don't pass to client
-        res.redirect(
-          POST_LOGIN_URL +
-            querystring.stringify({
-              access_token: access_token,
-            })
-        );
+        const encryptedAccessToken = encrypt(access_token);
+        const encryptedRefreshToken = encrypt(body.refresh_token);
+        if (encryptedAccessToken && encryptedRefreshToken) {
+          const jwt = generateAccessToken(
+            {
+              spotifyToken: encryptedAccessToken,
+              refresh: encryptedRefreshToken,
+              userId: profileBody.uri,
+              name: profileBody.display_name,
+            },
+            body.expires_in
+          );
+
+          res.redirect(
+            POST_LOGIN_URL +
+              querystring.stringify({
+                token: jwt,
+              })
+          );
+        }
       } else {
         console.log('invalid token');
         // res.redirect('/#' +
