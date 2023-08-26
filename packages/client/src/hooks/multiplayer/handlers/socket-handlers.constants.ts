@@ -6,6 +6,10 @@ export const SOCKET_READY_STATES = {
   CLOSED: 3,
 } as const;
 
+export const SOCKET_CLOSE_REASONS = {
+  UNAUTHORIZED: 4001,
+} as const;
+
 export type SocketReadyState =
   | typeof SOCKET_READY_STATES.CONNECTING
   | typeof SOCKET_READY_STATES.OPEN

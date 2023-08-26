@@ -4,11 +4,8 @@ import type { GameState, PlayerRoomSession } from '../../../clients/redis/models
 import { gameStatePublisherClient, playerStatePublisherClient } from '../../../clients/redis';
 import { sendResponse } from '../../../utils/websocket-response';
 import { subscribeGameHandler } from '../../game-handlers/subscribe-game/subscribe-game';
-import {
-  RECOVER_ROOM_SESSION_ERROR_RESPONSE,
-  RECOVER_ROOM_SESSION_RESPONSE,
-} from 'src/handlers/room-handlers/types/response';
-import { RECOVER_ROOM_SESSION_ERROR_CODES } from 'src/handlers/room-handlers/recover-room-session/recover-room-session.errors';
+import { RECOVER_ROOM_SESSION_ERROR_RESPONSE, RECOVER_ROOM_SESSION_RESPONSE } from '../../room-handlers/types/response';
+import { RECOVER_ROOM_SESSION_ERROR_CODES } from './recover-room-session.errors';
 
 export const recoverRoomSessionHandler = async (ws: WebSocket) => {
   let playerRoomStateStr: string | null;

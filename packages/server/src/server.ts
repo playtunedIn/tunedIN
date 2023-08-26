@@ -17,16 +17,28 @@ import { getSelf } from './clients/spotify/spotify-client';
 
 const WS_HEARTBEAT_INTERVAL = parseInt(process.env.WS_HEARTBEAT_INTERVAL || '30000');
 
+const IGNORE_HEARTBEAT_INTERVAL =
+  process.env.NODE_ENV === 'development' && process.env.IGNORE_HEARTBEAT_INTERVAL === 'true';
 const port = process.env.PORT || 3001;
 
 const app = express();
 app.use(cookieParser());
 app.use(cors({ origin: 'http://localhost:3000' }));
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-app.get('/test', function (_: any, res: any) {
+app.get('/test', function (_: Request, res: Response) {
   res.send({ test: 'good' });
 });
+
+app.get('/self', authenticateToken, async function (req: Request, res: Response) {
+  if (req.token) {
+    const user = await getSelf(req.token);
+    res.send({ user });
+  } else {
+    res.sendStatus(401);
+  }
+});
+
+setupOauthRoutes(app);
 
 let server: https.Server | http.Server;
 if (process.env.NODE_ENV === 'development') {
@@ -54,22 +66,24 @@ server.on('error', err => {
   console.error(err);
 });
 
-app.get('/test', function (_: Request, res: Response) {
-  res.send({ test: 'good' });
+const wsServer = new WebSocketServer({ noServer: true, path: '/ws/multiplayer' });
+
+server.on('upgrade', (req, socket, head) => {
+  /**
+   * TODO: Investigate if we can send a proper unauthorized response before handling the upgrade to websocket
+   *
+   * Git issue: https://github.com/websockets/ws/issues/377#issuecomment-1694386948
+   */
+  wsServer.handleUpgrade(req, socket, head, ws => {
+    try {
+      // TODO: Use JWT validate logic (may not need a try/catch)
+    } catch {
+      ws.close(4001);
+    }
+    // TODO: attach spotify api tokens to websocket
+    wsServer.emit('connection', ws, req);
+  });
 });
-
-app.get('/self', authenticateToken, async function (req: Request, res: Response) {
-  if (req.token) {
-    const user = await getSelf(req.token);
-    res.send({ user });
-  } else {
-    res.sendStatus(401);
-  }
-});
-
-setupOauthRoutes(app);
-
-const wsServer = new WebSocketServer({ server, path: '/ws/multiplayer' });
 
 wsServer.on('connection', (ws: WebSocket) => {
   ws.on('message', (data: string) => {
@@ -89,9 +103,19 @@ wsServer.on('connection', (ws: WebSocket) => {
   });
 });
 
+/**
+ * This interval is difficult to test websockets in non-webapp environments
+ *
+ * The IGNORE_INTERVAL environment variable allows you to turn the interval logic off
+ *
+ */
 const interval = setInterval(() => {
-  // FIXME: Figure out type override for WebSocketServer to allow our custom WebSocket properties.
+  if (IGNORE_HEARTBEAT_INTERVAL) {
+    return;
+  }
+
   wsServer.clients.forEach(_ws => {
+    // FIXME: Figure out type override for WebSocketServer to allow our custom WebSocket properties.
     const ws = _ws as WebSocket;
     if (!ws.isAlive) {
       return ws.terminate();

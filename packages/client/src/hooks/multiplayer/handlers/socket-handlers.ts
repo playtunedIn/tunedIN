@@ -2,6 +2,7 @@ import { APP_ENV__backendHost } from 'src/app-env';
 import { useSocketMessageHandlers } from './socket-message-handlers';
 import { WebSocketWrapper } from '../websocket-wrapper';
 import {
+  SOCKET_CLOSE_REASONS,
   SOCKET_PING_TIMEOUT,
   SOCKET_READY_STATES,
   SOCKET_RECONNECT_TIMEOUT,
@@ -65,8 +66,13 @@ export const useSocketHandlers = (
     hasSocketError = true;
   };
 
-  const onClose = () => {
-    // TODO: Better logistics when the socket closes gracefully by the server
+  const onClose = (event: CloseEvent) => {
+    switch (event.code) {
+      case SOCKET_CLOSE_REASONS.UNAUTHORIZED:
+        // TODO: Update redux if unauthorized
+        break;
+    }
+
     setStatus(SOCKET_READY_STATES.CLOSED);
 
     // Only attempt reconnecting if close event was caused by an error

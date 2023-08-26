@@ -106,7 +106,7 @@ describe('Socket Handlers', () => {
   describe('onClose', () => {
     it('should recreate websocket session (onClose)', () => {
       hookUtils.result.current.onError(new Event('TestSocketError'));
-      hookUtils.result.current.onClose();
+      hookUtils.result.current.onClose(new CloseEvent('test'));
       vi.runAllTimers();
 
       expect(MockWebSocketWrapper.WebSocketWrapper).toHaveBeenCalled();

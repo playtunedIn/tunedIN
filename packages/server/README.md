@@ -11,6 +11,7 @@ REDIRECT_URI=https://localhost:3001/callback
 POST_LOGIN_URL=http://localhost:3000/login_success?
 REDIS_HOSTNAME=redis://local.playtunedin-test.com:6379
 WS_HEARTBEAT_INTERVAL=30000
+IGNORE_HEARTBEAT_INTERVAL=false # Set to true only when testing websockets in postman locally
 ```
 
 Run `require('crypto').randomBytes(64).toString('hex')` and save the output as the value of JWT_SIGNING_HASH, this will
