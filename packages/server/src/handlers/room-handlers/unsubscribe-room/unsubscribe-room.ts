@@ -1,10 +1,10 @@
-import { WebSocket } from 'ws';
+import type { WebSocket } from 'ws';
 
-import { unsubscribeChannel } from '../../../clients/redis/redis-client';
+import { gameStateSubscriberClient } from '../../../clients/redis';
 
 export const unsubscribeRoomHandler = async (ws: WebSocket) => {
   if (ws.channelListener) {
-    await unsubscribeChannel(ws.channelListener);
+    await gameStateSubscriberClient.unsubscribeFromChanges(ws.channelListener);
     ws.send('unsubscribed');
   }
 };

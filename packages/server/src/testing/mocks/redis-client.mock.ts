@@ -9,13 +9,16 @@ export const createMockGameState = (): GameState => ({
   questions: [],
 });
 
+export const redisClientMock = {
+  connect: vi.fn(),
+  addListener: vi.fn(),
+  publish: vi.fn(),
+  subscribe: vi.fn(),
+  unsubscribe: vi.fn(),
+  get: vi.fn(),
+  set: vi.fn(),
+};
+
 vi.mock('redis', () => ({
-  createClient: vi.fn().mockImplementation(() => ({
-    connect: vi.fn(),
-    publish: vi.fn(),
-    subscribe: vi.fn(),
-    unsubscribe: vi.fn(),
-    get: vi.fn(),
-    set: vi.fn(),
-  })),
+  createClient: vi.fn().mockImplementation(() => redisClientMock),
 }));

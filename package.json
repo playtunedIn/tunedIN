@@ -1,6 +1,6 @@
 {
-  "name": "spotispy",
-  "description": "A Monorepo for spotispy project",
+  "name": "tunedin",
+  "description": "A Monorepo for TunedIn project",
   "private": true,
   "engines": {
     "node": ">=20.0.0"

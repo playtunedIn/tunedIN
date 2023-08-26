@@ -1,109 +1,147 @@
-import { beforeEach, afterEach, describe, vi, it, expect } from "vitest";
-import { WebSocket } from 'ws';
-import type { JoinRoomReq } from "../join-room.validator";
-import { isValidJoinRoomReq, joinRoomHandler } from "../join-room";
-import { instance, mock, verify, when } from 'ts-mockito';
-import { getValue } from "src/clients/redis/redis-client";
-import * as redisClientModule from 'src/clients/redis/redis-client';
-import { subscribeGameHandler } from "src/handlers/game-handlers/subscribe-game/subscribe-game";
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-class MockWebSocket extends WebSocket {
-    override send = vi.fn();
-    override close = vi.fn();
-}
-
+import { joinRoomHandler } from 'src/handlers/room-handlers/join-room/join-room';
+import { createMockGameState, redisClientMock } from 'src/testing/mocks/redis-client.mock';
+import { createMockWebSocket } from '../../../../testing/mocks/websocket.mock';
+import { JOIN_ROOM_ERROR_RESPONSE, JOIN_ROOM_RESPONSE } from 'src/handlers/room-handlers/types/response';
+import { JOIN_ROOM_ERROR_CODES } from '../join-room.errors';
+import type { JoinRoomReq } from '../join-room.validator';
 
 describe('Join Room Handler', () => {
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
 
-    // it('should call getValue and other functions correctly', async () => {
-    //     // Arrange
-    //     const wsMock = instance(mock(WebSocket));
-    //     const data = { roomId: 'testRoomId', playerId: 'Matttty'};
-    //     const getValueMock = mock(redisClientModule.getValue);
-    //     const setValueMock = mock(redisClientModule.setValue);
-    //     const publishChannelMock = mock(redisClientModule.publishChannel);
-    //     const subscribeGameHandlerMock = mock(subscribeGameHandler); // Assuming you have a function import like this
-    
-    //     // Mock getValue function behavior
-    //     when(getValueMock(anything())).thenResolve('gameStateJson');
-    
-    //     // Mock subscribeGameHandler to do nothing
-    //     when(subscribeGameHandlerMock(anything(), anything())).thenResolve();
-    
-    //     // Act
-    //     await joinRoomHandler(wsMock, data);
-    
-    //     // Assert
-    //     verify(getValueMock(data.roomId)).called(); // Verify getValue is called
-    //     verify(subscribeGameHandlerMock(wsMock, data.roomId)).called(); // Verify subscribeGameHandler is called
-    
-    //     // Restore original functions (important for subsequent tests)
-    //     when(setValueMock(anything(), anything())).thenResolve();
-    //     when(publishChannelMock(anything(), anything())).thenResolve();
-    //     // redisClientModule.getValue = redisClientModule.getValue;
-    //     // redisClientModule.setValue = redisClientModule.setValue;
-    //     // redisClientModule.publishChannel = redisClientModule.publishChannel;
-    //   });
+  it('should return the happy path of the join room', async () => {
+    const mockGameState = createMockGameState();
+    const mockWebSocket = createMockWebSocket();
+    redisClientMock.get.mockReturnValue(JSON.stringify(mockGameState));
+    await joinRoomHandler(mockWebSocket, { roomId: 'test', playerId: 'test' });
+    expect(mockWebSocket.send).toHaveBeenCalledWith(
+      JSON.stringify({
+        type: JOIN_ROOM_RESPONSE,
+        data: { ...mockGameState, host: 'test', players: [{ playerId: 'test', score: 0, answers: [] }] },
+      })
+    );
+  });
 
+  it('should return with an error of invalid schema', async () => {
+    const mockGameState = createMockGameState();
+    const mockWebSocket = createMockWebSocket();
+    const invalidReq = { roomId: 'test', grape: 'yoeoo' } as unknown as JoinRoomReq;
+    redisClientMock.get.mockReturnValue(JSON.stringify(mockGameState));
+    await joinRoomHandler(mockWebSocket, invalidReq);
+    expect(mockWebSocket.send).toHaveBeenCalledWith(
+      JSON.stringify({
+        type: JOIN_ROOM_ERROR_RESPONSE,
+        data: { errorCode: JOIN_ROOM_ERROR_CODES.InvalidRoomReq },
+      })
+    );
+  });
 
-      
-      it('should call send', () => {
-        const mockWebSocket = new MockWebSocket('ws://myexample.com')
+  it('should return with an error of room not found', async () => {
+    const mockWebSocket = createMockWebSocket();
+    redisClientMock.get.mockReturnValue('');
+    await joinRoomHandler(mockWebSocket, { roomId: 'test', playerId: 'test' });
+    expect(mockWebSocket.send).toHaveBeenCalledWith(
+      JSON.stringify({
+        type: JOIN_ROOM_ERROR_RESPONSE,
+        data: { errorCode: JOIN_ROOM_ERROR_CODES.RoomNotFound },
+      })
+    );
+  });
 
-        const getValueMock = mock(redisClientModule.getValue);
+  it('should return room is full', async () => {
+    const mockGameState = createMockGameState();
+    const mockWebSocket = createMockWebSocket();
 
+    const newPlayer = {
+      playerId: 'newPlayerId',
+      score: 0,
+      answers: [],
+    };
 
-        const mockJoinRoomReq: JoinRoomReq = {
-                    roomId: "mockedRoomId",
-                    playerId: "mockedPlayerId"
-                }
+    const newPlayer2 = {
+      playerId: 'newPlayerId2',
+      score: 0,
+      answers: [],
+    };
 
-        when(getValueMock(mockJoinRoomReq.roomId)).thenResolve();
+    const newPlayer3 = {
+      playerId: 'newPlayerId3',
+      score: 0,
+      answers: [],
+    };
 
-      
-        joinRoomHandler(mockWebSocket, mockJoinRoomReq);
-      
-        expect(mockWebSocket.send).toHaveBeenCalledOnce();
-        expect(getValueMock).toHaveBeenCalledOnce();
-      });
+    const newPlayer4 = {
+      playerId: 'newPlayerId4',
+      score: 0,
+      answers: [],
+    };
 
+    mockGameState.players.push(newPlayer);
+    mockGameState.players.push(newPlayer2);
+    mockGameState.players.push(newPlayer3);
+    mockGameState.players.push(newPlayer4);
 
-    // it('Valid Room Join', async () => {
+    redisClientMock.get.mockReturnValue(JSON.stringify(mockGameState));
+    await joinRoomHandler(mockWebSocket, { roomId: 'test', playerId: 'test' });
+    expect(mockWebSocket.send).toHaveBeenCalledWith(
+      JSON.stringify({
+        type: JOIN_ROOM_ERROR_RESPONSE,
+        data: { errorCode: JOIN_ROOM_ERROR_CODES.RoomFull },
+      })
+    );
+  });
 
-    //     // const mockWebSocket = {} as WebSocket;
+  it('should return with an error if player is already in the room', async () => {
+    const mockGameState = createMockGameState();
+    const newPlayer = {
+      playerId: 'newPlayerId',
+      score: 0,
+      answers: [],
+    };
+    mockGameState.players.push(newPlayer); // Assume `newPlayer` has already joined the room
+    const mockWebSocket = createMockWebSocket();
 
-    //     const mockWebSocket = {
-    //         send: vi.fn(),
-    //         close: vi.fn(),
-    //     }
+    redisClientMock.get.mockReturnValue(JSON.stringify(mockGameState));
+    await joinRoomHandler(mockWebSocket, { roomId: 'test', playerId: 'newPlayerId' });
 
-    //     // const generateMockWebSocket = () => ({
-    //     //     send: vi.fn(),
-    //     // })
+    expect(mockWebSocket.send).toHaveBeenCalledWith(
+      JSON.stringify({
+        type: JOIN_ROOM_ERROR_RESPONSE,
+        data: { errorCode: JOIN_ROOM_ERROR_CODES.PlayerAlreadyInRoom },
+      })
+    );
+  });
 
-    //     // const mockWebSocket = {
-    //     //     // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-    //     //     send: vi.fn(), // Mock the send method
-    //     //     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    //     //     close: vi.fn(), // Mock the close method
-    //     //     // Add other methods and properties that your code interacts with
-    //     //   };
+  //TODO
+  // it('should return with a handler error', async () => {
+  // });
 
-    //     const mockJoinRoomReq: JoinRoomReq = {
-    //         roomId: "mockedRoomId",
-    //         playerId: "mockedPlayerId"
-    //     }
+  it('should expect that there is a parsing error', async () => {
+    const mockWebSocket = createMockWebSocket();
+    const mockGameState = createMockGameState();
+    const expectedGameState = `{ roomId: 'test', host: 'test', players: [{
+      playerId: 'newPlayerId3',
+      score: 0,
+      answers: [],
+    }], questions: [] }`;
 
-    //     joinRoomHandler(mockWebSocket, mockJoinRoomReq);
+    const data = { roomId: 'test', playerId: 'test' };
 
-    //     const isValid = isValidJoinRoomReq(mockJoinRoomReq);
-    //     expect(isValid).toBeTruthy();
+    mockGameState.roomId = 'test';
+    redisClientMock.get.mockReturnValue(expectedGameState);
+    await joinRoomHandler(mockWebSocket, data);
+    expect(mockWebSocket.send).toHaveBeenCalledWith(
+      JSON.stringify({
+        type: JOIN_ROOM_ERROR_RESPONSE,
+        data: { errorCode: JOIN_ROOM_ERROR_CODES.GameStateParsingError },
+      })
+    );
+  });
 
-
-    // })
-    
+  //TODO
+  // it('should expect that the game state has changed', async () => {
+  // });
 });
-
-function anything(): any {
-    throw new Error("Function not implemented.");
-}

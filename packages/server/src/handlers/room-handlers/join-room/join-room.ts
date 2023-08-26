@@ -1,6 +1,6 @@
 import type { WebSocket } from 'ws';
 
-import { getValue, publishChannel, setValue } from '../../../clients/redis/redis-client';
+import { gameStatePublisherClient } from '../../../clients/redis';
 import { isValidSchema } from '../../message.validator';
 import { subscribeGameHandler } from '../../game-handlers/subscribe-game/subscribe-game';
 import type { JoinRoomReq } from './join-room.validator';
@@ -17,7 +17,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
     return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.InvalidRoomReq });
   }
 
-  const gameStateJson = await getValue(data.roomId);
+  const gameStateJson = await gameStatePublisherClient.get(data.roomId);
   if (!gameStateJson) {
     return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.RoomNotFound });
   }
@@ -53,8 +53,8 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
 
   try {
     await Promise.all([
-      setValue(gameState.roomId, newGameState),
-      publishChannel(gameState.roomId, newGameState),
+      gameStatePublisherClient.set(gameState.roomId, newGameState),
+      gameStatePublisherClient.publishChanges(gameState.roomId, newGameState),
       subscribeGameHandler(ws, gameState.roomId),
     ]);
   } catch (error) {

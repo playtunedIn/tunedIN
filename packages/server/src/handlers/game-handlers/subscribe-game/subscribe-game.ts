@@ -1,6 +1,6 @@
-import { WebSocket } from 'ws';
+import type { WebSocket } from 'ws';
 
-import { subscribeChannel } from '../../../clients/redis/redis-client';
+import { gameStateSubscriberClient } from '../../../clients/redis';
 
 export const subscribeGameHandler = async (ws: WebSocket, roomId: string) => {
   ws.channelListener = {
@@ -10,5 +10,5 @@ export const subscribeGameHandler = async (ws: WebSocket, roomId: string) => {
     },
   };
 
-  await subscribeChannel(ws.channelListener);
+  await gameStateSubscriberClient.subscribeToChanges(ws.channelListener);
 };
