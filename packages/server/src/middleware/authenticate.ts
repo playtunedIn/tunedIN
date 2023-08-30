@@ -1,5 +1,5 @@
 import { decrypt } from '../utils/crypto';
-import { TunedInJwtPayload, verifyToken } from '../utils/auth';
+import { type TunedInJwtPayload, verifyToken } from '../utils/auth';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const authenticateToken = (req: any, res: any, next: () => void) => {
@@ -13,6 +13,5 @@ export const authenticateToken = (req: any, res: any, next: () => void) => {
       req.token = decrypt(user.spotifyToken);
       next();
     })
-    .catch(() => res.sendStatus(403))
-
+    .catch(() => res.sendStatus(403));
 };

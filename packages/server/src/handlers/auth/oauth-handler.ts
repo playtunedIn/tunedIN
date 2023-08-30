@@ -104,7 +104,7 @@ export const setupOauthRoutes = (app: any) => {
       if (tokenResponse.status === 200) {
         const body = (await tokenResponse.json()) as OauthResponse;
         const access_token = body.access_token;
-        console.log({access_token})
+        console.log({ access_token });
         const profileBody = await getSelf(access_token);
 
         const encryptedAccessToken = encrypt(access_token);
@@ -119,6 +119,12 @@ export const setupOauthRoutes = (app: any) => {
             },
             body.expires_in
           );
+
+          res.cookie('TUNEDIN_TOKEN', jwt, {
+            secure: process.env.NODE_ENV !== 'development',
+            httpOnly: true,
+            expires: new Date(Date.now() + body.expires_in),
+          });
 
           res.redirect(
             POST_LOGIN_URL +
