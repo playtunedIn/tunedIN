@@ -1,15 +1,15 @@
-# SpotiSpy
+# TunedIN
 
-SpotiSpy is an app that combines trivia gaming with Spotify data. It provides a fun way to test your music knowledge
+TunedIN is an app that combines trivia gaming with Spotify data. It provides a fun way to test your music knowledge
 based on your personal Spotify data.
 
 ## Getting Started
 
-Follow the instructions below to get the SpotiSpy app up and running on your local machine.
+Follow the instructions below to get the TunedIN app up and running on your local machine.
 
 ### Prerequisites
 
-To run the SpotiSpy app, you'll need the following installed on your machine:
+To run the TunedIN app, you'll need the following installed on your machine:
 
 - Node.js (v20 or higher)
 - PNPM
@@ -19,13 +19,13 @@ To run the SpotiSpy app, you'll need the following installed on your machine:
 1. Clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/your-username/SpotiSpy.git
+git clone https://github.com/playtunedIn/tunedIN.git
 ```
 
 2. Navigate to the project's root directory:
 
 ```bash
-cd SpotiSpy
+cd tunedIN
 ```
 
 3. Install the dependencies:
@@ -40,13 +40,41 @@ pnpm install
 pnpm generate-certs
 ```
 
-5. Setup Redis instance (**note** you will need docker, docker runtime, and the redis image setup):
+5. Setup Docker
+
+To Setup Docker you must install a docker runtime
+
+**Windows**
+
+[Docker Desktop](https://www.docker.com/)
+
+**Mac**
+
+[Homebrew installer](https://brew.sh/)
 
 ```bash
-docker run -d -p 6379:6379 --name myredis redis
+brew install colima
 ```
 
-6. Start project:
+6. Run Docker
+
+**Windows**
+
+Launch Docker Desktop application
+
+**Mac**
+
+```bash
+colima start -m 4
+```
+
+7. Ensure Environments are setup for client and server
+
+[Client README.md](https://github.com/playtunedIn/tunedIN/blob/main/packages/client/README.md)
+
+[Server README.md](https://github.com/playtunedIn/tunedIN/blob/main/packages/server/README.md)
+
+8. Start project:
 
 ```bash
 pnpm dev
@@ -54,13 +82,13 @@ pnpm dev
 
 ### Usage
 
-Once the app is running, you can explore the SpotiSpy trivia game and enjoy testing your music knowledge based on your
+Once the app is running, you can explore the TunedIN trivia game and enjoy testing your music knowledge based on your
 Spotify data. Follow the on-screen instructions to play the game and have fun!
 
 To access the following services in your local environment use the following links:
 
-- client - http://localhost:8080
-- server - http://localhost:3001
+- client - https://local.playtunedin-test.com:8080/
+- server - https://local.playtunedin-test.com:3001/
 
 ### FAQ
 
