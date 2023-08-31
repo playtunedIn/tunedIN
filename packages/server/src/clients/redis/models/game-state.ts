@@ -4,6 +4,7 @@ export interface Question {
   answer: number; // Index in choices for correct answer.
 }
 
+//todo change playstate name to something different than playersate
 export interface PlayerState {
   playerId: string;
   score: number;

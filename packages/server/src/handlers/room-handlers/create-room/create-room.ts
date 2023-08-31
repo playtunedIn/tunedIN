@@ -1,108 +1,53 @@
 import type { WebSocket } from 'ws';
-import { getValue, setValue } from '../../../clients/redis/redis-client';
-import validator from '../../message.validator';
+import { isValidSchema } from '../../message.validator';
 import type { CreateRoomReq } from './create-room.validator';
 import { CREATE_ROOM_SCHEMA_NAME } from './create-room.validator';
-import { CreateRoomErrorCode } from './create-room-errors';
+import { CREATE_ROOM_ERROR_CODES } from './create-room-errors';
 import { joinRoomHandler } from '../join-room/join-room';
+import { sendResponse } from '../../../utils/websocket-response';
+import { CREATE_ROOM_ERROR_RESPONSE, CREATE_ROOM_RESPONSE } from '../types/response';
+import { generateDefaultGameState, generateJoinRoomReq, generateUniqueRoomId } from './create-room.utils';
+import { gameStatePublisherClient } from '../../../clients/redis';
 
-const roomIdLength = 4;
+const ROOM_ID_LENGTH = 4;
 
 export const createRoomHandler = async (ws: WebSocket, data: CreateRoomReq) => {
-  // Validate the incoming CreateRoomReq
-  if (!isValidCreateRoomReq(data)) {
-    return generateErrorResponse(ws, CreateRoomErrorCode.InvalidRoomReq);
+  if (!isValidSchema(data, CREATE_ROOM_SCHEMA_NAME)) {
+    return sendResponse(ws, CREATE_ROOM_ERROR_RESPONSE, { errorCode: CREATE_ROOM_ERROR_CODES.InvalidRoomReq });
   }
 
-  // Generate a unique room ID
-  const roomId = generateUniqueRoomId();
+  //todo playerstate check
+  // if (await playerStatePublisherClient.get(data.playerId)) {
+  //   return sendResponse(ws, CREATE_ROOM_ERROR_RESPONSE, { errorCode: CREATE_ROOM_ERROR_CODES.PlayerAlreadyInRoom });
+  // }
 
-  // Define the default game state with the generated room ID
+  const roomId = generateUniqueRoomId(ROOM_ID_LENGTH);
+  if ((await roomId).length != ROOM_ID_LENGTH) {
+    return sendResponse(ws, CREATE_ROOM_ERROR_RESPONSE, { errorCode: CREATE_ROOM_ERROR_CODES.GenerateIdError });
+  }
+
   const defaultGameStateJson = generateDefaultGameState(await roomId);
 
   let gameStateStr: string;
   try {
-    // Convert default game state to JSON string
     gameStateStr = JSON.stringify(defaultGameStateJson);
   } catch (stringifyError) {
-    return generateErrorResponse(ws, CreateRoomErrorCode.GameStateStringifyingError);
+    return sendResponse(ws, CREATE_ROOM_ERROR_RESPONSE, {
+      errorCode: CREATE_ROOM_ERROR_CODES.GameStateStringifyingError,
+    });
   }
 
   try {
-    // Store the default game state in Redis
-    await setValue(defaultGameStateJson.roomId, gameStateStr);
-    // Send success response
-    generateResponse(ws, gameStateStr);
+    await gameStatePublisherClient.set(defaultGameStateJson.roomId, gameStateStr);
+    sendResponse(ws, CREATE_ROOM_RESPONSE, defaultGameStateJson);
   } catch {
-    // Send error response if storage fails
-    generateErrorResponse(ws, CreateRoomErrorCode.HandlerError);
+    return sendResponse(ws, CREATE_ROOM_ERROR_RESPONSE, { errorCode: CREATE_ROOM_ERROR_CODES.HandlerError });
   }
 
-  // Prepare a JoinRoomReq to join the created room
   const joinRoomReq = generateJoinRoomReq(defaultGameStateJson, data);
-
   try {
-    // Call joinRoomHandler to join the created room
     joinRoomHandler(ws, joinRoomReq);
   } catch {
-    // Send error response if joinRoomHandler fails
-    generateErrorResponse(ws, CreateRoomErrorCode.JoinRoomHandlerError);
+    return sendResponse(ws, CREATE_ROOM_ERROR_RESPONSE, { errorCode: CREATE_ROOM_ERROR_CODES.JoinRoomHandlerError });
   }
-};
-
-const isValidCreateRoomReq = (data: CreateRoomReq) => {
-  const validate = validator.getSchema<CreateRoomReq>(CREATE_ROOM_SCHEMA_NAME);
-  return Boolean(validate?.(data));
-};
-
-function generateJoinRoomReq(defaultGameStateJson: { roomId: string; hostId: string; players: never[]; questions: never[]; }, data: CreateRoomReq) {
-  return {
-    roomId: defaultGameStateJson.roomId,
-    playerId: data.playerId,
-  };
-}
-
-function generateDefaultGameState(roomId: string) {
-  return {
-    roomId: roomId,
-    hostId: '',
-    players: [],
-    questions: [],
-  };
-}
-
-async function generateUniqueRoomId(): Promise<string> {
-  const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  let result = '';
-
-  for (let i = 0; i < roomIdLength; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    result += characters[randomIndex];
-  }
-  
-  const existingGameStateJson = await getValue(result);
-
-  if (existingGameStateJson) {
-    generateUniqueRoomId;
-  }
-
-  return result;
-}
-
-const generateResponse = (ws: WebSocket, gameState: string): void => {
-  const response = {
-    type: 'CreateRoomResponse',
-    data: gameState,
-  };
-
-  try {
-    const responseJson = JSON.stringify(response);
-    ws.send(responseJson);
-  } catch (stringifyError) {
-    console.error('Error while stringifying response JSON:', stringifyError);
-  }
-};
-
-  await setValue(defaultGameState.roomId, JSON.stringify(defaultGameState));
-  ws.send(`Created room: ${defaultGameState.roomId}`);
 };
