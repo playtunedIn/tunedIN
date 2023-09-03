@@ -104,7 +104,6 @@ export const setupOauthRoutes = (app: any) => {
       if (tokenResponse.status === 200) {
         const body = (await tokenResponse.json()) as OauthResponse;
         const access_token = body.access_token;
-        console.log({ access_token });
         const profileBody = await getSelf(access_token);
 
         const encryptedAccessToken = encrypt(access_token);
