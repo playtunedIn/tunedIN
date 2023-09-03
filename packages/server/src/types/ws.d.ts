@@ -8,3 +8,5 @@ declare module 'ws' {
     };
   }
 }
+
+export {};
