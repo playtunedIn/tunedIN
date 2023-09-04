@@ -14,6 +14,8 @@ import { heartbeat } from './handlers/websocket/websocket-handlers';
 import { gameStateSubscriberClient } from './clients/redis';
 import { authenticateToken } from './middleware/authenticate';
 import { getSelf } from './clients/spotify/spotify-client';
+import type { TunedInJwtPayload } from './utils/auth';
+import { verifyToken } from './utils/auth';
 
 const WS_HEARTBEAT_INTERVAL = parseInt(process.env.WS_HEARTBEAT_INTERVAL || '30000');
 
@@ -23,7 +25,7 @@ const port = process.env.PORT || 3001;
 
 const app = express();
 app.use(cookieParser());
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: 'https://local.playtunedin-test.com:8080' }));
 
 app.get('/test', function (_: Request, res: Response) {
   res.send({ test: 'good' });
@@ -74,18 +76,28 @@ server.on('upgrade', (req, socket, head) => {
    *
    * Git issue: https://github.com/websockets/ws/issues/377#issuecomment-1694386948
    */
-  wsServer.handleUpgrade(req, socket, head, ws => {
+  wsServer.handleUpgrade(req, socket, head, async ws => {
+    const token = req.headers.token;
+    if (typeof token !== 'string') {
+      ws.close(4001);
+      return;
+    }
+
+    let userToken: TunedInJwtPayload;
     try {
-      // TODO: Use JWT validate logic (may not need a try/catch)
+      userToken = await verifyToken(token);
     } catch {
       ws.close(4001);
+      return;
     }
-    // TODO: attach spotify api tokens to websocket
-    wsServer.emit('connection', ws, req);
+
+    wsServer.emit('connection', ws, req, userToken);
   });
 });
 
-wsServer.on('connection', (ws: WebSocket) => {
+wsServer.on('connection', (ws: WebSocket, userToken: TunedInJwtPayload) => {
+  ws.userToken = userToken;
+
   ws.on('message', (data: string) => {
     messageHandler(ws, data);
   });

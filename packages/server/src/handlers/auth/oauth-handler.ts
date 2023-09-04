@@ -14,6 +14,7 @@ import jwt from 'jsonwebtoken';
 import { encrypt } from '../../utils/crypto';
 import { getSelf } from '../../clients/spotify/spotify-client';
 import type { Request, Response } from 'express';
+import type { TunedInJwtPayload } from 'src/utils/auth';
 
 const CLIENT_ID = process.env.CLIENT_ID || ''; // Your client id
 const CLIENT_SECRET = process.env.CLIENT_SECRET || ''; // Your secret
@@ -29,13 +30,6 @@ type OauthResponse = {
   token_type: string;
   expires_in: number;
   scope: string;
-};
-
-export type TunedInJwtPayload = {
-  spotifyToken: string;
-  refresh: string;
-  userId: string;
-  name: string;
 };
 
 /**
@@ -110,7 +104,6 @@ export const setupOauthRoutes = (app: any) => {
       if (tokenResponse.status === 200) {
         const body = (await tokenResponse.json()) as OauthResponse;
         const access_token = body.access_token;
-
         const profileBody = await getSelf(access_token);
 
         const encryptedAccessToken = encrypt(access_token);
@@ -125,6 +118,12 @@ export const setupOauthRoutes = (app: any) => {
             },
             body.expires_in
           );
+
+          res.cookie('TUNEDIN_TOKEN', jwt, {
+            secure: process.env.NODE_ENV !== 'development',
+            httpOnly: true,
+            expires: new Date(Date.now() + body.expires_in),
+          });
 
           res.redirect(
             POST_LOGIN_URL +
