@@ -145,9 +145,6 @@ importers:
       redis:
         specifier: ^4.6.7
         version: 4.6.8
-      ts-mockito:
-        specifier: ^2.6.1
-        version: 2.6.1
       websocket:
         specifier: ^1.0.34
         version: 1.0.34
@@ -6650,12 +6647,6 @@ packages:
     resolution: {integrity: sha512-jRKj0n0jXWo6kh62nA5TEh3+4igKDXLvzBJcPpiizP7oOolUrYIxmVBG9TOtHYFHoddUk6YvAkGeGoSVTXfQXQ==}
     engines: {node: '>=12'}
     dev: true
-
-  /ts-mockito@2.6.1:
-    resolution: {integrity: sha512-qU9m/oEBQrKq5hwfbJ7MgmVN5Gu6lFnIGWvpxSjrqq6YYEVv+RwVFWySbZMBgazsWqv6ctAyVBpo9TmAxnOEKw==}
-    dependencies:
-      lodash: 4.17.21
-    dev: false
 
   /tsconfig-paths@3.14.2:
     resolution: {integrity: sha512-o/9iXgCYc5L/JxCHPe3Hvh8Q/2xm5Z+p18PESBU6Ff33695QnCHBEjcytY2q19ua7Mbl/DavtBOLq+oG0RCL+g==}
