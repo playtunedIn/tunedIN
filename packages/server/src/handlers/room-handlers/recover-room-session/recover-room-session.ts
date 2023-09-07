@@ -10,8 +10,7 @@ import { RECOVER_ROOM_SESSION_ERROR_CODES } from './recover-room-session.errors'
 export const recoverRoomSessionHandler = async (ws: WebSocket) => {
   let playerRoomStateStr: string | null;
   try {
-    // TODO: Use jwt to determine player's id
-    playerRoomStateStr = await playerStatePublisherClient.get('player 2');
+    playerRoomStateStr = await playerStatePublisherClient.get(ws.userToken.userId);
   } catch (err) {
     return sendResponse(ws, RECOVER_ROOM_SESSION_ERROR_RESPONSE, {
       errorCode: RECOVER_ROOM_SESSION_ERROR_CODES.PLAYER_SESSION_REQ_FAILED,
