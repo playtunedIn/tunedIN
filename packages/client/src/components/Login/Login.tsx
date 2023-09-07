@@ -1,4 +1,4 @@
-const authUrl = 'https://localhost:3001/login';
+const authUrl = 'https://local.playtunedin-test.com:3001/login';
 
 export const Login = () => {
   const redirectToAuth = () => (window.location.href = authUrl);
