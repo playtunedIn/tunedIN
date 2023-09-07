@@ -74,7 +74,6 @@ const wsServer = new WebSocketServer({
 });
 
 wsServer.on('connection', (ws: WebSocket) => {
-  
   ws.on('message', (data: string) => {
     messageHandler(ws, data);
   });
