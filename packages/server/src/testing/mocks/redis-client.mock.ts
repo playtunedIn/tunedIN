@@ -1,12 +1,16 @@
 import { vi } from 'vitest';
 
-import type { GameState } from 'src/clients/redis/models/game-state';
+import type { GameState, PlayerRoomSession } from 'src/clients/redis/models/game-state';
 
 export const createMockGameState = (): GameState => ({
   roomId: '',
   host: '',
   players: [],
   questions: [],
+});
+
+export const createMockPlayerSessionState = (): PlayerRoomSession => ({
+  roomId: '',
 });
 
 export const redisClientMock = {
