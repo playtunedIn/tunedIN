@@ -77,9 +77,7 @@ server.on('upgrade', (req, socket, head) => {
    * Git issue: https://github.com/websockets/ws/issues/377#issuecomment-1694386948
    */
   wsServer.handleUpgrade(req, socket, head, async ws => {
-    const token = req.headers.cookie;
-
-    const tokenValue = token
+    const tokenValue = req.headers.cookie
       ?.split(';')
       .map(vals => vals.split('='))
       .filter(vals => vals[0] === 'TUNEDIN_TOKEN')
