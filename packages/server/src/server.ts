@@ -101,7 +101,7 @@ server.on('upgrade', (req, socket, head) => {
   });
 });
 
-wsServer.on('connection', (ws: WebSocket, userToken: TunedInJwtPayload) => {
+wsServer.on('connection', (ws: WebSocket, _: Request, userToken: TunedInJwtPayload) => {
   ws.userToken = userToken;
 
   ws.on('message', (data: string) => {
