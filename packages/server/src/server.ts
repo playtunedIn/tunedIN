@@ -15,6 +15,7 @@ import { gameStateSubscriberClient } from './clients/redis';
 import { authenticateToken } from './middleware/authenticate';
 import { getSelf } from './clients/spotify/spotify-client';
 import type { TunedInJwtPayload } from './utils/auth';
+import { getCookie } from './utils/auth';
 import { verifyToken } from './utils/auth';
 
 const WS_HEARTBEAT_INTERVAL = parseInt(process.env.WS_HEARTBEAT_INTERVAL || '30000');
@@ -77,11 +78,7 @@ server.on('upgrade', (req, socket, head) => {
    * Git issue: https://github.com/websockets/ws/issues/377#issuecomment-1694386948
    */
   wsServer.handleUpgrade(req, socket, head, async ws => {
-    const tokenValue = req.headers.cookie
-      ?.split(';')
-      .map(vals => vals.split('='))
-      .filter(vals => vals[0] === 'TUNEDIN_TOKEN')
-      .map(vals => vals[1])?.[0];
+    const tokenValue = getCookie(req.headers.cookie, 'TUNEDIN_TOKEN');
 
     if (typeof tokenValue !== 'string') {
       console.log('Token not found');
