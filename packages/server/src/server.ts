@@ -77,25 +77,31 @@ server.on('upgrade', (req, socket, head) => {
    * Git issue: https://github.com/websockets/ws/issues/377#issuecomment-1694386948
    */
   wsServer.handleUpgrade(req, socket, head, async ws => {
-    const token = req.headers.token;
-    if (typeof token !== 'string') {
+    const tokenValue = req.headers.cookie
+      ?.split(';')
+      .map(vals => vals.split('='))
+      .filter(vals => vals[0] === 'TUNEDIN_TOKEN')
+      .map(vals => vals[1])?.[0];
+
+    if (typeof tokenValue !== 'string') {
+      console.log('Token not found');
       ws.close(4001);
       return;
     }
 
     let userToken: TunedInJwtPayload;
     try {
-      userToken = await verifyToken(token);
+      userToken = await verifyToken(tokenValue);
     } catch {
+      console.log('Error verifying token');
       ws.close(4001);
       return;
     }
-
     wsServer.emit('connection', ws, req, userToken);
   });
 });
 
-wsServer.on('connection', (ws: WebSocket, userToken: TunedInJwtPayload) => {
+wsServer.on('connection', (ws: WebSocket, _: Request, userToken: TunedInJwtPayload) => {
   ws.userToken = userToken;
 
   ws.on('message', (data: string) => {
