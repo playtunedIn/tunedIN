@@ -1,5 +1,5 @@
 services:
   redis:
-    image: 'redis:alpine'
+    image: 'redis/redis-stack-server:7.2.0-v2'
     ports:
       - '6379:6379'

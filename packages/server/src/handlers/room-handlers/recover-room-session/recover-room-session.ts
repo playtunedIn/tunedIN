@@ -1,61 +1,39 @@
 import type { WebSocket } from 'ws';
 
+import type { RedisJSON } from '@redis/json/dist/commands';
+
 import type { GameState, PlayerRoomSession } from '../../../clients/redis/models/game-state';
 import { gameStatePublisherClient, playerStatePublisherClient } from '../../../clients/redis';
 import { sendResponse } from '../../../utils/websocket-response';
 import { subscribeGameHandler } from '../../game-handlers/subscribe-game/subscribe-game';
 import { RECOVER_ROOM_SESSION_ERROR_RESPONSE, RECOVER_ROOM_SESSION_RESPONSE } from '../../room-handlers/types/response';
-import { RECOVER_ROOM_SESSION_ERROR_CODES } from './recover-room-session.errors';
+import { REDIS_ERROR_CODES } from '../../../errors';
 
 export const recoverRoomSessionHandler = async (ws: WebSocket) => {
-  let playerRoomStateStr: string | null;
+  let playerSessionResponse: RedisJSON[];
   try {
-    playerRoomStateStr = await playerStatePublisherClient.get(ws.userToken.userId);
-  } catch (err) {
-    return sendResponse(ws, RECOVER_ROOM_SESSION_ERROR_RESPONSE, {
-      errorCode: RECOVER_ROOM_SESSION_ERROR_CODES.PLAYER_SESSION_REQ_FAILED,
-    });
+    playerSessionResponse = (await playerStatePublisherClient.json.get(ws.userToken.userId)) as RedisJSON[];
+  } catch {
+    return sendResponse(ws, RECOVER_ROOM_SESSION_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.COMMAND_FAILURE });
   }
 
-  if (!playerRoomStateStr) {
-    return sendResponse(ws, RECOVER_ROOM_SESSION_ERROR_RESPONSE, {
-      errorCode: RECOVER_ROOM_SESSION_ERROR_CODES.PLAYER_SESSION_NOT_FOUND,
-    });
+  if (playerSessionResponse[0] === null) {
+    return sendResponse(ws, RECOVER_ROOM_SESSION_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.KEY_NOT_FOUND });
   }
+  const playerSession = playerSessionResponse[0] as unknown as PlayerRoomSession;
 
-  let playerRoomState: PlayerRoomSession;
+  let gameStateResponse: RedisJSON[];
   try {
-    playerRoomState = JSON.parse(playerRoomStateStr);
-  } catch (err) {
-    return sendResponse(ws, RECOVER_ROOM_SESSION_ERROR_RESPONSE, {
-      errorCode: RECOVER_ROOM_SESSION_ERROR_CODES.CORRUPT_PLAYER_SESSION,
-    });
+    gameStateResponse = (await gameStatePublisherClient.json.get(playerSession.roomId)) as RedisJSON[];
+  } catch {
+    return sendResponse(ws, RECOVER_ROOM_SESSION_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.COMMAND_FAILURE });
   }
 
-  let gameStateStr: string | null;
-  try {
-    gameStateStr = await gameStatePublisherClient.get(playerRoomState.roomId);
-  } catch (err) {
-    return sendResponse(ws, RECOVER_ROOM_SESSION_ERROR_RESPONSE, {
-      errorCode: RECOVER_ROOM_SESSION_ERROR_CODES.GAME_STATE_REQ_FAILED,
-    });
+  if (gameStateResponse[0] === null) {
+    return sendResponse(ws, RECOVER_ROOM_SESSION_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.KEY_NOT_FOUND });
   }
-
-  if (!gameStateStr) {
-    return sendResponse(ws, RECOVER_ROOM_SESSION_ERROR_RESPONSE, {
-      errorCode: RECOVER_ROOM_SESSION_ERROR_CODES.GAME_STATE_NOT_FOUND,
-    });
-  }
-
-  let gameState: GameState;
-  try {
-    gameState = JSON.parse(gameStateStr);
-  } catch (err) {
-    return sendResponse(ws, RECOVER_ROOM_SESSION_ERROR_RESPONSE, {
-      errorCode: RECOVER_ROOM_SESSION_ERROR_CODES.CORRUPT_GAME_STATE,
-    });
-  }
+  const gameState = gameStateResponse[0] as unknown as GameState;
 
   sendResponse(ws, RECOVER_ROOM_SESSION_RESPONSE, { state: gameState });
-  await subscribeGameHandler(ws, playerRoomState.roomId);
+  await subscribeGameHandler(ws, gameState.roomId);
 };

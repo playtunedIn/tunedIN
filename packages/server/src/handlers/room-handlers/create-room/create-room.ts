@@ -17,6 +17,6 @@ export const createRoomHandler = async (ws: WebSocket, data: CreateRoomReq) => {
     questions: [],
   };
 
-  await gameStatePublisherClient.set(defaultGameState.roomId, JSON.stringify(defaultGameState));
+  await gameStatePublisherClient.json.set(defaultGameState.roomId, '$', defaultGameState);
   ws.send(`Created room: ${defaultGameState.roomId}`);
 };
