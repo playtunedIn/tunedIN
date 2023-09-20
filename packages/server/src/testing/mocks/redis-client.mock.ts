@@ -1,11 +1,17 @@
 import { vi } from 'vitest';
 
-import type { GameState, PlayerRoomSession, PlayerState } from 'src/clients/redis/models/game-state';
+import {
+  ROOM_STATUS,
+  type GameState,
+  type PlayerRoomSession,
+  type PlayerState,
+} from '../../clients/redis/models/game-state';
 import type { SubscribedMessageHandlerResponse } from 'src/handlers/room-handlers/types/response';
 
 export const createMockGameState = (): GameState => ({
   roomId: '',
-  host: '',
+  hostId: '',
+  roomStatus: ROOM_STATUS.LOBBY,
   players: [],
   questions: [],
 });
