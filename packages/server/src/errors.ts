@@ -6,6 +6,8 @@ export const REDIS_ERROR_CODES = {
   TRANSACTION_ATTEMPT_LIMIT_REACHED: 'MULT-002',
   TRANSACTION_KEY_CHANGE: 'MULT-003',
   KEY_NOT_FOUND: 'MULT-004',
+  CORRUPT_STRINGIFY: 'MULT-005',
+  CORRUPT_JSON_PARSE: 'MULT-006',
 } as const;
 
 // Join room error codes are reserved from 200 - 299
