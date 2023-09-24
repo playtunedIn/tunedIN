@@ -17,7 +17,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: .
+        working-directory: ./terraform
     steps:
       - name: Git checkout
         uses: actions/checkout@v3
