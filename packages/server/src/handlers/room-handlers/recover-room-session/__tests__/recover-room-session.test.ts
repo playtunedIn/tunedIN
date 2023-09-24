@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { gameStatePublisherClient, playerStatePublisherClient } from '../../../../clients/redis';
 import { createMockWebSocket, createMockWebSocketMessage } from '../../../../testing/mocks/websocket.mock';
 import { recoverRoomSessionHandler } from '../recover-room-session';
-import { RECOVER_ROOM_SESSION_ERROR_RESPONSE, RECOVER_ROOM_SESSION_RESPONSE } from '../../types/response';
+import { RECOVER_ROOM_SESSION_ERROR_RESPONSE, RECOVER_ROOM_SESSION_RESPONSE } from '../../../responses';
 import { REDIS_ERROR_CODES } from '../../../../errors';
 import { createMockGameState, createMockPlayerSessionState } from 'src/testing/mocks/redis-client.mock';
 

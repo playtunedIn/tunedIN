@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { publishMessageHandler, subscribeRoomHandler, unsubscribeRoomHandler } from '../subscribed-message-handlers';
 import { createMockWebSocket, createMockWebSocketMessage } from '../../testing/mocks/websocket.mock';
-import { ADD_PLAYER_RESPONSE, SUBSCRIBED_RESPONSE } from '../room-handlers/types/response';
+import { ADD_PLAYER_RESPONSE, SUBSCRIBED_RESPONSE } from '../responses';
 import { REDIS_ERROR_CODES } from '../../errors';
 import { gameStatePublisherClient, gameStateSubscriberClient } from '../../clients/redis';
 import { createMockPublisherPayload } from '../../testing/mocks/redis-client.mock';
@@ -27,18 +27,18 @@ describe('Subscribed Message Handlers', () => {
       mockData.circularRef = mockData;
 
       await expect(() =>
-        publishMessageHandler(mockRoomId, mockUserId, ADD_PLAYER_RESPONSE, mockData)
+        publishMessageHandler(mockRoomId, ADD_PLAYER_RESPONSE, mockData, mockUserId)
       ).rejects.toThrowError(REDIS_ERROR_CODES.CORRUPT_STRINGIFY);
     });
 
     it('publishes payload', async () => {
       vi.spyOn(gameStatePublisherClient, 'publish').mockResolvedValueOnce(1);
 
-      await publishMessageHandler(mockRoomId, mockUserId, ADD_PLAYER_RESPONSE, {});
+      await publishMessageHandler(mockRoomId, ADD_PLAYER_RESPONSE, {}, mockUserId);
 
       await expect(gameStatePublisherClient.publish).toHaveBeenCalledWith(
         mockRoomId,
-        createMockPublisherPayload(mockUserId, ADD_PLAYER_RESPONSE, {})
+        createMockPublisherPayload(ADD_PLAYER_RESPONSE, {}, mockUserId)
       );
     });
   });
@@ -59,7 +59,7 @@ describe('Subscribed Message Handlers', () => {
     it('does not send response if payload is from self', async () => {
       vi.spyOn(gameStateSubscriberClient, 'subscribe').mockImplementation(
         async (_: string | string[], listener: any): Promise<void> => {
-          await listener(createMockPublisherPayload(mockUserId, ADD_PLAYER_RESPONSE, {}));
+          await listener(createMockPublisherPayload(ADD_PLAYER_RESPONSE, {}, mockUserId));
         }
       );
 
@@ -72,7 +72,7 @@ describe('Subscribed Message Handlers', () => {
     it('should send publish subscribed response', async () => {
       vi.spyOn(gameStateSubscriberClient, 'subscribe').mockImplementation(
         async (_: string | string[], listener: any): Promise<void> => {
-          await listener(createMockPublisherPayload(mockUserId, ADD_PLAYER_RESPONSE, {}));
+          await listener(createMockPublisherPayload(ADD_PLAYER_RESPONSE, {}, mockUserId));
         }
       );
 

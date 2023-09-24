@@ -51,7 +51,7 @@ describe('Socket Handlers', () => {
   afterEach(() => {
     hookUtils.unmount();
     console.error = originalConsoleError;
-    vi.restoreAllMocks();
+    vi.resetAllMocks();
   });
 
   describe('onOpen', () => {

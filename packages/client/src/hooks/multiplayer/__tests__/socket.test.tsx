@@ -15,7 +15,7 @@ describe('Socket', () => {
 
   afterEach(() => {
     console.error = originalConsoleError;
-    vi.restoreAllMocks();
+    vi.resetAllMocks();
   });
 
   describe('sendMessage', () => {

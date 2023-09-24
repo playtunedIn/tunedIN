@@ -1,19 +1,15 @@
 import type { WebSocket } from 'ws';
 
 import { gameStatePublisherClient, gameStateSubscriberClient } from '../clients/redis';
-import {
-  type SubscribedMessagePayload,
-  type SubscribedMessageHandlerResponse,
-  SUBSCRIBED_RESPONSE,
-} from './room-handlers/types/response';
-import { sendResponse } from 'src/utils/websocket-response';
-import { REDIS_ERROR_CODES } from 'src/errors';
+import { type SubscribedMessagePayload, type SubscribedMessageHandlerResponse, SUBSCRIBED_RESPONSE } from './responses';
+import { sendResponse } from '../utils/websocket-response';
+import { REDIS_ERROR_CODES } from '../errors';
 
 export const publishMessageHandler = async (
   roomId: string,
-  userId: string,
   type: SubscribedMessageHandlerResponse,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
+  userId?: string
 ) => {
   const payload: SubscribedMessagePayload = {
     userId,
@@ -28,7 +24,7 @@ export const publishMessageHandler = async (
     throw new Error(REDIS_ERROR_CODES.CORRUPT_STRINGIFY);
   }
 
-  await gameStatePublisherClient.publish(roomId, payloadStr);
+  return gameStatePublisherClient.publish(roomId, payloadStr);
 };
 
 export const subscribeRoomHandler = async (ws: WebSocket, roomId: string) => {
@@ -52,7 +48,7 @@ export const subscribeRoomHandler = async (ws: WebSocket, roomId: string) => {
     },
   };
 
-  await gameStateSubscriberClient.subscribe(ws.channelListener.channel, ws.channelListener.listener);
+  return gameStateSubscriberClient.subscribe(ws.channelListener.channel, ws.channelListener.listener);
 };
 
 export const unsubscribeRoomHandler = async (ws: WebSocket) => {

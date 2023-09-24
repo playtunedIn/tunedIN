@@ -6,15 +6,32 @@ import {
   type PlayerRoomSession,
   type PlayerState,
 } from '../../clients/redis/models/game-state';
-import type { SubscribedMessageHandlerResponse } from 'src/handlers/room-handlers/types/response';
+import type { SubscribedMessageHandlerResponse } from 'src/handlers/responses';
+import { GLOBAL_MOCK_USER_ID } from './auth.mock';
 
 export const createMockGameState = (): GameState => ({
   roomId: '',
   hostId: '',
   roomStatus: ROOM_STATUS.LOBBY,
   players: [],
+  questionIndex: 0,
   questions: [],
 });
+
+export const createMockPlayers = (): PlayerState[] => [
+  {
+    playerId: GLOBAL_MOCK_USER_ID,
+    name: 'Emil',
+    answers: [null],
+    score: 0,
+  },
+  {
+    playerId: 'test id 2',
+    name: 'Matt',
+    answers: [null],
+    score: 0,
+  },
+];
 
 export const createMockPlayerState = (): PlayerState => ({
   playerId: 'test player id',
@@ -28,9 +45,9 @@ export const createMockPlayerSessionState = (): PlayerRoomSession => ({
 });
 
 export const createMockPublisherPayload = <T extends object>(
-  userId: string,
   type: SubscribedMessageHandlerResponse,
-  data: T
+  data: T,
+  userId?: string
 ) => {
   const payload = {
     userId,

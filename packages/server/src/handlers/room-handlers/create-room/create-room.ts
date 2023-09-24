@@ -17,6 +17,7 @@ export const createRoomHandler = async (ws: WebSocket, data: CreateRoomReq) => {
     hostId: '',
     roomStatus: ROOM_STATUS.LOBBY,
     players: [],
+    questionIndex: 0,
     questions: [],
   };
 

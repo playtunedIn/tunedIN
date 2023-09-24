@@ -23,7 +23,7 @@ describe('Join Room Transaction', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.resetAllMocks();
   });
 
   it('could not find players', async () => {

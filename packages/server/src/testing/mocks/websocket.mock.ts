@@ -1,7 +1,7 @@
 import type { WebSocket } from 'ws';
 import { vi } from 'vitest';
 
-import type { MessageHandlerResponse } from 'src/handlers/room-handlers/types/response';
+import type { MessageHandlerResponse } from 'src/handlers/responses';
 import { createMockAuthContext } from 'src/testing/mocks/auth.mock';
 
 export const createMockWebSocketMessage = <T extends object>(messageType: MessageHandlerResponse, data: T) => {

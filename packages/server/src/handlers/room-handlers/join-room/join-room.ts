@@ -8,11 +8,7 @@ import type { JoinRoomReq } from './join-room.validator';
 import { JOIN_ROOM_SCHEMA_NAME } from './join-room.validator';
 import type { PlayerState } from 'src/clients/redis/models/game-state';
 import { sendResponse } from '../../../utils/websocket-response';
-import {
-  ADD_PLAYER_RESPONSE,
-  JOIN_ROOM_ERROR_RESPONSE,
-  JOIN_ROOM_RESPONSE,
-} from '../../../handlers/room-handlers/types/response';
+import { ADD_PLAYER_RESPONSE, JOIN_ROOM_ERROR_RESPONSE, JOIN_ROOM_RESPONSE } from '../../responses';
 import { createNewPlayerState } from '../../../utils/room-helpers';
 import { joinRoomTransaction } from './join-room-transaction';
 
@@ -21,6 +17,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
     return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.INVALID_ROOM_REQ });
   }
 
+  const { userId } = ws.userToken;
   const { roomId, playerId } = data;
 
   let roomExists: boolean;
@@ -44,7 +41,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   }
 
   await subscribeRoomHandler(ws, data.roomId);
-  await publishMessageHandler(data.roomId, ws.userToken.userId, ADD_PLAYER_RESPONSE, { player: newPlayer });
+  await publishMessageHandler(data.roomId, ADD_PLAYER_RESPONSE, { player: newPlayer }, userId);
 
   sendResponse(ws, JOIN_ROOM_RESPONSE, players);
 };
