@@ -2,6 +2,7 @@ import { createClient } from 'redis';
 
 import { REDIS_DB_MAP, REDIS_HOSTNAME } from './redis.constants';
 
+export * from './redis.constants';
 export { executeTransaction } from './transactions';
 
 export const gameStatePublisherClient = createClient({

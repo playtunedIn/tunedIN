@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { RedisJSON } from '@redis/json/dist/commands';
 
-import { gameStatePublisherClient } from '../../../../../clients/redis';
+import { QUESTIONS_QUERY, QUESTION_INDEX_QUERY, gameStatePublisherClient } from '../../../../../clients/redis';
 import { ROOM_STATUS } from '../../../../../clients/redis/models/game-state';
 import { REDIS_ERROR_CODES } from '../../../../../errors';
 import { createMockQuestions } from '../../../../../testing/mocks/spotify-client.mock';
@@ -39,8 +39,8 @@ describe('Question Round Handler', () => {
 
   it('cancels game if question/index keys not found', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      ['$.questions']: [null],
-      ['$.questionIndex']: [null],
+      [QUESTIONS_QUERY]: [null],
+      [QUESTION_INDEX_QUERY]: [null],
     });
 
     await questionRoundHandler(MOCK_ROOM_ID);
@@ -50,8 +50,8 @@ describe('Question Round Handler', () => {
 
   it('cancels game if update question expiration fails', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      ['$.questions']: [createMockQuestions()],
-      ['$.questionIndex']: [MOCK_QUESTION_INDEX],
+      [QUESTIONS_QUERY]: [createMockQuestions()],
+      [QUESTION_INDEX_QUERY]: [MOCK_QUESTION_INDEX],
     } as unknown as RedisJSON);
     vi.spyOn(gameStatePublisherClient.json, 'set').mockRejectedValueOnce('');
 
@@ -65,8 +65,8 @@ describe('Question Round Handler', () => {
 
     const questions = createMockQuestions();
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      ['$.questions']: [questions],
-      ['$.questionIndex']: [MOCK_QUESTION_INDEX],
+      [QUESTIONS_QUERY]: [questions],
+      [QUESTION_INDEX_QUERY]: [MOCK_QUESTION_INDEX],
     } as unknown as RedisJSON);
     vi.spyOn(gameStatePublisherClient.json, 'set').mockResolvedValueOnce('OK');
 
@@ -92,8 +92,8 @@ describe('Question Round Handler', () => {
 
       const questions = createMockQuestions();
       vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-        ['$.questions']: [questions],
-        ['$.questionIndex']: [MOCK_QUESTION_INDEX],
+        [QUESTIONS_QUERY]: [questions],
+        [QUESTION_INDEX_QUERY]: [MOCK_QUESTION_INDEX],
       } as unknown as RedisJSON);
       vi.spyOn(gameStatePublisherClient.json, 'set').mockResolvedValueOnce('OK');
 

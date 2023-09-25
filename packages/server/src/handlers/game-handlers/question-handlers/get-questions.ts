@@ -1,7 +1,7 @@
 import type { RedisJSON } from '@redis/json/dist/commands';
 
 import type { Question } from '../../../clients/redis/models/game-state';
-import { gameStatePublisherClient } from '../../../clients/redis';
+import { QUESTIONS_QUERY, gameStatePublisherClient } from '../../../clients/redis';
 import { getQuestions } from '../../../clients/spotify/spotify-client';
 import { REDIS_ERROR_CODES, START_GAME_ERROR_CODES } from '../../../errors';
 import { cancelGameHandler } from '../cancel-game/cancel-game';
@@ -16,9 +16,8 @@ export const getQuestionsHandler = async (roomId: string) => {
     return cancelGameHandler(roomId, START_GAME_ERROR_CODES.GET_QUESTIONS_FAILED);
   }
 
-  const questionsQuery = '$.questions';
   try {
-    await gameStatePublisherClient.json.set(roomId, questionsQuery, questions as unknown as RedisJSON[]);
+    await gameStatePublisherClient.json.set(roomId, QUESTIONS_QUERY, questions as unknown as RedisJSON[]);
   } catch {
     return cancelGameHandler(roomId, REDIS_ERROR_CODES.COMMAND_FAILURE);
   }

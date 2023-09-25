@@ -1,4 +1,4 @@
-import { gameStatePublisherClient } from '../../../clients/redis';
+import { ROOM_STATUS_QUERY, gameStatePublisherClient } from '../../../clients/redis';
 import { ROOM_STATUS } from '../../../clients/redis/models/game-state';
 import { publishMessageHandler } from '../../subscribed-message-handlers';
 import { UPDATE_ROOM_STATUS_RESPONSE } from '../../responses';
@@ -10,7 +10,7 @@ export const cancelGameHandler = async (roomId: string, errorCode: string) => {
   // TODO: replace error logging with tracking
   console.error({ errorCode, roomId });
   try {
-    await gameStatePublisherClient.json.set(roomId, '$.roomStatus', ROOM_STATUS.CANCELED);
+    await gameStatePublisherClient.json.set(roomId, ROOM_STATUS_QUERY, ROOM_STATUS.CANCELED);
   } catch {
     console.error({ errorCode, roomId });
     return;

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { RedisJSON } from '@redis/json/dist/commands';
 
-import { gameStatePublisherClient } from '../../../../../clients/redis';
+import { QUESTIONS_QUERY, QUESTION_INDEX_QUERY, gameStatePublisherClient } from '../../../../../clients/redis';
 import { createMockPlayers, createMockPublisherPayload } from '../../../../../testing/mocks/redis-client.mock';
 import { REDIS_ERROR_CODES } from '../../../../../errors';
 import * as cancelGame from '../../../cancel-game/cancel-game';
@@ -88,8 +88,8 @@ describe('Question Round Results Handler', () => {
 
     it('cancels game if timeout queries are null', async () => {
       vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-        ['$.questions']: [null],
-        ['$.questionIndex']: [null],
+        [QUESTIONS_QUERY]: [null],
+        [QUESTION_INDEX_QUERY]: [null],
       });
 
       await vi.runOnlyPendingTimersAsync();
@@ -99,8 +99,8 @@ describe('Question Round Results Handler', () => {
 
     it('cancels game if timeout fails to update question index', async () => {
       vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-        ['$.questions']: [createMockQuestions()],
-        ['$.questionIndex']: [MOCK_QUESTION_INDEX],
+        [QUESTIONS_QUERY]: [createMockQuestions()],
+        [QUESTION_INDEX_QUERY]: [MOCK_QUESTION_INDEX],
       } as unknown as RedisJSON);
       vi.spyOn(gameStatePublisherClient.json, 'set').mockRejectedValueOnce('');
 
@@ -111,8 +111,8 @@ describe('Question Round Results Handler', () => {
 
     it('calls end game handler when all questions answered', async () => {
       vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-        ['$.questions']: [createMockQuestions()],
-        ['$.questionIndex']: [2],
+        [QUESTIONS_QUERY]: [createMockQuestions()],
+        [QUESTION_INDEX_QUERY]: [2],
       } as unknown as RedisJSON);
       vi.spyOn(gameStatePublisherClient.json, 'set').mockResolvedValueOnce('OK');
 
@@ -124,8 +124,8 @@ describe('Question Round Results Handler', () => {
 
     it('should enter question round if not all questions answered', async () => {
       vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-        ['$.questions']: [createMockQuestions()],
-        ['$.questionIndex']: [MOCK_QUESTION_INDEX],
+        [QUESTIONS_QUERY]: [createMockQuestions()],
+        [QUESTION_INDEX_QUERY]: [MOCK_QUESTION_INDEX],
       } as unknown as RedisJSON);
       vi.spyOn(gameStatePublisherClient.json, 'set').mockResolvedValueOnce('OK');
 

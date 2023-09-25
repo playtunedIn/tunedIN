@@ -1,7 +1,13 @@
 import type { RedisJSON } from '@redis/json/dist/commands';
 
 import type { PlayerState, Question } from '../../../../clients/redis/models/game-state';
-import { executeTransaction, gameStatePublisherClient } from '../../../../clients/redis';
+import {
+  PLAYERS_QUERY,
+  createPlayerQuery,
+  createQuestionQuery,
+  executeTransaction,
+  gameStatePublisherClient,
+} from '../../../../clients/redis';
 import { QUESTION_ROUND_ERROR_CODES, REDIS_ERROR_CODES } from '../../../../errors';
 import { calculateScore } from '../../../../utils/room-helpers';
 
@@ -17,23 +23,21 @@ export const answerQuestionTransaction = async (
   executeTransaction(ANSWER_QUESTION_TRANSACTION_ATTEMPTS, async () => {
     await gameStatePublisherClient.watch(roomId);
 
-    const questionQuery = `$.questions[${questionIndex}]`;
-    const playersQuery = '$.players';
-
+    const questionQuery = createQuestionQuery(questionIndex);
     let response: Record<string, unknown[]>;
     try {
       response = (await gameStatePublisherClient.json.get(roomId, {
-        path: [questionQuery, playersQuery],
+        path: [questionQuery, PLAYERS_QUERY],
       })) as Record<string, unknown[]>;
     } catch {
       throw new Error(REDIS_ERROR_CODES.COMMAND_FAILURE);
     }
-    if (response[questionQuery]?.[0] === null || response[playersQuery]?.[0] === null) {
+    if (response[questionQuery]?.[0] === null || response[PLAYERS_QUERY]?.[0] === null) {
       throw new Error(REDIS_ERROR_CODES.KEY_NOT_FOUND);
     }
 
     const question = response[questionQuery][0] as Question;
-    const players = response[playersQuery][0] as PlayerState[];
+    const players = response[PLAYERS_QUERY][0] as PlayerState[];
 
     if (answerIndex >= question.choices.length) {
       throw new Error(QUESTION_ROUND_ERROR_CODES.ANSWER_OUT_OF_RANGE);
@@ -67,8 +71,9 @@ export const answerQuestionTransaction = async (
     player.answers[questionIndex] = answerIndex;
     player.score += score;
 
+    const playerQuery = createPlayerQuery(playerIndex);
     const transaction = gameStatePublisherClient.multi();
-    transaction.json.set(roomId, `$.players[${playerIndex}]`, player as unknown as RedisJSON);
+    transaction.json.set(roomId, playerQuery, player as unknown as RedisJSON);
 
     // TODO: Functionally Test this a lot we want to make sure it actually returns null
     const result = await transaction.exec();

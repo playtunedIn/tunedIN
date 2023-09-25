@@ -2,7 +2,7 @@ import type { RedisJSON } from '@redis/json/dist/commands';
 
 import type { PlayerState } from 'src/clients/redis/models/game-state';
 import { JOIN_ROOM_ERROR_CODES, REDIS_ERROR_CODES } from '../../../errors';
-import { executeTransaction, gameStatePublisherClient } from '../../../clients/redis';
+import { PLAYERS_QUERY, executeTransaction, gameStatePublisherClient } from '../../../clients/redis';
 
 const PLAYER_LIMIT = 4;
 const JOIN_ROOM_TRANSACTION_ATTEMPTS = 10;
@@ -12,7 +12,7 @@ export const joinRoomTransaction = (roomId: string, newPlayer: PlayerState) =>
     await gameStatePublisherClient.watch(roomId);
 
     const response = (await gameStatePublisherClient.json.get(roomId, {
-      path: '$.players',
+      path: PLAYERS_QUERY,
     })) as RedisJSON[];
     if (response[0] === null) {
       throw new Error(REDIS_ERROR_CODES.KEY_NOT_FOUND);
@@ -31,7 +31,7 @@ export const joinRoomTransaction = (roomId: string, newPlayer: PlayerState) =>
     players.push(newPlayer);
 
     const transaction = gameStatePublisherClient.multi();
-    transaction.json.arrAppend(roomId, '$.players', newPlayer as unknown as RedisJSON);
+    transaction.json.arrAppend(roomId, PLAYERS_QUERY, newPlayer as unknown as RedisJSON);
     // TODO: Functionally Test this a lot we want to make sure it actually returns null
     const result = await transaction.exec();
     if (result === null) {

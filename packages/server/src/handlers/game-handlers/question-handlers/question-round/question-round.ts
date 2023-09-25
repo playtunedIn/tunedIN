@@ -2,7 +2,13 @@ import type { RedisJSON } from '@redis/json/dist/commands';
 
 import type { PlayerState } from '../../../../clients/redis/models/game-state';
 import { ROOM_STATUS, type Question } from '../../../../clients/redis/models/game-state';
-import { gameStatePublisherClient } from '../../../../clients/redis';
+import {
+  PLAYERS_QUERY,
+  QUESTIONS_QUERY,
+  QUESTION_INDEX_QUERY,
+  createQuestionQuery,
+  gameStatePublisherClient,
+} from '../../../../clients/redis';
 import { REDIS_ERROR_CODES } from '../../../../errors';
 import { allPlayersAnswered } from '../../../../utils/room-helpers';
 import { publishMessageHandler } from '../../../subscribed-message-handlers';
@@ -13,31 +19,29 @@ import { questionRoundResultsHandler } from './question-round-results';
 export const QUESTION_ROUND_TIME_LIMIT = 20000;
 
 export const questionRoundHandler = async (roomId: string) => {
-  const questionsQuery = '$.questions';
-  const questionIndexQuery = '$.questionIndex';
-
   let response: Record<string, unknown[]>;
   try {
     response = (await gameStatePublisherClient.json.get(roomId, {
-      path: [questionsQuery, questionIndexQuery],
+      path: [QUESTIONS_QUERY, QUESTION_INDEX_QUERY],
     })) as Record<string, unknown[]>;
   } catch {
     return cancelGameHandler(roomId, REDIS_ERROR_CODES.COMMAND_FAILURE);
   }
 
-  if (response[questionsQuery]?.[0] === null || response[questionIndexQuery]?.[0] === null) {
+  if (response[QUESTIONS_QUERY]?.[0] === null || response[QUESTION_INDEX_QUERY]?.[0] === null) {
     return cancelGameHandler(roomId, REDIS_ERROR_CODES.KEY_NOT_FOUND);
   }
 
-  const questions = response[questionsQuery][0] as Question[];
-  const questionIndex = response[questionIndexQuery][0] as number;
+  const questions = response[QUESTIONS_QUERY][0] as Question[];
+  const questionIndex = response[QUESTION_INDEX_QUERY][0] as number;
   const question = questions[questionIndex];
   const questionExpirationTimestamp = Date.now() + QUESTION_ROUND_TIME_LIMIT;
 
   question.expirationTimestamp = questionExpirationTimestamp;
 
+  const questionQuery = createQuestionQuery(questionIndex);
   try {
-    await gameStatePublisherClient.json.set(roomId, `$.questions[${questionIndex}]`, question as unknown as RedisJSON);
+    await gameStatePublisherClient.json.set(roomId, questionQuery, question as unknown as RedisJSON);
   } catch {
     return cancelGameHandler(roomId, REDIS_ERROR_CODES.COMMAND_FAILURE);
   }
@@ -52,12 +56,10 @@ export const questionRoundHandler = async (roomId: string) => {
 };
 
 const questionRoundTimeoutHandler = async (roomId: string, questionIndex: number) => {
-  const playersQuery = '$.players';
-
   let response: RedisJSON[];
   try {
     response = (await gameStatePublisherClient.json.get(roomId, {
-      path: playersQuery,
+      path: PLAYERS_QUERY,
     })) as RedisJSON[];
   } catch {
     return cancelGameHandler(roomId, REDIS_ERROR_CODES.COMMAND_FAILURE);

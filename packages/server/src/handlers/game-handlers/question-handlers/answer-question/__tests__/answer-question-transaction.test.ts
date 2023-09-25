@@ -5,7 +5,7 @@ import { GLOBAL_MOCK_USER_ID } from '../../../../../testing/mocks/auth.mock';
 import { createMockPlayers, mockMultiCommand } from '../../../../../testing/mocks/redis-client.mock';
 import { createMockQuestion } from '../../../../../testing/mocks/spotify-client.mock';
 import { QUESTION_ROUND_ERROR_CODES, REDIS_ERROR_CODES } from '../../../../../errors';
-import { gameStatePublisherClient } from '../../../../../clients/redis';
+import { PLAYERS_QUERY, createQuestionQuery, gameStatePublisherClient } from '../../../../../clients/redis';
 import { answerQuestionTransaction } from '../answer-question-transaction';
 import { calculateScore } from 'src/utils/room-helpers';
 
@@ -32,8 +32,8 @@ describe('Answer Question Transaction', () => {
 
   it('fails when key(s) not found', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      [`$.questions[${MOCK_QUESTION_INDEX}]`]: [null],
-      ['$.players']: [null],
+      [createQuestionQuery(MOCK_QUESTION_INDEX)]: [null],
+      [PLAYERS_QUERY]: [null],
     });
 
     await expect(() =>
@@ -50,8 +50,8 @@ describe('Answer Question Transaction', () => {
   it('fails when answer choice is out of range', async () => {
     const question = createMockQuestion();
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      [`$.questions[${MOCK_QUESTION_INDEX}]`]: [question],
-      ['$.players']: [createMockPlayers()],
+      [createQuestionQuery(MOCK_QUESTION_INDEX)]: [question],
+      [PLAYERS_QUERY]: [createMockPlayers()],
     } as unknown as RedisJSON);
 
     await expect(() =>
@@ -68,8 +68,8 @@ describe('Answer Question Transaction', () => {
   it('fails when expiration for question is not set (round not started)', async () => {
     const question = createMockQuestion();
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      [`$.questions[${MOCK_QUESTION_INDEX}]`]: [question],
-      ['$.players']: [createMockPlayers()],
+      [createQuestionQuery(MOCK_QUESTION_INDEX)]: [question],
+      [PLAYERS_QUERY]: [createMockPlayers()],
     } as unknown as RedisJSON);
 
     await expect(() =>
@@ -87,8 +87,8 @@ describe('Answer Question Transaction', () => {
     const question = createMockQuestion();
     question.expirationTimestamp = MOCK_ANSWER_TIMESTAMP - 1;
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      [`$.questions[${MOCK_QUESTION_INDEX}]`]: [question],
-      ['$.players']: [createMockPlayers()],
+      [createQuestionQuery(MOCK_QUESTION_INDEX)]: [question],
+      [PLAYERS_QUERY]: [createMockPlayers()],
     } as unknown as RedisJSON);
 
     await expect(() =>
@@ -106,8 +106,8 @@ describe('Answer Question Transaction', () => {
     const question = createMockQuestion();
     question.expirationTimestamp = MOCK_ANSWER_TIMESTAMP;
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      [`$.questions[${MOCK_QUESTION_INDEX}]`]: [question],
-      ['$.players']: [createMockPlayers()],
+      [createQuestionQuery(MOCK_QUESTION_INDEX)]: [question],
+      [PLAYERS_QUERY]: [createMockPlayers()],
     } as unknown as RedisJSON);
 
     await expect(() =>
@@ -128,8 +128,8 @@ describe('Answer Question Transaction', () => {
     players[0].answers = [MOCK_ANSWER_INDEX];
 
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      [`$.questions[${MOCK_QUESTION_INDEX}]`]: [question],
-      ['$.players']: [players],
+      [createQuestionQuery(MOCK_QUESTION_INDEX)]: [question],
+      [PLAYERS_QUERY]: [players],
     } as unknown as RedisJSON);
 
     await expect(() =>
@@ -152,8 +152,8 @@ describe('Answer Question Transaction', () => {
         new Promise(resolve =>
           resolve(
             new Object({
-              [`$.questions[${MOCK_QUESTION_INDEX}]`]: [question],
-              ['$.players']: [createMockPlayers()],
+              [createQuestionQuery(MOCK_QUESTION_INDEX)]: [question],
+              [PLAYERS_QUERY]: [createMockPlayers()],
             })
           )
         ) as Promise<any>
@@ -185,8 +185,8 @@ describe('Answer Question Transaction', () => {
     );
 
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      [`$.questions[${MOCK_QUESTION_INDEX}]`]: [question],
-      ['$.players']: [createMockPlayers()],
+      [createQuestionQuery(MOCK_QUESTION_INDEX)]: [question],
+      [PLAYERS_QUERY]: [createMockPlayers()],
     } as unknown as RedisJSON);
     mockMultiCommand.exec.mockReturnValueOnce(1);
 

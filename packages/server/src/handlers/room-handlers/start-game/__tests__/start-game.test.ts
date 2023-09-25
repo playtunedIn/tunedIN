@@ -3,7 +3,7 @@ import type { WebSocket } from 'ws';
 
 import { createMockWebSocket, createMockWebSocketMessage } from '../../../../testing/mocks/websocket.mock';
 import { REDIS_ERROR_CODES, START_GAME_ERROR_CODES } from '../../../../errors';
-import { gameStatePublisherClient } from '../../../../clients/redis';
+import { HOST_ID_QUERY, ROOM_STATUS_QUERY, gameStatePublisherClient } from '../../../../clients/redis';
 import { ROOM_STATUS } from '../../../../clients/redis/models/game-state';
 import { GLOBAL_MOCK_USER_ID } from '../../../../testing/mocks/auth.mock';
 import * as getQuestions from '../../../game-handlers/question-handlers/get-questions';
@@ -53,8 +53,8 @@ describe('Start Game Handler', () => {
 
   it('cannot access game state keys', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      '$.hostId': [null],
-      '$.roomStatus': [null],
+      [HOST_ID_QUERY]: [null],
+      [ROOM_STATUS_QUERY]: [null],
     });
 
     await startGameHandler(ws, mockStartGameReq);
@@ -67,8 +67,8 @@ describe('Start Game Handler', () => {
 
   it('should not allow non-host to start game', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      '$.hostId': ['Someone else is host'],
-      '$.roomStatus': [ROOM_STATUS.LOBBY],
+      [HOST_ID_QUERY]: ['Someone else is host'],
+      [ROOM_STATUS_QUERY]: [ROOM_STATUS.LOBBY],
     });
 
     await startGameHandler(ws, mockStartGameReq);
@@ -81,8 +81,8 @@ describe('Start Game Handler', () => {
 
   it('should not start games for rooms that are not in lobby', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      '$.hostId': [GLOBAL_MOCK_USER_ID],
-      '$.roomStatus': [ROOM_STATUS.IN_QUESTION],
+      [HOST_ID_QUERY]: [GLOBAL_MOCK_USER_ID],
+      [ROOM_STATUS_QUERY]: [ROOM_STATUS.IN_QUESTION],
     });
 
     await startGameHandler(ws, mockStartGameReq);
@@ -95,8 +95,8 @@ describe('Start Game Handler', () => {
 
   it('should send error response if game state update fails', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      '$.hostId': [GLOBAL_MOCK_USER_ID],
-      '$.roomStatus': [ROOM_STATUS.LOBBY],
+      [HOST_ID_QUERY]: [GLOBAL_MOCK_USER_ID],
+      [ROOM_STATUS_QUERY]: [ROOM_STATUS.LOBBY],
     });
     vi.spyOn(gameStatePublisherClient.json, 'set').mockRejectedValueOnce('');
 
@@ -110,8 +110,8 @@ describe('Start Game Handler', () => {
 
   it('should start game', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      '$.hostId': [GLOBAL_MOCK_USER_ID],
-      '$.roomStatus': [ROOM_STATUS.LOBBY],
+      [HOST_ID_QUERY]: [GLOBAL_MOCK_USER_ID],
+      [ROOM_STATUS_QUERY]: [ROOM_STATUS.LOBBY],
     });
     vi.spyOn(gameStatePublisherClient.json, 'set').mockResolvedValueOnce('OK');
 
