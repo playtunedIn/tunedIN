@@ -17,3 +17,10 @@ export const JOIN_ROOM_ERROR_CODES = {
   ROOM_FULL: 'MULT-202',
   PLAYER_ALREADY_IN_ROOM: 'MULT-203',
 } as const;
+
+// Start room error code are reserved from 300 - 399
+export const START_GAME_ERROR_CODES = {
+  INVALID_ROOM_REQ: 'MULT-300',
+  NOT_HOST: 'MULT-301',
+  ROOM_NOT_IN_LOBBY: 'MULT-302',
+};

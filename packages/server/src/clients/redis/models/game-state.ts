@@ -1,3 +1,13 @@
+export const ROOM_STATUS = {
+  LOBBY: 'LOBBY',
+  LOADING_GAME: 'LOADING_GAME',
+  IN_QUESTION: 'IN_QUESTION',
+  IN_LEADERBOARD: 'IN_LEADERBOARD',
+  RESULT: 'RESULTS',
+} as const;
+
+export type RoomStatus = (typeof ROOM_STATUS)[keyof typeof ROOM_STATUS];
+
 export interface Question {
   question: string;
   choices: string[];
@@ -13,9 +23,10 @@ export interface PlayerState {
 
 export interface GameState {
   roomId: string;
-  host: string;
+  hostId: string;
+  roomStatus: RoomStatus;
   players: PlayerState[];
-  questions: Question[]; // We might not want to come up with all the questions right away so this array will grow as the game progresses.
+  questions: Question[];
 }
 
 export interface PlayerRoomSession {
