@@ -16,7 +16,7 @@ import { authenticateToken } from './middleware/authenticate';
 import { getSelf } from './clients/spotify/spotify-client';
 import type { TunedInJwtPayload } from './utils/auth';
 import { unsubscribeRoomHandler } from './handlers/subscribed-message-handlers';
-import { verifyToken } from './utils/auth';
+import { getCookie, verifyToken } from './utils/auth';
 
 const WS_HEARTBEAT_INTERVAL = parseInt(process.env.WS_HEARTBEAT_INTERVAL || '30000');
 
@@ -25,6 +25,9 @@ const IGNORE_HEARTBEAT_INTERVAL =
 const port = process.env.PORT || 3001;
 
 const startServer = async () => {
+  /**
+   * Connect redis clients
+   */
   try {
     await Promise.all([
       gameStatePublisherClient.connect(),
@@ -36,6 +39,9 @@ const startServer = async () => {
     process.exit(1);
   }
 
+  /**
+   * Create Express app
+   */
   const app = express();
   app.use(cookieParser());
   app.use(cors({ origin: 'https://local.playtunedin-test.com:8080' }));
@@ -55,6 +61,9 @@ const startServer = async () => {
 
   setupOauthRoutes(app);
 
+  /**
+   * Create http server
+   */
   let server: https.Server | http.Server;
   if (process.env.NODE_ENV === 'development') {
     const key = readFileSync('./.cert/server.key');
@@ -81,8 +90,14 @@ const startServer = async () => {
     console.error(err);
   });
 
+  /**
+   * Create Websocket Server
+   */
   const wsServer = new WebSocketServer({ noServer: true, path: '/ws/multiplayer' });
 
+  /**
+   * Handle authenticating Websocket connections
+   */
   server.on('upgrade', (req, socket, head) => {
     /**
      * TODO: Investigate if we can send a proper unauthorized response before handling the upgrade to websocket
@@ -90,11 +105,7 @@ const startServer = async () => {
      * Git issue: https://github.com/websockets/ws/issues/377#issuecomment-1694386948
      */
     wsServer.handleUpgrade(req, socket, head, async ws => {
-      const tokenValue = req.headers.cookie
-        ?.split(';')
-        .map(vals => vals.split('='))
-        .filter(vals => vals[0] === 'TUNEDIN_TOKEN')
-        .map(vals => vals[1])?.[0];
+      const tokenValue = getCookie(req.headers.cookie, 'TUNEDIN_TOKEN');
 
       if (typeof tokenValue !== 'string') {
         console.log('Token not found');
@@ -114,6 +125,9 @@ const startServer = async () => {
     });
   });
 
+  /**
+   * Websocket event handlers
+   */
   wsServer.on('connection', (ws: WebSocket, _: Request, userToken: TunedInJwtPayload) => {
     ws.userToken = userToken;
 
