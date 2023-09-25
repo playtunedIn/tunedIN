@@ -5,6 +5,7 @@ import TempCreateRoomButton from '@components/TempCreateRoomButton';
 import reactLogo from '@assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
+import SocketStatus from '@components/common/SocketStatus';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -12,6 +13,7 @@ function App() {
   return (
     <MultiplayerProvider>
       <>
+        <SocketStatus />
         <TempCreateRoomButton />
         <div data-testid="app-root">
           <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
