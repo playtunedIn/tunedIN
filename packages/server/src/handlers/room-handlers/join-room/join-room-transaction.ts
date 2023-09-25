@@ -2,7 +2,7 @@ import type { RedisJSON } from '@redis/json/dist/commands';
 
 import type { PlayerState } from 'src/clients/redis/models/game-state';
 import { JOIN_ROOM_ERROR_CODES, REDIS_ERROR_CODES } from '../../../errors';
-import { PLAYERS_QUERY, executeTransaction, gameStatePublisherClient } from '../../../clients/redis';
+import { PLAYERS_QUERY, executeTransaction, gameStatePublisherClient, query } from '../../../clients/redis';
 
 const PLAYER_LIMIT = 4;
 const JOIN_ROOM_TRANSACTION_ATTEMPTS = 10;
@@ -11,14 +11,7 @@ export const joinRoomTransaction = (roomId: string, newPlayer: PlayerState) =>
   executeTransaction(JOIN_ROOM_TRANSACTION_ATTEMPTS, async () => {
     await gameStatePublisherClient.watch(roomId);
 
-    const response = (await gameStatePublisherClient.json.get(roomId, {
-      path: PLAYERS_QUERY,
-    })) as RedisJSON[];
-    if (response[0] === null) {
-      throw new Error(REDIS_ERROR_CODES.KEY_NOT_FOUND);
-    }
-
-    const players = response[0] as unknown as PlayerState[];
+    const players = await query<PlayerState[]>(roomId, PLAYERS_QUERY, gameStatePublisherClient);
 
     if (players.some(player => player.playerId === newPlayer.playerId)) {
       throw new Error(JOIN_ROOM_ERROR_CODES.PLAYER_ALREADY_IN_ROOM);
