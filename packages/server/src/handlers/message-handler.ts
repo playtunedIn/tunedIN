@@ -7,7 +7,7 @@ export const messageHandler = (ws: WebSocket, dataStr: string) => {
   let data: SocketMessage;
   try {
     data = JSON.parse(dataStr);
-  } catch (err) {
+  } catch {
     return ws.send('Invalid Command');
   }
 

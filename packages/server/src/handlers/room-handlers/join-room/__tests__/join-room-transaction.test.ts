@@ -1,10 +1,10 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { gameStatePublisherClient } from '../../../../clients/redis';
 import { joinRoomTransaction } from 'src/handlers/room-handlers/join-room/join-room-transaction';
 import { JOIN_ROOM_ERROR_CODES, REDIS_ERROR_CODES } from 'src/errors';
 import type { PlayerState } from 'src/clients/redis/models/game-state';
-import { mockMultiCommand } from 'src/testing/mocks/redis-client.mock';
+import { createMockPlayerState, mockMultiCommand } from 'src/testing/mocks/redis-client.mock';
 
 describe('Join Room Transaction', () => {
   const mockPlayerStateArr: PlayerState[] = [
@@ -17,7 +17,10 @@ describe('Join Room Transaction', () => {
   ];
 
   const mockRoomId = 'test roomId';
-  const mockPlayerId = 'test playerId';
+  let mockNewPlayer: PlayerState;
+  beforeEach(() => {
+    mockNewPlayer = createMockPlayerState();
+  });
 
   afterEach(() => {
     vi.restoreAllMocks();
@@ -26,7 +29,7 @@ describe('Join Room Transaction', () => {
   it('could not find players', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([null]);
 
-    await expect(() => joinRoomTransaction(mockRoomId, mockPlayerId)).rejects.toThrowError(
+    await expect(() => joinRoomTransaction(mockRoomId, mockNewPlayer)).rejects.toThrowError(
       REDIS_ERROR_CODES.KEY_NOT_FOUND
     );
   });
@@ -34,7 +37,9 @@ describe('Join Room Transaction', () => {
   it('found player in room already', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([mockPlayerStateArr as any]);
 
-    await expect(() => joinRoomTransaction(mockRoomId, 'playerId')).rejects.toThrowError(
+    mockNewPlayer.playerId = 'playerId';
+
+    await expect(() => joinRoomTransaction(mockRoomId, mockNewPlayer)).rejects.toThrowError(
       JOIN_ROOM_ERROR_CODES.PLAYER_ALREADY_IN_ROOM
     );
   });
@@ -68,7 +73,7 @@ describe('Join Room Transaction', () => {
     ];
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([mockFullPlayerStateArr as any]);
 
-    await expect(() => joinRoomTransaction(mockRoomId, mockPlayerId)).rejects.toThrowError(
+    await expect(() => joinRoomTransaction(mockRoomId, mockNewPlayer)).rejects.toThrowError(
       JOIN_ROOM_ERROR_CODES.ROOM_FULL
     );
   });
@@ -83,7 +88,7 @@ describe('Join Room Transaction', () => {
     );
     mockMultiCommand.exec.mockReturnValue(null);
 
-    await expect(() => joinRoomTransaction(mockRoomId, mockPlayerId)).rejects.toThrowError(
+    await expect(() => joinRoomTransaction(mockRoomId, mockNewPlayer)).rejects.toThrowError(
       REDIS_ERROR_CODES.TRANSACTION_ATTEMPT_LIMIT_REACHED
     );
   });
@@ -92,9 +97,9 @@ describe('Join Room Transaction', () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([mockPlayerStateArr as any]);
     mockMultiCommand.exec.mockReturnValue(1);
 
-    await expect(joinRoomTransaction(mockRoomId, mockPlayerId)).resolves.toEqual([
+    await expect(joinRoomTransaction(mockRoomId, mockNewPlayer)).resolves.toEqual([
       ...mockPlayerStateArr,
-      { playerId: mockPlayerId, name: mockPlayerId, score: 0, answers: [] } as PlayerState,
+      mockNewPlayer,
     ]);
   });
 });

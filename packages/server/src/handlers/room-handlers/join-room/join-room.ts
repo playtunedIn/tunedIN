@@ -3,12 +3,17 @@ import type { WebSocket } from 'ws';
 import { JOIN_ROOM_ERROR_CODES, REDIS_ERROR_CODES } from '../../../errors';
 import { gameStatePublisherClient } from '../../../clients/redis';
 import { isValidSchema } from '../../message.validator';
-import { subscribeGameHandler } from '../../game-handlers/subscribe-game/subscribe-game';
+import { publishMessageHandler, subscribeRoomHandler } from '../../subscribed-message-handlers';
 import type { JoinRoomReq } from './join-room.validator';
 import { JOIN_ROOM_SCHEMA_NAME } from './join-room.validator';
 import type { PlayerState } from 'src/clients/redis/models/game-state';
 import { sendResponse } from '../../../utils/websocket-response';
-import { JOIN_ROOM_ERROR_RESPONSE, JOIN_ROOM_RESPONSE } from '../../../handlers/room-handlers/types/response';
+import {
+  ADD_PLAYER_RESPONSE,
+  JOIN_ROOM_ERROR_RESPONSE,
+  JOIN_ROOM_RESPONSE,
+} from '../../../handlers/room-handlers/types/response';
+import { createNewPlayerState } from '../../../utils/room-helpers';
 import { joinRoomTransaction } from './join-room-transaction';
 
 export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
@@ -29,15 +34,17 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
     return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.ROOM_NOT_FOUND });
   }
 
+  const newPlayer = createNewPlayerState(playerId);
+
   let players: PlayerState[];
   try {
-    players = await joinRoomTransaction(roomId, playerId);
+    players = await joinRoomTransaction(roomId, newPlayer);
   } catch (err) {
     return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: (err as Error).message });
   }
 
-  await subscribeGameHandler(ws, data.roomId);
-  await gameStatePublisherClient.publish(data.roomId, 'PLAYER JOINED');
+  await subscribeRoomHandler(ws, data.roomId);
+  await publishMessageHandler(data.roomId, ws.userToken.userId, ADD_PLAYER_RESPONSE, { player: newPlayer });
 
   sendResponse(ws, JOIN_ROOM_RESPONSE, players);
 };

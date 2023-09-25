@@ -5,7 +5,7 @@ import type { RedisJSON } from '@redis/json/dist/commands';
 import type { GameState, PlayerRoomSession } from '../../../clients/redis/models/game-state';
 import { gameStatePublisherClient, playerStatePublisherClient } from '../../../clients/redis';
 import { sendResponse } from '../../../utils/websocket-response';
-import { subscribeGameHandler } from '../../game-handlers/subscribe-game/subscribe-game';
+import { subscribeRoomHandler } from '../../subscribed-message-handlers';
 import { RECOVER_ROOM_SESSION_ERROR_RESPONSE, RECOVER_ROOM_SESSION_RESPONSE } from '../../room-handlers/types/response';
 import { REDIS_ERROR_CODES } from '../../../errors';
 
@@ -34,6 +34,6 @@ export const recoverRoomSessionHandler = async (ws: WebSocket) => {
   }
   const gameState = gameStateResponse[0] as unknown as GameState;
 
+  await subscribeRoomHandler(ws, gameState.roomId);
   sendResponse(ws, RECOVER_ROOM_SESSION_RESPONSE, { state: gameState });
-  await subscribeGameHandler(ws, gameState.roomId);
 };

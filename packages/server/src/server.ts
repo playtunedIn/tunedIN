@@ -15,9 +15,8 @@ import { gameStateSubscriberClient, gameStatePublisherClient, playerStatePublish
 import { authenticateToken } from './middleware/authenticate';
 import { getSelf } from './clients/spotify/spotify-client';
 import type { TunedInJwtPayload } from './utils/auth';
-import { unsubscribeRoomHandler } from './handlers/room-handlers/unsubscribe-room/unsubscribe-room';
-import { getCookie } from './utils/auth';
-import { verifyToken } from './utils/auth';
+import { unsubscribeRoomHandler } from './handlers/subscribed-message-handlers';
+import { getCookie, verifyToken } from './utils/auth';
 
 const WS_HEARTBEAT_INTERVAL = parseInt(process.env.WS_HEARTBEAT_INTERVAL || '30000');
 
