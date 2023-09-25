@@ -22,3 +22,11 @@ export const verifyToken = (token: string): Promise<TunedInJwtPayload> => {
     );
   });
 };
+
+export const getCookie = (cookieString: string | undefined, cookieName: string): string | undefined => {
+  return cookieString
+    ?.split(';')
+    .map(vals => vals.split('='))
+    .filter(vals => vals[0] === cookieName)
+    .map(vals => vals[1])?.[0];
+};
