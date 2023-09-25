@@ -10,5 +10,5 @@ export const subscribeGameHandler = async (ws: WebSocket, roomId: string) => {
     },
   };
 
-  await gameStateSubscriberClient.subscribeToChanges(ws.channelListener);
+  await gameStateSubscriberClient.subscribe(ws.channelListener.channel, ws.channelListener.listener);
 };

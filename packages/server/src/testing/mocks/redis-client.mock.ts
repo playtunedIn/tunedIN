@@ -13,16 +13,31 @@ export const createMockPlayerSessionState = (): PlayerRoomSession => ({
   roomId: '',
 });
 
-export const redisClientMock = {
-  connect: vi.fn(),
-  addListener: vi.fn(),
+const mockRedisCommands = {
   publish: vi.fn(),
   subscribe: vi.fn(),
   unsubscribe: vi.fn(),
-  get: vi.fn(),
-  set: vi.fn(),
+  exists: vi.fn(),
+  watch: vi.fn(),
+  json: {
+    get: vi.fn(),
+    set: vi.fn(),
+    arrAppend: vi.fn(),
+  },
+};
+
+export const mockMultiCommand = {
+  ...mockRedisCommands,
+  exec: vi.fn(),
+};
+
+export const redisClientMock = {
+  connect: vi.fn(),
+  addListener: vi.fn(),
+  multi: () => mockMultiCommand,
+  ...mockRedisCommands,
 };
 
 vi.mock('redis', () => ({
-  createClient: vi.fn().mockImplementation(() => redisClientMock),
+  createClient: () => redisClientMock,
 }));

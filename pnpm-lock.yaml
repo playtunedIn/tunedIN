@@ -111,12 +111,6 @@ importers:
 
   packages/server:
     dependencies:
-      '@types/cors':
-        specifier: ^2.8.13
-        version: 2.8.13
-      '@types/jsonwebtoken':
-        specifier: ^9.0.2
-        version: 9.0.2
       ajv:
         specifier: ^8.12.0
         version: 8.12.0
@@ -145,12 +139,21 @@ importers:
         specifier: ^8.13.0
         version: 8.13.0
     devDependencies:
+      '@redis/json':
+        specifier: 1.0.4
+        version: 1.0.4(@redis/client@1.5.8)
       '@types/cookie-parser':
         specifier: ^1.4.3
         version: 1.4.3
+      '@types/cors':
+        specifier: ^2.8.13
+        version: 2.8.13
       '@types/express':
         specifier: ^4.17.17
         version: 4.17.17
+      '@types/jsonwebtoken':
+        specifier: ^9.0.2
+        version: 9.0.2
       '@types/node':
         specifier: ^20.3.2
         version: 20.3.2
@@ -2088,7 +2091,6 @@ packages:
       cluster-key-slot: 1.1.2
       generic-pool: 3.9.0
       yallist: 4.0.0
-    dev: false
 
   /@redis/graph@1.1.0(@redis/client@1.5.8):
     resolution: {integrity: sha512-16yZWngxyXPd+MJxeSr0dqh2AIOi8j9yXKcKCwVaKDbH3HTuETpDVPcLujhFYVPtYrngSco31BUcSa9TH31Gqg==}
@@ -2104,7 +2106,6 @@ packages:
       '@redis/client': ^1.0.0
     dependencies:
       '@redis/client': 1.5.8
-    dev: false
 
   /@redis/search@1.1.3(@redis/client@1.5.8):
     resolution: {integrity: sha512-4Dg1JjvCevdiCBTZqjhKkGoC5/BcB7k9j99kdMnaXFXg8x4eyOIVg9487CMv7/BUVkFLZCaIh8ead9mU15DNng==}
@@ -2243,7 +2244,7 @@ packages:
     resolution: {integrity: sha512-RG8AStHlUiV5ysZQKq97copd2UmVYw3/pRMLefISZ3S1hK104Cwm7iLQ3fTKx+lsUH2CE8FlLaYeEA2LSeqYUA==}
     dependencies:
       '@types/node': 20.3.2
-    dev: false
+    dev: true
 
   /@types/express-serve-static-core@4.17.35:
     resolution: {integrity: sha512-wALWQwrgiB2AWTT91CB62b6Yt0sNHpznUXeZEcnPU3DRdlDIz74x8Qg1UUYKSVFi+va5vKOLYRBI1bRKiLLKIg==}
@@ -2290,7 +2291,7 @@ packages:
     resolution: {integrity: sha512-drE6uz7QBKq1fYqqoFKTDRdFCPHd5TCub75BM+D+cMx7NU9hUz7SESLfC2fSCXVFMO5Yj8sOWHuGqPgjc+fz0Q==}
     dependencies:
       '@types/node': 20.3.2
-    dev: false
+    dev: true
 
   /@types/mime@1.3.2:
     resolution: {integrity: sha512-YATxVxgRqNH6nHEIsvg6k2Boc1JHI9ZbH5iWFFv/MTkchz3b1ieGDa5T0a9RznNdI0KhVbdbWSN+KWWrQZRxTw==}
@@ -2313,6 +2314,7 @@ packages:
 
   /@types/node@20.3.2:
     resolution: {integrity: sha512-vOBLVQeCQfIcF/2Y7eKFTqrMnizK5lRNQ7ykML/5RuwVXVWxYkgwS7xbt4B6fKCUPgbSL5FSsjHQpaGQP/dQmw==}
+    dev: true
 
   /@types/normalize-package-data@2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
@@ -3175,7 +3177,6 @@ packages:
   /cluster-key-slot@1.1.2:
     resolution: {integrity: sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==}
     engines: {node: '>=0.10.0'}
-    dev: false
 
   /color-convert@1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
@@ -4305,7 +4306,6 @@ packages:
   /generic-pool@3.9.0:
     resolution: {integrity: sha512-hymDOu5B53XvN4QT9dBmZxPX4CWhBPPLguTZ9MMFeFa/Kg0xWVfylOVNlJji/E7yTZWFd/q9GO5TxDLq156D7g==}
     engines: {node: '>= 4'}
-    dev: false
 
   /gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}

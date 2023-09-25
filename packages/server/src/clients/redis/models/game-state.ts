@@ -6,6 +6,7 @@ export interface Question {
 
 export interface PlayerState {
   playerId: string;
+  name: string;
   score: number;
   answers: boolean[]; // This could be more complex if we want to see what they said. Right now I just have it so we know if the question is right or wrong.
 }
