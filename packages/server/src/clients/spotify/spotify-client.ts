@@ -1,3 +1,5 @@
+import type { Question } from '../redis/models/game-state';
+
 type Image = {
   url: string;
 };
@@ -26,4 +28,9 @@ export const getSelf = async (token: string): Promise<Profile> => {
   const accessResponse = await fetch('https://api.spotify.com/v1/me', options);
   const profileBody = (await accessResponse.json()) as Profile;
   return profileBody;
+};
+
+// TODO: create actual implementation for getting questions from Spotify
+export const getQuestions = async (): Promise<Question[]> => {
+  return [];
 };

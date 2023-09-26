@@ -1,4 +1,4 @@
-import type { MessageHandlerResponse } from '../handlers/room-handlers/types/response';
+import type { MessageHandlerResponse } from '../handlers/responses';
 import type { WebSocket } from 'ws';
 
 export const sendResponse = <T extends object>(ws: WebSocket, responseType: MessageHandlerResponse, data: T): void => {

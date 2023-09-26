@@ -3,31 +3,38 @@ import type { WebSocket } from 'ws';
 
 import { createMockWebSocket, createMockWebSocketMessage } from '../../../../testing/mocks/websocket.mock';
 import { REDIS_ERROR_CODES, START_GAME_ERROR_CODES } from '../../../../errors';
-import { gameStatePublisherClient } from '../../../../clients/redis';
+import { HOST_ID_QUERY, ROOM_STATUS_QUERY, gameStatePublisherClient } from '../../../../clients/redis';
 import { ROOM_STATUS } from '../../../../clients/redis/models/game-state';
 import { GLOBAL_MOCK_USER_ID } from '../../../../testing/mocks/auth.mock';
+import * as getQuestions from '../../../game-handlers/question-handlers/get-questions';
 import type { StartGameReq } from '../start-game.validator';
 import { startGameHandler } from '../start-game';
-import { START_GAME_ERROR_RESPONSE, START_GAME_RESPONSE } from '../../types/response';
+import { START_GAME_ERROR_RESPONSE, UPDATE_ROOM_STATUS_RESPONSE } from '../../../responses';
+import { createMockPublisherPayload } from 'src/testing/mocks/redis-client.mock';
 
 describe('Start Game Handler', () => {
+  const MOCK_ROOM_ID = 'test room id';
+
   let ws: WebSocket;
   let mockStartGameReq: StartGameReq;
   beforeEach(() => {
     ws = createMockWebSocket();
 
     mockStartGameReq = {
-      roomId: 'test room id',
+      roomId: MOCK_ROOM_ID,
     };
+
+    vi.spyOn(getQuestions, 'getQuestionsHandler').mockResolvedValue();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.resetAllMocks();
   });
 
   it('has an invalid data schema', async () => {
     await startGameHandler(ws, {} as StartGameReq);
 
+    expect(gameStatePublisherClient.publish).not.toHaveBeenCalled();
     expect(ws.send).toHaveBeenCalledWith(
       createMockWebSocketMessage(START_GAME_ERROR_RESPONSE, { errorCode: START_GAME_ERROR_CODES.INVALID_ROOM_REQ })
     );
@@ -38,16 +45,21 @@ describe('Start Game Handler', () => {
 
     await startGameHandler(ws, mockStartGameReq);
 
+    expect(gameStatePublisherClient.publish).not.toHaveBeenCalled();
     expect(ws.send).toHaveBeenCalledWith(
       createMockWebSocketMessage(START_GAME_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.COMMAND_FAILURE })
     );
   });
 
   it('cannot access game state keys', async () => {
-    vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({});
+    vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
+      [HOST_ID_QUERY]: [null],
+      [ROOM_STATUS_QUERY]: [null],
+    });
 
     await startGameHandler(ws, mockStartGameReq);
 
+    expect(gameStatePublisherClient.publish).not.toHaveBeenCalled();
     expect(ws.send).toHaveBeenCalledWith(
       createMockWebSocketMessage(START_GAME_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.KEY_NOT_FOUND })
     );
@@ -55,12 +67,13 @@ describe('Start Game Handler', () => {
 
   it('should not allow non-host to start game', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      '$.hostId': ['Someone else is host'],
-      '$.roomStatus': [ROOM_STATUS.LOBBY],
+      [HOST_ID_QUERY]: ['Someone else is host'],
+      [ROOM_STATUS_QUERY]: [ROOM_STATUS.LOBBY],
     });
 
     await startGameHandler(ws, mockStartGameReq);
 
+    expect(gameStatePublisherClient.publish).not.toHaveBeenCalled();
     expect(ws.send).toHaveBeenCalledWith(
       createMockWebSocketMessage(START_GAME_ERROR_RESPONSE, { errorCode: START_GAME_ERROR_CODES.NOT_HOST })
     );
@@ -68,12 +81,13 @@ describe('Start Game Handler', () => {
 
   it('should not start games for rooms that are not in lobby', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      '$.hostId': [GLOBAL_MOCK_USER_ID],
-      '$.roomStatus': [ROOM_STATUS.IN_QUESTION],
+      [HOST_ID_QUERY]: [GLOBAL_MOCK_USER_ID],
+      [ROOM_STATUS_QUERY]: [ROOM_STATUS.IN_QUESTION],
     });
 
     await startGameHandler(ws, mockStartGameReq);
 
+    expect(gameStatePublisherClient.publish).not.toHaveBeenCalled();
     expect(ws.send).toHaveBeenCalledWith(
       createMockWebSocketMessage(START_GAME_ERROR_RESPONSE, { errorCode: START_GAME_ERROR_CODES.ROOM_NOT_IN_LOBBY })
     );
@@ -81,13 +95,14 @@ describe('Start Game Handler', () => {
 
   it('should send error response if game state update fails', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      '$.hostId': [GLOBAL_MOCK_USER_ID],
-      '$.roomStatus': [ROOM_STATUS.LOBBY],
+      [HOST_ID_QUERY]: [GLOBAL_MOCK_USER_ID],
+      [ROOM_STATUS_QUERY]: [ROOM_STATUS.LOBBY],
     });
     vi.spyOn(gameStatePublisherClient.json, 'set').mockRejectedValueOnce('');
 
     await startGameHandler(ws, mockStartGameReq);
 
+    expect(gameStatePublisherClient.publish).not.toHaveBeenCalled();
     expect(ws.send).toHaveBeenCalledWith(
       createMockWebSocketMessage(START_GAME_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.COMMAND_FAILURE })
     );
@@ -95,15 +110,17 @@ describe('Start Game Handler', () => {
 
   it('should start game', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      '$.hostId': [GLOBAL_MOCK_USER_ID],
-      '$.roomStatus': [ROOM_STATUS.LOBBY],
+      [HOST_ID_QUERY]: [GLOBAL_MOCK_USER_ID],
+      [ROOM_STATUS_QUERY]: [ROOM_STATUS.LOBBY],
     });
     vi.spyOn(gameStatePublisherClient.json, 'set').mockResolvedValueOnce('OK');
 
     await startGameHandler(ws, mockStartGameReq);
 
-    expect(ws.send).toHaveBeenCalledWith(
-      createMockWebSocketMessage(START_GAME_RESPONSE, { roomStatus: ROOM_STATUS.LOADING_GAME })
+    expect(gameStatePublisherClient.publish).toHaveBeenCalledWith(
+      MOCK_ROOM_ID,
+      createMockPublisherPayload(UPDATE_ROOM_STATUS_RESPONSE, { roomStatus: ROOM_STATUS.LOADING_GAME })
     );
+    expect(getQuestions.getQuestionsHandler).toHaveBeenCalledWith(MOCK_ROOM_ID);
   });
 });

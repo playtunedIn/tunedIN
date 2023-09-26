@@ -17,7 +17,7 @@ describe('Create Room Handlers', () => {
   afterEach(() => {
     console.log = originalConsoleLog;
     console.error = originalConsoleError;
-    vi.restoreAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should call console log', () => {
