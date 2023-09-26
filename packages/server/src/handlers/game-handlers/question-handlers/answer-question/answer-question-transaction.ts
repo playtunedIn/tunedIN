@@ -7,6 +7,7 @@ import {
   createQuestionQuery,
   executeTransaction,
   gameStatePublisherClient,
+  queryMultiple,
 } from '../../../../clients/redis';
 import { QUESTION_ROUND_ERROR_CODES, REDIS_ERROR_CODES } from '../../../../errors';
 import { calculateScore } from '../../../../utils/room-helpers';
@@ -24,20 +25,14 @@ export const answerQuestionTransaction = async (
     await gameStatePublisherClient.watch(roomId);
 
     const questionQuery = createQuestionQuery(questionIndex);
-    let response: Record<string, unknown[]>;
-    try {
-      response = (await gameStatePublisherClient.json.get(roomId, {
-        path: [questionQuery, PLAYERS_QUERY],
-      })) as Record<string, unknown[]>;
-    } catch {
-      throw new Error(REDIS_ERROR_CODES.COMMAND_FAILURE);
-    }
-    if (response[questionQuery]?.[0] === null || response[PLAYERS_QUERY]?.[0] === null) {
-      throw new Error(REDIS_ERROR_CODES.KEY_NOT_FOUND);
-    }
+    const response = await queryMultiple(
+      roomId,
+      [createQuestionQuery(questionIndex), PLAYERS_QUERY],
+      gameStatePublisherClient
+    );
 
-    const question = response[questionQuery][0] as Question;
-    const players = response[PLAYERS_QUERY][0] as PlayerState[];
+    const question: Question = response[questionQuery] as Question;
+    const players = response[PLAYERS_QUERY] as PlayerState[];
 
     if (answerIndex >= question.choices.length) {
       throw new Error(QUESTION_ROUND_ERROR_CODES.ANSWER_OUT_OF_RANGE);

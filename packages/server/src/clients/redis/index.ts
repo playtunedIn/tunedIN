@@ -2,6 +2,9 @@ import { createClient } from 'redis';
 
 import { REDIS_DB_MAP, REDIS_HOSTNAME } from './redis.constants';
 
+export type RedisClient = ReturnType<typeof createClient>;
+
+export * from './query-helpers';
 export * from './redis.constants';
 export { executeTransaction } from './transactions';
 
