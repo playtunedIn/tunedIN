@@ -34,47 +34,46 @@ cd tunedIN
 pnpm install
 ```
 
-4. Generate Server SSL Certs:
+5. Update your host file
 
-```bash
-pnpm generate-certs
+[How to update host file](https://www.hostinger.com/tutorials/how-to-edit-hosts-file)
+
+add an entry for local tunedin:
+
+```
+127.0.0.1 local.playtunedin-test.com
 ```
 
-5. Setup Docker
+6. Generate Server SSL Certs:
+
+```bash
+sudo pnpm generate-certs
+
+# You may need to change file permissions to allow node to read certs
+chmod +wrx packages/client/.cert/*
+chmod +wrx packages/server/.cert/*
+```
+
+7. Setup Docker
 
 To Setup Docker you must install a docker runtime
 
-**Windows**
-
 [Docker Desktop](https://www.docker.com/)
 
-**Mac**
 
-[Homebrew installer](https://brew.sh/)
+8. Run Docker
 
-```bash
-brew install colima
-```
-
-6. Run Docker
-
-**Windows**
 
 Launch Docker Desktop application
 
-**Mac**
 
-```bash
-colima start -m 4
-```
-
-7. Ensure Environments are setup for client and server
+9. Ensure Environments are setup for client and server
 
 [Client README.md](https://github.com/playtunedIn/tunedIN/blob/main/packages/client/README.md)
 
 [Server README.md](https://github.com/playtunedIn/tunedIN/blob/main/packages/server/README.md)
 
-8. Start project:
+10. Start project:
 
 ```bash
 pnpm dev
