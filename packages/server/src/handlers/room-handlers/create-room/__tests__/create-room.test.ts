@@ -10,14 +10,11 @@ import * as roomHelpers from '../../../../utils/room-helpers';
 
 describe('Create Room Handler', () => {
   let ws: WebSocket;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let mockCreateRoomReq: CreateRoomReq;
 
   beforeEach(() => {
     ws = createMockWebSocket();
-
     vi.spyOn(roomHelpers, 'generateUniqueRoomId').mockReturnValueOnce('4JTY');
-
     mockCreateRoomReq = {};
   });
 
@@ -38,6 +35,7 @@ describe('Create Room Handler', () => {
     vi.spyOn(gameStatePublisherClient, 'exists').mockRejectedValueOnce('');
 
     await createRoomHandler(ws, mockCreateRoomReq);
+
     expect(gameStatePublisherClient.json.set).not.toHaveBeenCalled();
     expect(ws.send).toHaveBeenCalledWith(
       createMockWebSocketMessage(CREATE_ROOM_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.COMMAND_FAILURE })
@@ -48,6 +46,7 @@ describe('Create Room Handler', () => {
     vi.spyOn(gameStatePublisherClient, 'exists').mockResolvedValueOnce(1);
 
     await createRoomHandler(ws, mockCreateRoomReq);
+
     expect(gameStatePublisherClient.json.set).not.toHaveBeenCalled();
     expect(ws.send).toHaveBeenCalledWith(
       createMockWebSocketMessage(CREATE_ROOM_ERROR_RESPONSE, { errorCode: CREATE_ROOM_ERROR_CODES.GENERATE_ID_ERROR })
@@ -55,9 +54,6 @@ describe('Create Room Handler', () => {
   });
 
   it('should create room', async () => {
-    vi.spyOn(gameStatePublisherClient, 'exists').mockResolvedValueOnce(0);
-    vi.spyOn(gameStatePublisherClient.json, 'set').mockResolvedValueOnce('OK');
-
     const expectedDefaultGameState = {
       roomId: '4JTY',
       host: '',
@@ -65,7 +61,11 @@ describe('Create Room Handler', () => {
       questions: [],
     };
 
+    vi.spyOn(gameStatePublisherClient, 'exists').mockResolvedValueOnce(0);
+    vi.spyOn(gameStatePublisherClient.json, 'set').mockResolvedValueOnce('OK');
+
     await createRoomHandler(ws, mockCreateRoomReq);
+
     expect(roomHelpers.generateUniqueRoomId).toHaveBeenCalled();
     expect(gameStatePublisherClient.exists).toHaveBeenCalledWith('4JTY');
     expect(gameStatePublisherClient.json.set).toHaveBeenCalledWith('4JTY', ROOT_QUERY, expectedDefaultGameState);
