@@ -1,17 +1,12 @@
 import type { JSONSchemaType } from 'ajv';
 
-export interface CreateRoomReq {
-  roomId: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface CreateRoomReq {}
 
 export const CREATE_ROOM_SCHEMA_NAME = 'CreateRoomReq';
 
 const createRoomReqSchema: JSONSchemaType<CreateRoomReq> = {
   type: 'object',
-  properties: {
-    roomId: { type: 'string' },
-  },
-  required: ['roomId'],
   additionalProperties: false,
 };
 
