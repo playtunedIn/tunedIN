@@ -211,45 +211,6 @@ function theXRatedPlayer(data: QuestionData[]): AnsweredQuestion {
   return answeredQuestion;
 }
 
-// function playlistMastermind(data: QuestionData[]): AnsweredQuestion {
-
-//     const title = "Playlist Mastermind";
-//     const description =  "Who made the playlist with the following title?";
-//     const answerType = "player";
-//     //players are the answer options
-//     const answerOpts = data.map(questionData => questionData.player);
-//     let correctAnswer = [];
-
-//     //make an array of random numbers (size of number of players, from 0-size)
-//         //loop through this, the first player to have a playlist, use them as the answer, and use their playlists
-//         //if NO player has a playlist, ERROR OUT //write a ticket for these scenerios in which a question won't work .....
-
-//     //logic to set the extra description (IF NEEDED)
-//     const extraDescr = ""
-
-//     //logic to set the correct answer
-//     correctAnswer = [""];
-
-//     //put all together
-//     const answeredQuestion = {
-//         question_title: title,
-//         question_description: description,
-//         question_description_extra: extraDescr, //DELETE IF NOT NEEDED
-//         answer_options: answerOpts,
-//         answer_type: answerType,
-//         correct_answer: correctAnswer
-//     }
-
-//     return answeredQuestion;
-// }
-
-// {
-//     "question_name": "Playlist Mastermind",
-//     "question_description": "Who made the playlist with the following title?",
-//     "has_customized_description_end": true,
-//     "answer_type": "player"
-// },
-
 /*   --- TEMPLATE ---
 
 function questionName(data: QuestionData[]): AnsweredQuestion {
