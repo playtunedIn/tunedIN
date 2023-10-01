@@ -35,7 +35,7 @@ function getSpotifyData(users: User[]): QuestionData[] {
 
 function getRandomNumbers(max: number, total: number): number[] {
   if (total > max) {
-    throw new Error('Total cannot be greater than max'); //LOOK at how shayne does errors
+    throw new Error('Total cannot be greater than max'); //decide what we want to do in these scenerios, probably just use max?
   }
 
   const numbers: number[] = [];
