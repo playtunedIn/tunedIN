@@ -12,8 +12,7 @@ export const REDIS_ERROR_CODES = {
 
 //Create room error codes are from 100 - 199
 export const CREATE_ROOM_ERROR_CODES = {
-  INVALID_REQ: 'MULT-100',
-  GENERATE_ID_ERROR: 'MULT-101',
+  GENERATE_ID_ERROR: 'MULT-100',
 };
 
 // Join room error codes are reserved from 200 - 299
