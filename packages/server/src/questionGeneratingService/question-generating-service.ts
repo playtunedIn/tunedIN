@@ -76,33 +76,3 @@ export function getGameQuestions(users: User[], numQuestions: number): AnsweredQ
 
   return results;
 }
-
-/*
-
-1) create a json object like this:
-    {
-        favSong: (big data) => {},
-        topArtist: (big data) => {},
-        etc.
-    }
-
-    so basically, an json object filled with the functions for each question. They take in the same parameters (because it's typed)
-    so it needs to be same type, then it will return the question answer thing
-
-
-2) const questionSelector = Object.keys(theJsonObjAbove) // turns it into an array
-3) a function that makes an array of unique random numbers, passing in two things (the size of the questions array, and the num round questions)
-4) call the function at each index of the array 
-
-**** for now, a question can only get called once in a game, even though a question might have randomization within it, making it potentially unique
-    - later on, we can add a tag indicating if something can be called twice in a game? idk
-*/
-
-//ASSUMPTIONS/DECISIONS:
-/*
-
-    - the questions will list ALL player names as question options when applicable
-    - a question will only be called once in a game 
-    - player needs a unique nickname/username to enter the game
-
- */
