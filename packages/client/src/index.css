@@ -56,6 +56,24 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+.socket-status-indicator {
+  position: fixed;
+  bottom: 1em;
+  left: 1em;
+}
+
+.socket-status-indicator.connecting {
+  color: orange;
+}
+
+.socket-status-indicator.connected {
+  color: green;
+}
+
+.socket-status-indicator.failed {
+  color: red;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

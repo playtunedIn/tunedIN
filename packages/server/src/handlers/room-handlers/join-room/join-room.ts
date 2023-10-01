@@ -1,73 +1,47 @@
 import type { WebSocket } from 'ws';
 
+import { JOIN_ROOM_ERROR_CODES, REDIS_ERROR_CODES } from '../../../errors';
 import { gameStatePublisherClient } from '../../../clients/redis';
 import { isValidSchema } from '../../message.validator';
-import { subscribeGameHandler } from '../../game-handlers/subscribe-game/subscribe-game';
+import { publishMessageHandler, subscribeRoomHandler } from '../../subscribed-message-handlers';
 import type { JoinRoomReq } from './join-room.validator';
 import { JOIN_ROOM_SCHEMA_NAME } from './join-room.validator';
-import type { GameState, PlayerState } from 'src/clients/redis/models/game-state';
-import { JOIN_ROOM_ERROR_CODES } from './join-room.errors';
+import type { PlayerState } from 'src/clients/redis/models/game-state';
 import { sendResponse } from '../../../utils/websocket-response';
-import { JOIN_ROOM_ERROR_RESPONSE, JOIN_ROOM_RESPONSE } from '../../../handlers/room-handlers/types/response';
-
-const PLAYER_LIMIT = 4;
+import { ADD_PLAYER_RESPONSE, JOIN_ROOM_ERROR_RESPONSE, JOIN_ROOM_RESPONSE } from '../../responses';
+import { createNewPlayerState } from '../../../utils/room-helpers';
+import { joinRoomTransaction } from './join-room-transaction';
 
 export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   if (!isValidSchema(data, JOIN_ROOM_SCHEMA_NAME)) {
-    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.InvalidRoomReq });
+    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.INVALID_ROOM_REQ });
   }
 
-  const gameStateJson = await gameStatePublisherClient.get(data.roomId);
-  if (!gameStateJson) {
-    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.RoomNotFound });
-  }
+  const { userId } = ws.userToken;
+  const { roomId, playerId } = data;
 
-  let gameState: GameState;
+  let roomExists: boolean;
   try {
-    gameState = JSON.parse(gameStateJson);
-  } catch (parseError) {
-    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.GameStateParsingError });
+    roomExists = (await gameStatePublisherClient.exists(data.roomId)) > 0;
+  } catch {
+    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.COMMAND_FAILURE });
   }
 
-  if (gameState.players.length >= PLAYER_LIMIT) {
-    sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.RoomFull });
-    return;
+  if (!roomExists) {
+    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.ROOM_NOT_FOUND });
   }
 
-  if (gameState.players.some(player => player.playerId === data.playerId)) {
-    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.PlayerAlreadyInRoom });
-  }
+  const newPlayer = createNewPlayerState(playerId);
 
-  const newPlayer: PlayerState = createNewPlayerState(data);
-  gameState.players.push(newPlayer);
-  if (gameState.players.length === 1) {
-    gameState.host = newPlayer.playerId;
-  }
-
-  let newGameState: string;
+  let players: PlayerState[];
   try {
-    newGameState = JSON.stringify(gameState);
-  } catch (stringifyError) {
-    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.GameStateStringifyingError });
+    players = await joinRoomTransaction(roomId, newPlayer);
+  } catch (err) {
+    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: (err as Error).message });
   }
 
-  try {
-    await Promise.all([
-      gameStatePublisherClient.set(gameState.roomId, newGameState),
-      gameStatePublisherClient.publishChanges(gameState.roomId, newGameState),
-      subscribeGameHandler(ws, gameState.roomId),
-    ]);
-  } catch (error) {
-    sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.HandlerError });
-  }
+  await subscribeRoomHandler(ws, data.roomId);
+  await publishMessageHandler(data.roomId, ADD_PLAYER_RESPONSE, { player: newPlayer }, userId);
 
-  sendResponse(ws, JOIN_ROOM_RESPONSE, gameState);
+  sendResponse(ws, JOIN_ROOM_RESPONSE, players);
 };
-
-function createNewPlayerState(data: JoinRoomReq): PlayerState {
-  return {
-    playerId: data.playerId,
-    score: 0,
-    answers: [],
-  };
-}

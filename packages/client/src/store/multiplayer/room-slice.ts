@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
-interface RoomState {
+export interface RoomState {
   roomId: string;
+  roomErrorCode?: string;
 }
 
 const initialState: RoomState = {
@@ -16,8 +17,14 @@ const roomSlice = createSlice({
     updateRoomId: (state, action: PayloadAction<string>) => {
       state.roomId = action.payload;
     },
+    updateRoomErrorCode: (state, action: PayloadAction<string | undefined>) => {
+      state.roomErrorCode = action.payload;
+    },
+    updateRoomState: (_, action: PayloadAction<RoomState>) => {
+      return action.payload;
+    },
   },
 });
 
 export default roomSlice.reducer;
-export const { updateRoomId } = roomSlice.actions;
+export const { updateRoomId, updateRoomErrorCode, updateRoomState } = roomSlice.actions;
