@@ -1,0 +1,114 @@
+
+[
+    {
+        "question_name": "Mainstream Junkie",
+        "question_description": "Who listened to the most popular song most recently?",
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Hidden Gem Hunter",
+        "question_description": "Who listened to the least popular song most recently?",
+        "answer_type": "player"
+    },
+    {
+        "question_name": "The Artist Scout",
+        "question_description": "Who listened to this list of artists recently?",
+        "has_customized_description_end": true,
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Multifaceted Melophile",
+        "question_description": "Who's 10 most recent songs were sung by this number of unique artists",
+        "has_customized_description_end": true,
+        "answer_type": "player"
+    },
+    {
+        "question_name": "The X-Rated Player",
+        "question_description": "Who listened to the most explicit songs recently?",
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Playlist Mastermind",
+        "question_description": "Who made the playlist with the following title?",
+        "has_customized_description_end": true,
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Album Art Aficionado",
+        "question_description": "Who made a playlist and chose this as the album conver?",
+        "has_customized_description_end": true,
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Mixtape Magician",
+        "question_description": "Who made the playlist with the following songs on it?",
+        "has_customized_description_end": true,
+        "answer_type": "player"
+    },
+    {
+        "question_name": "The Most Popular",
+        "question_description": "Who has the most followers?",
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Birthdate Harmonizer",
+        "question_description": "Which player was born in the same month and year as this album was released?",
+        "has_customized_description_end": true,
+        "answer_type": "player"
+    },
+    {
+        "question_name": "The Artist Admirer",
+        "question_description": "Who has this artist in their queue right now?",
+        "has_customized_description_end": true,
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Next in Line Listener",
+        "question_description": "Who has this song queued up next?",
+        "has_customized_description_end": true,
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Planning Ahead",
+        "question_description": "Who has the most songs queued up?",
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Cover Art Crusade",
+        "question_description": "Who recently listened to a song from this album?",
+        "has_customized_description_end": true,
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Penny-Pinching Player",
+        "question_description": "Who has the free version of Spotify?",
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Popularity Magnet",
+        "question_description": "Who recently listened to the most popular artist?",
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Indie Explorer",
+        "question_description": "Who recently listened to the least popular artist",
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Collaboration Connoisseur",
+        "question_description": "Who listens to songs ft. more than one artist?",
+        "answer_type": "player"
+    },
+    {
+        "question_name": "Song Spy",
+        "question_description": "Who listened to this song recently?",
+        "has_customized_description_end": true,
+        "answer_type": "player"
+    },
+    {
+        "question_name": "The Artist Admirer",
+        "question_description": "Who listened to this artist recently?",
+        "has_customized_description_end": true,
+        "answer_type": "player"
+    }
+]
