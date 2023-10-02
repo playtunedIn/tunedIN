@@ -1,4 +1,4 @@
-import type { PlayerRoundResult } from 'src/clients/redis/models/game-state';
+import type { PlayerRoundResult, Question } from 'src/clients/redis/models/game-state';
 import type { PlayerState } from 'src/clients/redis/models/game-state';
 
 export const createNewPlayerState = (playerId: string): PlayerState => ({
@@ -11,15 +11,40 @@ export const createNewPlayerState = (playerId: string): PlayerState => ({
 export const calculateScore = (
   questionExpirationTimestamp: number,
   currentTimestamp: number,
-  questionAnswerIndex: number,
-  answerIndex: number
+  questionAnswerIndexes: number[],
+  answerIndexes: number[]
 ): number => {
-  if (questionAnswerIndex !== answerIndex) {
-    return 0;
-  }
+  const questionAnswersSet = new Set(questionAnswerIndexes);
+
+  let numOfCorrectAnswers = 0;
+  answerIndexes.forEach(answerIndex => {
+    if (questionAnswersSet.has(answerIndex)) {
+      numOfCorrectAnswers++;
+    }
+  });
 
   // keep numbers whole and every 1 second before the expiration is 100 points
-  return Math.floor((questionExpirationTimestamp - currentTimestamp) * 0.1);
+  return Math.floor(numOfCorrectAnswers * ((questionExpirationTimestamp - currentTimestamp) * 0.1));
+};
+
+export const areValidAnswers = (answerIndexes: number[], question: Question): boolean => {
+  if (answerIndexes.length === 0 || answerIndexes.length > question.choices.length) {
+    return false;
+  }
+
+  const answersOutOfBounds = answerIndexes.some(answerIndex => {
+    return answerIndex >= question.choices.length;
+  });
+  if (answersOutOfBounds) {
+    return false;
+  }
+
+  const usedAnswers = new Set(answerIndexes);
+  if (usedAnswers.size !== answerIndexes.length) {
+    return false;
+  }
+
+  return true;
 };
 
 export const getRoundLeaderboard = (players: PlayerState[], questionIndex: number): PlayerRoundResult[] =>

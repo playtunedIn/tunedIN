@@ -13,7 +13,7 @@ export interface Question {
   expirationTimestamp?: number;
   question: string;
   choices: string[];
-  answer: number; // Index in choices for correct answer.
+  answers: number[]; // Indexes in choices for correct answer.
 }
 
 export interface PlayerState {
@@ -23,13 +23,13 @@ export interface PlayerState {
   /**
    * Player's answer to each question (null if they did not answer question)
    */
-  answers: (number | null)[];
+  answers: (number[] | null)[];
 }
 
 export interface PlayerRoundResult {
   name: string;
   score: number;
-  answer: number | null;
+  answer: number[] | null;
 }
 
 export interface GameState {

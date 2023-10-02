@@ -44,7 +44,7 @@ export const questionRoundHandler = async (roomId: string) => {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { answer, ...questionWithoutAnswer } = question;
+  const { answers, ...questionWithoutAnswer } = question;
   publishMessageHandler(roomId, UPDATE_ROOM_STATUS_RESPONSE, {
     roomStatus: ROOM_STATUS.IN_QUESTION,
     question: questionWithoutAnswer,

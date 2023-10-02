@@ -27,7 +27,7 @@ describe('Answer Question Handler', () => {
     mockAnswerQuestionReq = {
       roomId: MOCK_ROOM_ID,
       questionIndex: MOCK_QUESTION_INDEX,
-      answerIndex: 0,
+      answerIndexes: [0],
     };
 
     vi.spyOn(questionRoundResultsHandler, 'questionRoundResultsHandler');
@@ -77,8 +77,8 @@ describe('Answer Question Handler', () => {
   it('calls round result handler when everyone has answered question', async () => {
     const players = createMockPlayers();
     // set question to answered (not null)
-    players[0].answers = [0];
-    players[1].answers = [0];
+    players[0].answers = [[0]];
+    players[1].answers = [[0]];
 
     vi.spyOn(answerQuestionTransaction, 'answerQuestionTransaction').mockResolvedValueOnce(players);
 
