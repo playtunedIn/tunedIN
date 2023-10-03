@@ -1,4 +1,6 @@
 // Root level message handlers responses
+export const CREATE_ROOM_RESPONSE = 'createRoomResponse';
+export const CREATE_ROOM_ERROR_RESPONSE = 'createRoomErrorResponse';
 export const JOIN_ROOM_RESPONSE = 'joinRoomResponse';
 export const JOIN_ROOM_ERROR_RESPONSE = 'joinRoomErrorResponse';
 export const RECOVER_ROOM_SESSION_RESPONSE = 'recoverRoomSessionResponse';
@@ -10,6 +12,8 @@ export const ANSWER_QUESTION_RESPONSE = 'answerQuestionResponse';
 export const ANSWER_QUESTION_ERROR_RESPONSE = 'answerQuestionErrorResponse';
 
 export type MessageHandlerResponse =
+  | typeof CREATE_ROOM_RESPONSE
+  | typeof CREATE_ROOM_ERROR_RESPONSE
   | typeof JOIN_ROOM_RESPONSE
   | typeof JOIN_ROOM_ERROR_RESPONSE
   | typeof RECOVER_ROOM_SESSION_RESPONSE

@@ -10,6 +10,11 @@ export const REDIS_ERROR_CODES = {
   CORRUPT_JSON_PARSE: 'MULT-006',
 } as const;
 
+//Create room error codes are from 100 - 199
+export const CREATE_ROOM_ERROR_CODES = {
+  GENERATE_ID_ERROR: 'MULT-100',
+};
+
 // Join room error codes are reserved from 200 - 299
 export const JOIN_ROOM_ERROR_CODES = {
   INVALID_ROOM_REQ: 'MULT-200',
