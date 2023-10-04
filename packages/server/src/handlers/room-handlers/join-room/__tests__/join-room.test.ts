@@ -17,7 +17,6 @@ describe('Join Room Handler', () => {
     ws = createMockWebSocket();
     mockJoinRoomReq = {
       roomId: 'test room id',
-      playerId: 'test player',
     };
   });
 
@@ -69,7 +68,7 @@ describe('Join Room Handler', () => {
   it('should join room', async () => {
     const mockPlayers: PlayerState[] = [
       {
-        playerId: mockJoinRoomReq.playerId,
+        userId: 'userId',
         name: 'Joe Smith',
         score: 0,
         answers: [],

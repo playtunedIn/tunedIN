@@ -20,13 +20,13 @@ export const createMockGameState = (): GameState => ({
 
 export const createMockPlayers = (): PlayerState[] => [
   {
-    playerId: GLOBAL_MOCK_USER_ID,
+    userId: GLOBAL_MOCK_USER_ID,
     name: 'Emil',
     answers: [null],
     score: 0,
   },
   {
-    playerId: 'test id 2',
+    userId: 'test id 2',
     name: 'Matt',
     answers: [null],
     score: 0,
@@ -34,7 +34,7 @@ export const createMockPlayers = (): PlayerState[] => [
 ];
 
 export const createMockPlayerState = (): PlayerState => ({
-  playerId: 'test player id',
+  userId: 'test player id',
   name: 'Joe Smith',
   score: 0,
   answers: [],

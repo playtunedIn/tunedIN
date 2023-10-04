@@ -17,7 +17,7 @@ export interface Question {
 }
 
 export interface PlayerState {
-  playerId: string;
+  userId: string;
   name: string;
   score: number;
   /**
