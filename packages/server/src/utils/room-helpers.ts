@@ -1,10 +1,5 @@
-import {
-  ROOM_STATUS,
-  type GameState,
-  type PlayerRoundResult,
-  type Question,
-} from 'src/clients/redis/models/game-state';
-import type { PlayerState } from 'src/clients/redis/models/game-state';
+import type { GameState, PlayerRoundResult, Question, PlayerState } from 'src/clients/redis/models/game-state';
+import { ROOM_STATUS } from '../clients/redis/models/game-state';
 
 const ROOM_ID_LENGTH = 4;
 

@@ -7,8 +7,7 @@ export const useMultiplayerClient = () => {
   const { closeConnection, sendMessage, status } = useSocket();
 
   const createRoom = () => {
-    // TODO: Implement in SPOT-46
-    sendMessage({ type: 'createRoom', data: { roomId: 'test' } });
+    sendMessage({ type: 'createRoom' });
   };
 
   const exitRoom = () => {
