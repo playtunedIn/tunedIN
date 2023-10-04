@@ -46,7 +46,7 @@ export const answerQuestionTransaction = async (
       throw new Error(QUESTION_ROUND_ERROR_CODES.QUESTION_EXPIRED);
     }
 
-    const playerIndex = players.findIndex(player => player.playerId === userId);
+    const playerIndex = players.findIndex(player => player.userId === userId);
 
     /**
      * player is passed by reference since the array players is an array of objects.

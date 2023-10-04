@@ -13,7 +13,7 @@ export const joinRoomTransaction = (roomId: string, newPlayer: PlayerState) =>
 
     const players = await query<PlayerState[]>(roomId, PLAYERS_QUERY, gameStatePublisherClient);
 
-    if (players.some(player => player.playerId === newPlayer.playerId)) {
+    if (players.some(player => player.userId === newPlayer.userId)) {
       throw new Error(JOIN_ROOM_ERROR_CODES.PLAYER_ALREADY_IN_ROOM);
     }
 

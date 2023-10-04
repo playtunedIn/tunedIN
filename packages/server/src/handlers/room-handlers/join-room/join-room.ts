@@ -18,7 +18,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   }
 
   const { userId } = ws.userToken;
-  const { roomId, playerId } = data;
+  const { roomId } = data;
 
   let roomExists: boolean;
   try {
@@ -31,7 +31,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
     return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.ROOM_NOT_FOUND });
   }
 
-  const newPlayer = createNewPlayerState(playerId);
+  const newPlayer = createNewPlayerState(userId);
 
   let players: PlayerState[];
   try {
