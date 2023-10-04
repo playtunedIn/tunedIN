@@ -131,7 +131,7 @@ describe('Question Round Handler', () => {
 
     it('does not call round result handler in timeout when all players have answered question', async () => {
       const players = createMockPlayers();
-      players.forEach(player => (player.answers[MOCK_QUESTION_INDEX] = 1));
+      players.forEach(player => (player.answers[MOCK_QUESTION_INDEX] = [1]));
       vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([players] as any);
 
       await vi.runOnlyPendingTimersAsync();

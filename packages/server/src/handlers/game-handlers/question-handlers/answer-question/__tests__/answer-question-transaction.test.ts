@@ -13,7 +13,7 @@ describe('Answer Question Transaction', () => {
   const MOCK_ROOM_ID = 'test room id';
   const MOCK_USER_ID = GLOBAL_MOCK_USER_ID;
   const MOCK_QUESTION_INDEX = 0;
-  const MOCK_ANSWER_INDEX = 0;
+  const MOCK_ANSWER_INDEX = [0];
   const MOCK_ANSWER_TIMESTAMP = 5000;
 
   it('fails when redis get fails', async () => {
@@ -59,10 +59,10 @@ describe('Answer Question Transaction', () => {
         MOCK_ROOM_ID,
         MOCK_USER_ID,
         MOCK_QUESTION_INDEX,
-        question.choices.length,
+        [question.choices.length],
         MOCK_ANSWER_TIMESTAMP
       )
-    ).rejects.toThrowError(QUESTION_ROUND_ERROR_CODES.ANSWER_OUT_OF_RANGE);
+    ).rejects.toThrowError(QUESTION_ROUND_ERROR_CODES.INVALID_ANSWERS);
   });
 
   it('fails when expiration for question is not set (round not started)', async () => {
@@ -180,7 +180,7 @@ describe('Answer Question Transaction', () => {
     expectedUpdatedPlayers[0].score += calculateScore(
       question.expirationTimestamp,
       MOCK_ANSWER_TIMESTAMP,
-      question.answer,
+      question.answers,
       MOCK_ANSWER_INDEX
     );
 

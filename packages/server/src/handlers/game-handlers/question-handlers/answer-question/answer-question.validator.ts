@@ -3,7 +3,7 @@ import type { JSONSchemaType } from 'ajv';
 export interface AnswerQuestionReq {
   roomId: string;
   questionIndex: number;
-  answerIndex: number;
+  answerIndexes: number[];
 }
 
 export const ANSWER_QUESTION_SCHEMA_NAME = 'AnswerQuestionReq';
@@ -13,9 +13,14 @@ const answerQuestionReqSchema: JSONSchemaType<AnswerQuestionReq> = {
   properties: {
     roomId: { type: 'string' },
     questionIndex: { type: 'number' },
-    answerIndex: { type: 'number' },
+    answerIndexes: {
+      type: 'array',
+      items: {
+        type: 'number',
+      },
+    },
   },
-  required: ['roomId', 'questionIndex', 'answerIndex'],
+  required: ['roomId', 'questionIndex', 'answerIndexes'],
   additionalProperties: false,
 };
 
