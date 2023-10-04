@@ -17,7 +17,7 @@ const joinRoomReqSchema: JSONSchemaType<JoinRoomReq> = {
     roomId: { type: 'string', minLength: ROOM_ID_LENGTH, maxLength: ROOM_ID_LENGTH },
     name: { type: 'string', minLength: MIN_NAME_LENGTH, maxLength: MAX_NAME_LENGTH, transform: ['trim'] },
   },
-  required: ['roomId'],
+  required: ['roomId', 'name'],
   additionalProperties: false,
 };
 
