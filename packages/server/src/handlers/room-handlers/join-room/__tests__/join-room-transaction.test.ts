@@ -7,16 +7,17 @@ import type { PlayerState } from 'src/clients/redis/models/game-state';
 import { createMockPlayerState, mockMultiCommand } from 'src/testing/mocks/redis-client.mock';
 
 describe('Join Room Transaction', () => {
+  const MOCK_NAME = 'Betsy';
   const mockPlayerStateArr: PlayerState[] = [
     {
       playerId: 'playerId',
-      name: 'Joe Smith',
+      name: MOCK_NAME,
       score: 0,
       answers: [],
     },
   ];
 
-  const mockRoomId = 'test roomId';
+  const mockRoomId = 'TEST';
   let mockNewPlayer: PlayerState;
   beforeEach(() => {
     mockNewPlayer = createMockPlayerState();
@@ -44,29 +45,39 @@ describe('Join Room Transaction', () => {
     );
   });
 
+  it('errors when player name already taken', async () => {
+    vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([mockPlayerStateArr as any]);
+
+    mockNewPlayer.name = MOCK_NAME;
+
+    await expect(() => joinRoomTransaction(mockRoomId, mockNewPlayer)).rejects.toThrowError(
+      JOIN_ROOM_ERROR_CODES.NAME_TAKEN
+    );
+  });
+
   it('should not let player join a full room', async () => {
     const mockFullPlayerStateArr: PlayerState[] = [
       {
         playerId: 'playerId',
-        name: 'Joe Smith',
+        name: 'Joe',
         score: 0,
         answers: [],
       },
       {
         playerId: 'playerId',
-        name: 'Joe Smith',
+        name: 'Smith',
         score: 0,
         answers: [],
       },
       {
         playerId: 'playerId',
-        name: 'Joe Smith',
+        name: 'Jane',
         score: 0,
         answers: [],
       },
       {
         playerId: 'playerId',
-        name: 'Joe Smith',
+        name: 'Doe',
         score: 0,
         answers: [],
       },

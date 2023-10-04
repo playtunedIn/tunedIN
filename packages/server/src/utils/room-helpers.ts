@@ -1,11 +1,11 @@
 import type { PlayerRoundResult, Question } from 'src/clients/redis/models/game-state';
 import type { PlayerState } from 'src/clients/redis/models/game-state';
 
-const ROOM_ID_LENGTH = 4;
+export const ROOM_ID_LENGTH = 4;
 
-export const createNewPlayerState = (playerId: string): PlayerState => ({
+export const createNewPlayerState = (playerId: string, name: string): PlayerState => ({
   playerId,
-  name: playerId,
+  name,
   score: 0,
   answers: [],
 });

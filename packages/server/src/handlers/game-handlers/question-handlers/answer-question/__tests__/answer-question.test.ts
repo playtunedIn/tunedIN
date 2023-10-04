@@ -17,7 +17,7 @@ import { answerQuestionHandler } from '../answer-question';
 import * as answerQuestionTransaction from '../answer-question-transaction';
 
 describe('Answer Question Handler', () => {
-  const MOCK_ROOM_ID = 'test room id';
+  const MOCK_ROOM_ID = 'TEST';
   const MOCK_QUESTION_INDEX = 0;
 
   let ws: WebSocket;
