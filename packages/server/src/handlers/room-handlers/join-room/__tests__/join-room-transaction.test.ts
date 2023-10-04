@@ -10,7 +10,7 @@ describe('Join Room Transaction', () => {
   const MOCK_NAME = 'Betsy';
   const mockPlayerStateArr: PlayerState[] = [
     {
-      playerId: 'playerId',
+      userId: 'userId',
       name: MOCK_NAME,
       score: 0,
       answers: [],
@@ -38,7 +38,7 @@ describe('Join Room Transaction', () => {
   it('found player in room already', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([mockPlayerStateArr as any]);
 
-    mockNewPlayer.playerId = 'playerId';
+    mockNewPlayer.userId = 'userId';
 
     await expect(() => joinRoomTransaction(mockRoomId, mockNewPlayer)).rejects.toThrowError(
       JOIN_ROOM_ERROR_CODES.PLAYER_ALREADY_IN_ROOM
@@ -58,26 +58,26 @@ describe('Join Room Transaction', () => {
   it('should not let player join a full room', async () => {
     const mockFullPlayerStateArr: PlayerState[] = [
       {
-        playerId: 'playerId',
-        name: 'Joe',
+        userId: '123',
+        name: 'Joey',
         score: 0,
         answers: [],
       },
       {
-        playerId: 'playerId',
+        userId: '456',
         name: 'Smith',
         score: 0,
         answers: [],
       },
       {
-        playerId: 'playerId',
-        name: 'Jane',
+        userId: '789',
+        name: 'Joe',
         score: 0,
         answers: [],
       },
       {
-        playerId: 'playerId',
-        name: 'Doe',
+        userId: '101',
+        name: 'Jane',
         score: 0,
         answers: [],
       },

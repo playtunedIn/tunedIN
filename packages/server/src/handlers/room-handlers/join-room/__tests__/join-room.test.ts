@@ -79,7 +79,7 @@ describe('Join Room Handler', () => {
   it('should join room', async () => {
     const mockPlayers: PlayerState[] = [
       {
-        playerId: 'mock ID',
+        userId: 'userId',
         name: 'Joe Smith',
         score: 0,
         answers: [],
