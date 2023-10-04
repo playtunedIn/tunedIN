@@ -1,3 +1,4 @@
+import { CREATE_ROOM_MESSAGE } from '@hooks/multiplayer/handlers/socket-handlers.constants';
 import { useSocket } from './socket';
 
 /**
@@ -7,7 +8,7 @@ export const useMultiplayerClient = () => {
   const { closeConnection, sendMessage, status } = useSocket();
 
   const createRoom = () => {
-    sendMessage({ type: 'createRoom' });
+    sendMessage({ type: CREATE_ROOM_MESSAGE });
   };
 
   const exitRoom = () => {
