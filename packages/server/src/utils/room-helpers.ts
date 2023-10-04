@@ -3,9 +3,9 @@ import type { PlayerState } from 'src/clients/redis/models/game-state';
 
 const ROOM_ID_LENGTH = 4;
 
-export const createNewPlayerState = (playerId: string): PlayerState => ({
-  playerId,
-  name: playerId,
+export const createNewPlayerState = (userId: string): PlayerState => ({
+  userId,
+  name: userId,
   score: 0,
   answers: [],
 });
