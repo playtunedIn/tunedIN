@@ -1,13 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { ROOM_STATUS } from '@store/multiplayer/room-slice/room-slice.constants';
 
-export interface RoomState {
-  roomId: string;
-  roomErrorCode?: string;
-}
+import type { RoomState } from '@store/multiplayer/room-slice/room-slice.types';
 
 const initialState: RoomState = {
   roomId: '',
+  roomStatus: ROOM_STATUS.NOT_IN_ROOM,
 };
 
 const roomSlice = createSlice({

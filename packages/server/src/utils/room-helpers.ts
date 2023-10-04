@@ -1,4 +1,9 @@
-import type { PlayerRoundResult, Question } from 'src/clients/redis/models/game-state';
+import {
+  ROOM_STATUS,
+  type GameState,
+  type PlayerRoundResult,
+  type Question,
+} from 'src/clients/redis/models/game-state';
 import type { PlayerState } from 'src/clients/redis/models/game-state';
 
 const ROOM_ID_LENGTH = 4;
@@ -55,14 +60,14 @@ export const getRoundLeaderboard = (players: PlayerState[], questionIndex: numbe
 export const allPlayersAnswered = (players: PlayerState[], questionIndex: number) =>
   !players.some(player => player.answers[questionIndex] === null);
 
-export function generateDefaultGameState(roomId: string) {
-  return {
-    roomId: roomId,
-    host: '',
-    players: [],
-    questions: [],
-  };
-}
+export const generateDefaultGameState = (roomId: string): GameState => ({
+  roomId: roomId,
+  hostId: '',
+  players: [],
+  questions: [],
+  roomStatus: ROOM_STATUS.LOBBY,
+  questionIndex: 0,
+});
 
 export function generateUniqueRoomId(): string {
   const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';

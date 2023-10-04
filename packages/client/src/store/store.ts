@@ -1,9 +1,9 @@
 import type { PreloadedState } from '@reduxjs/toolkit';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
-import playersReducers from './multiplayer/players-slice';
-import questionsReducers from './multiplayer/questions-slice';
-import roomReducers from './multiplayer/room-slice';
+import playersReducers from './multiplayer/players-slice/players-slice';
+import questionsReducers from './multiplayer/questions-slice/questions-slice';
+import roomReducers from './multiplayer/room-slice/room-slice';
 
 export const rootReducer = combineReducers({
   players: playersReducers,
