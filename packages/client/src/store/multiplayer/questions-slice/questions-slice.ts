@@ -13,8 +13,7 @@ const questionsSlice = createSlice({
   initialState,
   reducers: {
     addQuestion: (state, action: PayloadAction<ReceivedQuestion>) => {
-      // TODO: Don't merge this in unless I check if this is valid
-      state.questions = state.questions.concat(action.payload);
+      state.questions.push(action.payload);
     },
     updateQuestionsState: (_, action: PayloadAction<QuestionsState>) => {
       return action.payload;
