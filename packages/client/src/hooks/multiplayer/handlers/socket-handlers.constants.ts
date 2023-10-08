@@ -20,5 +20,6 @@ export const SOCKET_RECONNECT_TIMEOUT = 2000;
 export const SOCKET_PING_TIMEOUT = 31000;
 
 export const CREATE_ROOM_MESSAGE = 'createRoom';
+export const JOIN_ROOM_MESSAGE = 'joinRoom';
 
-export type WebSocketMessageTypes = typeof CREATE_ROOM_MESSAGE;
+export type WebSocketMessageTypes = typeof CREATE_ROOM_MESSAGE | typeof JOIN_ROOM_MESSAGE;
