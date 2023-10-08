@@ -13,7 +13,7 @@ import { START_GAME_ERROR_RESPONSE, UPDATE_ROOM_STATUS_RESPONSE } from '../../..
 import { createMockPublisherPayload } from 'src/testing/mocks/redis-client.mock';
 
 describe('Start Game Handler', () => {
-  const MOCK_ROOM_ID = 'test room id';
+  const MOCK_ROOM_ID = 'TEST';
 
   let ws: WebSocket;
   let mockStartGameReq: StartGameReq;

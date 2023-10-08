@@ -1,5 +1,7 @@
 import type { JSONSchemaType } from 'ajv';
 import Ajv from 'ajv';
+import ajvKeywords from 'ajv-keywords';
+
 import { JOIN_ROOM_SCHEMA_NAME } from './room-handlers/join-room/join-room.validator';
 import joinRoomReqSchema from './room-handlers/join-room/join-room.validator';
 import startGameReqSchema, { START_GAME_SCHEMA_NAME } from './room-handlers/start-game/start-game.validator';
@@ -10,7 +12,7 @@ import answerQuestionReqSchema, {
 type SchemaName = typeof JOIN_ROOM_SCHEMA_NAME | typeof START_GAME_SCHEMA_NAME | typeof ANSWER_QUESTION_SCHEMA_NAME;
 type Schema = typeof joinRoomReqSchema | typeof startGameReqSchema | typeof answerQuestionReqSchema;
 
-const validator = new Ajv();
+const validator = ajvKeywords(new Ajv());
 
 const schemaMap: Record<SchemaName, Schema> = {
   [JOIN_ROOM_SCHEMA_NAME]: joinRoomReqSchema,

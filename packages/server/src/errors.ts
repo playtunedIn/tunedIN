@@ -21,6 +21,7 @@ export const JOIN_ROOM_ERROR_CODES = {
   ROOM_NOT_FOUND: 'MULT-201',
   ROOM_FULL: 'MULT-202',
   PLAYER_ALREADY_IN_ROOM: 'MULT-203',
+  NAME_TAKEN: 'MULT-204',
 } as const;
 
 // Start room error code are reserved from 300 - 399

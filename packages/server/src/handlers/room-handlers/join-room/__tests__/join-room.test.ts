@@ -16,7 +16,8 @@ describe('Join Room Handler', () => {
   beforeEach(() => {
     ws = createMockWebSocket();
     mockJoinRoomReq = {
-      roomId: 'test room id',
+      roomId: 'TEST',
+      name: 'Joe Smith',
     };
   });
 
@@ -26,6 +27,16 @@ describe('Join Room Handler', () => {
 
   it('has an invalid data schema', async () => {
     await joinRoomHandler(ws, {} as JoinRoomReq);
+
+    expect(ws.send).toHaveBeenCalledWith(
+      createMockWebSocketMessage(JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.INVALID_ROOM_REQ })
+    );
+  });
+
+  it('does accept all spaces for name', async () => {
+    mockJoinRoomReq.name = '   ';
+
+    await joinRoomHandler(ws, mockJoinRoomReq);
 
     expect(ws.send).toHaveBeenCalledWith(
       createMockWebSocketMessage(JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.INVALID_ROOM_REQ })
