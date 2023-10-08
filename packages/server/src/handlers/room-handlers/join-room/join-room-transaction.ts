@@ -3,7 +3,14 @@ import type { RedisJSON } from '@redis/json/dist/commands';
 import type { GameState, PlayerState } from 'src/clients/redis/models/game-state';
 import { sanitizeRoomState } from '../../../utils/room-helpers';
 import { JOIN_ROOM_ERROR_CODES, REDIS_ERROR_CODES } from '../../../errors';
-import { PLAYERS_QUERY, ROOT_QUERY, executeTransaction, gameStatePublisherClient, query } from '../../../clients/redis';
+import {
+  HOST_ID_QUERY,
+  PLAYERS_QUERY,
+  ROOT_QUERY,
+  executeTransaction,
+  gameStatePublisherClient,
+  query,
+} from '../../../clients/redis';
 
 const PLAYER_LIMIT = 4;
 const JOIN_ROOM_TRANSACTION_ATTEMPTS = 10;
@@ -30,7 +37,12 @@ export const joinRoomTransaction = (roomId: string, newPlayer: PlayerState) =>
 
     const transaction = gameStatePublisherClient.multi();
     transaction.json.arrAppend(roomId, PLAYERS_QUERY, newPlayer as unknown as RedisJSON);
-    // TODO: Functionally Test this a lot we want to make sure it actually returns null
+
+    if (!roomState.hostId) {
+      roomState.hostId = newPlayer.userId;
+      transaction.json.set(roomId, HOST_ID_QUERY, roomState.hostId);
+    }
+
     const result = await transaction.exec();
     if (result === null) {
       throw new Error(REDIS_ERROR_CODES.TRANSACTION_KEY_CHANGE);

@@ -112,6 +112,7 @@ describe('Join Room Transaction', () => {
 
     await expect(joinRoomTransaction(mockRoomId, mockNewPlayer)).resolves.toEqual({
       ...mockRoomState,
+      hostId: mockNewPlayer.userId,
       players: [...mockRoomState.players, mockNewPlayer],
     });
   });
