@@ -6,6 +6,7 @@ import { ROOT_QUERY, gameStatePublisherClient } from 'src/clients/redis';
 import { CREATE_ROOM_ERROR_RESPONSE, CREATE_ROOM_RESPONSE } from 'src/handlers/responses';
 import { CREATE_ROOM_ERROR_CODES, REDIS_ERROR_CODES } from 'src/errors';
 import * as roomHelpers from '../../../../utils/room-helpers';
+import { ROOM_STATUS, type GameState } from 'src/clients/redis/models/game-state';
 
 describe('Create Room Handler', () => {
   let ws: WebSocket;
@@ -42,11 +43,13 @@ describe('Create Room Handler', () => {
   });
 
   it('should create room', async () => {
-    const expectedDefaultGameState = {
+    const expectedDefaultGameState: GameState = {
       roomId: '4JTY',
-      host: '',
+      hostId: '',
       players: [],
       questions: [],
+      roomStatus: ROOM_STATUS.LOBBY,
+      questionIndex: 0,
     };
 
     vi.spyOn(gameStatePublisherClient, 'exists').mockResolvedValueOnce(0);

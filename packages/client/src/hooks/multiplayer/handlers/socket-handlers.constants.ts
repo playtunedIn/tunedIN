@@ -18,3 +18,7 @@ export type SocketReadyState =
 
 export const SOCKET_RECONNECT_TIMEOUT = 2000;
 export const SOCKET_PING_TIMEOUT = 31000;
+
+export const CREATE_ROOM_MESSAGE = 'createRoom';
+
+export type WebSocketMessageTypes = typeof CREATE_ROOM_MESSAGE;

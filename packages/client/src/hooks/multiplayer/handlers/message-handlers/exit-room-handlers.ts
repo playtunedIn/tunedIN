@@ -3,7 +3,7 @@
  */
 
 import { useAppDispatch } from '@hooks/store/app-store';
-import { updateRoomId } from '@store/multiplayer/room-slice';
+import { updateRoomId } from '@store/multiplayer/room-slice/room-slice';
 
 interface ExitRoomResponse {
   roomId: string;
