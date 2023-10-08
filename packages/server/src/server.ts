@@ -130,6 +130,7 @@ const startServer = async () => {
    */
   wsServer.on('connection', (ws: WebSocket, _: Request, userToken: TunedInJwtPayload) => {
     ws.userToken = userToken;
+    ws.isAlive = true;
 
     ws.on('message', (data: string) => {
       messageHandler(ws, data);
