@@ -1,4 +1,8 @@
-import { CREATE_ROOM_MESSAGE, JOIN_ROOM_MESSAGE } from '@hooks/multiplayer/handlers/socket-handlers.constants';
+import {
+  CREATE_ROOM_MESSAGE,
+  JOIN_ROOM_MESSAGE,
+  START_GAME_MESSAGE,
+} from '@hooks/multiplayer/handlers/socket-handlers.constants';
 import { useSocket } from './socket';
 
 /**
@@ -8,16 +12,15 @@ export const useMultiplayerClient = () => {
   const { closeConnection, sendMessage, status } = useSocket();
 
   const createRoom = () => {
-    sendMessage({ type: CREATE_ROOM_MESSAGE });
+    sendMessage(CREATE_ROOM_MESSAGE);
   };
 
   const joinRoom = (roomId: string, name: string) => {
-    const data = {
-      roomId,
-      name,
-    };
+    sendMessage(JOIN_ROOM_MESSAGE, { roomId, name });
+  };
 
-    sendMessage({ type: JOIN_ROOM_MESSAGE, data });
+  const startGame = (roomId: string) => {
+    sendMessage(START_GAME_MESSAGE, { roomId });
   };
 
   const exitRoom = () => {
@@ -29,6 +32,7 @@ export const useMultiplayerClient = () => {
     connectionStatus: status,
     createRoom,
     joinRoom,
+    startGame,
     exitRoom,
   };
 };

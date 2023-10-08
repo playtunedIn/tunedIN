@@ -9,8 +9,7 @@ import https from 'https';
 import { readFileSync } from 'fs';
 
 import { setupOauthRoutes } from './handlers/auth/oauth-handler';
-import { messageHandler } from './handlers/message-handler';
-import { heartbeat } from './handlers/websocket/websocket-handlers';
+import { heartbeat, messageHandler } from './handlers/websocket/websocket-handlers';
 import { gameStateSubscriberClient, gameStatePublisherClient, playerStatePublisherClient } from './clients/redis';
 import { authenticateToken } from './middleware/authenticate';
 import { getSelf } from './clients/spotify/spotify-client';

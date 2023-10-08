@@ -5,6 +5,7 @@ import { act, renderHook } from '@testing-library/react';
 import { wrapMultiplayerProvider } from '@testing/helpers/multiplayer-helpers';
 import { useSocket } from '../socket';
 import { WebSocketWrapper as MockWebSocketWrapper } from '../websocket-wrapper';
+import { JOIN_ROOM_MESSAGE } from '@hooks/multiplayer/handlers/socket-handlers.constants';
 
 const originalConsoleError = console.error;
 
@@ -22,9 +23,9 @@ describe('Socket', () => {
     it('should error for non-stringable data', () => {
       const { result, unmount } = renderHook(() => useSocket(), { wrapper: wrapMultiplayerProvider() });
 
-      const message: Record<string, unknown> = {};
-      message.circularRef = message;
-      act(() => result.current.sendMessage(message));
+      const data: Record<string, unknown> = {};
+      data.circularRef = data;
+      act(() => result.current.sendMessage(JOIN_ROOM_MESSAGE, data));
 
       expect(console.error).toHaveBeenCalled();
       unmount();
@@ -37,7 +38,7 @@ describe('Socket', () => {
 
       const { result, unmount } = renderHook(() => useSocket(), { wrapper: wrapMultiplayerProvider() });
 
-      act(() => result.current.sendMessage({}));
+      act(() => result.current.sendMessage(JOIN_ROOM_MESSAGE));
 
       expect(console.error).toHaveBeenCalled();
       unmount();
@@ -46,7 +47,7 @@ describe('Socket', () => {
     it('should send message', () => {
       const { result, unmount } = renderHook(() => useSocket(), { wrapper: wrapMultiplayerProvider() });
 
-      act(() => result.current.sendMessage({}));
+      act(() => result.current.sendMessage(JOIN_ROOM_MESSAGE));
 
       expect(MockWebSocketWrapper.prototype.send).toHaveBeenCalled();
       unmount();
