@@ -8,7 +8,8 @@ import { JOIN_ROOM_ERROR_CODES, REDIS_ERROR_CODES } from '../../../../errors';
 import type { JoinRoomReq } from '../join-room.validator';
 import { gameStatePublisherClient } from '../../../../clients/redis';
 import * as joinRoomTransactionMock from '../join-room-transaction';
-import type { PlayerState } from 'src/clients/redis/models/game-state';
+import { createMockGameState } from '../../../../testing/mocks/redis-client.mock';
+import { sanitizeRoomState } from '../../../../utils/room-helpers';
 
 describe('Join Room Handler', () => {
   let ws: WebSocket;
@@ -77,19 +78,14 @@ describe('Join Room Handler', () => {
   });
 
   it('should join room', async () => {
-    const mockPlayers: PlayerState[] = [
-      {
-        userId: 'userId',
-        name: 'Joe Smith',
-        score: 0,
-        answers: [],
-      },
-    ];
+    const mockRoomState = createMockGameState();
+    const sanitizedRoomState = sanitizeRoomState(mockRoomState);
+
     vi.spyOn(gameStatePublisherClient, 'exists').mockResolvedValueOnce(1);
-    vi.spyOn(joinRoomTransactionMock, 'joinRoomTransaction').mockResolvedValueOnce(mockPlayers);
+    vi.spyOn(joinRoomTransactionMock, 'joinRoomTransaction').mockResolvedValueOnce(sanitizedRoomState);
 
     await joinRoomHandler(ws, mockJoinRoomReq);
 
-    expect(ws.send).toHaveBeenCalledWith(createMockWebSocketMessage(JOIN_ROOM_RESPONSE, mockPlayers));
+    expect(ws.send).toHaveBeenCalledWith(createMockWebSocketMessage(JOIN_ROOM_RESPONSE, sanitizedRoomState));
   });
 });

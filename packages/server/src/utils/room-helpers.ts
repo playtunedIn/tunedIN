@@ -1,4 +1,11 @@
-import type { GameState, PlayerRoundResult, Question, PlayerState } from 'src/clients/redis/models/game-state';
+import type {
+  GameState,
+  PlayerRoundResult,
+  Question,
+  PlayerState,
+  SanitizedGameState,
+  SanitizedQuestion,
+} from 'src/clients/redis/models/game-state';
 import { ROOM_STATUS } from '../clients/redis/models/game-state';
 
 export const ROOM_ID_LENGTH = 4;
@@ -73,3 +80,23 @@ export function generateUniqueRoomId(): string {
   }
   return result;
 }
+
+export const sanitizeRoomState = (roomState: GameState): SanitizedGameState => {
+  return {
+    ...roomState,
+    questions: sanitizeQuestions(roomState.questions),
+  };
+};
+
+export const sanitizeQuestions = (questions: Question[]) => {
+  return questions.reduce<SanitizedQuestion[]>((result, question) => {
+    result.push(sanitizeQuestion(question));
+    return result;
+  }, []);
+};
+
+export const sanitizeQuestion = (question: Question): SanitizedQuestion => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { answers, ...sanitizedQuestion } = question;
+  return sanitizedQuestion;
+};

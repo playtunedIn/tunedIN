@@ -1,25 +1,27 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { gameStatePublisherClient } from '../../../../clients/redis';
+import { GLOBAL_MOCK_USER_ID } from '../../../../testing/mocks/auth.mock';
 import { joinRoomTransaction } from 'src/handlers/room-handlers/join-room/join-room-transaction';
 import { JOIN_ROOM_ERROR_CODES, REDIS_ERROR_CODES } from 'src/errors';
-import type { PlayerState } from 'src/clients/redis/models/game-state';
-import { createMockPlayerState, mockMultiCommand } from 'src/testing/mocks/redis-client.mock';
+import type { GameState, PlayerState } from 'src/clients/redis/models/game-state';
+import {
+  createMockGameState,
+  createMockPlayerState,
+  createMockPlayers,
+  mockMultiCommand,
+} from 'src/testing/mocks/redis-client.mock';
 
 describe('Join Room Transaction', () => {
-  const MOCK_NAME = 'Betsy';
-  const mockPlayerStateArr: PlayerState[] = [
-    {
-      userId: 'userId',
-      name: MOCK_NAME,
-      score: 0,
-      answers: [],
-    },
-  ];
+  let mockRoomState: GameState;
 
   const mockRoomId = 'TEST';
+
   let mockNewPlayer: PlayerState;
   beforeEach(() => {
+    mockRoomState = createMockGameState();
+    mockRoomState.players = createMockPlayers();
+
     mockNewPlayer = createMockPlayerState();
   });
 
@@ -36,9 +38,9 @@ describe('Join Room Transaction', () => {
   });
 
   it('found player in room already', async () => {
-    vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([mockPlayerStateArr as any]);
+    vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([mockRoomState as any]);
 
-    mockNewPlayer.userId = 'userId';
+    mockNewPlayer.userId = GLOBAL_MOCK_USER_ID;
 
     await expect(() => joinRoomTransaction(mockRoomId, mockNewPlayer)).rejects.toThrowError(
       JOIN_ROOM_ERROR_CODES.PLAYER_ALREADY_IN_ROOM
@@ -46,9 +48,9 @@ describe('Join Room Transaction', () => {
   });
 
   it('errors when player name already taken', async () => {
-    vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([mockPlayerStateArr as any]);
+    vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([mockRoomState as any]);
 
-    mockNewPlayer.name = MOCK_NAME;
+    mockNewPlayer.name = 'Emil';
 
     await expect(() => joinRoomTransaction(mockRoomId, mockNewPlayer)).rejects.toThrowError(
       JOIN_ROOM_ERROR_CODES.NAME_TAKEN
@@ -56,7 +58,7 @@ describe('Join Room Transaction', () => {
   });
 
   it('should not let player join a full room', async () => {
-    const mockFullPlayerStateArr: PlayerState[] = [
+    mockRoomState.players = [
       {
         userId: '123',
         name: 'Joey',
@@ -82,7 +84,7 @@ describe('Join Room Transaction', () => {
         answers: [],
       },
     ];
-    vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([mockFullPlayerStateArr as any]);
+    vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([mockRoomState as any]);
 
     await expect(() => joinRoomTransaction(mockRoomId, mockNewPlayer)).rejects.toThrowError(
       JOIN_ROOM_ERROR_CODES.ROOM_FULL
@@ -95,7 +97,7 @@ describe('Join Room Transaction', () => {
      * prevents the case where the player is found again by reusing the same array
      */
     vi.spyOn(gameStatePublisherClient.json, 'get').mockImplementation(
-      () => new Promise(resolve => resolve(new Array([mockPlayerStateArr]))) as Promise<any>
+      () => new Promise(resolve => resolve([structuredClone(mockRoomState)])) as Promise<any>
     );
     mockMultiCommand.exec.mockReturnValue(null);
 
@@ -105,12 +107,12 @@ describe('Join Room Transaction', () => {
   });
 
   it('should return players', async () => {
-    vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([mockPlayerStateArr as any]);
+    vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce([mockRoomState as any]);
     mockMultiCommand.exec.mockReturnValue(1);
 
-    await expect(joinRoomTransaction(mockRoomId, mockNewPlayer)).resolves.toEqual([
-      ...mockPlayerStateArr,
-      mockNewPlayer,
-    ]);
+    await expect(joinRoomTransaction(mockRoomId, mockNewPlayer)).resolves.toEqual({
+      ...mockRoomState,
+      players: [...mockRoomState.players, mockNewPlayer],
+    });
   });
 });

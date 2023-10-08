@@ -16,6 +16,8 @@ export interface Question {
   answers: number[]; // Indexes in choices for correct answer.
 }
 
+export type SanitizedQuestion = Omit<Question, 'answers'>;
+
 export interface PlayerState {
   userId: string;
   name: string;
@@ -39,6 +41,10 @@ export interface GameState {
   players: PlayerState[];
   questionIndex: number;
   questions: Question[];
+}
+
+export interface SanitizedGameState extends Omit<GameState, 'questions'> {
+  questions: SanitizedQuestion[];
 }
 
 export interface PlayerRoomSession {
