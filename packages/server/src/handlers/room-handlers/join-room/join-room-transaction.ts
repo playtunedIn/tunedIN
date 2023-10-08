@@ -17,6 +17,10 @@ export const joinRoomTransaction = (roomId: string, newPlayer: PlayerState) =>
       throw new Error(JOIN_ROOM_ERROR_CODES.PLAYER_ALREADY_IN_ROOM);
     }
 
+    if (players.some(player => player.name === newPlayer.name)) {
+      throw new Error(JOIN_ROOM_ERROR_CODES.NAME_TAKEN);
+    }
+
     if (players.length >= PLAYER_LIMIT) {
       throw new Error(JOIN_ROOM_ERROR_CODES.ROOM_FULL);
     }
