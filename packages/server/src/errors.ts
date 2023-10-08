@@ -30,6 +30,7 @@ export const START_GAME_ERROR_CODES = {
   NOT_HOST: 'MULT-301',
   ROOM_NOT_IN_LOBBY: 'MULT-302',
   GET_QUESTIONS_FAILED: 'MULT-303',
+  NOT_ENOUGH_PLAYERS: 'MULT-304',
 };
 
 // Question round codes are reserved from 400-499
