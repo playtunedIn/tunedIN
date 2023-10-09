@@ -15,6 +15,9 @@ const playersSlice = createSlice({
     updatePlayers: (state, action: PayloadAction<PlayerState[]>) => {
       state.players = action.payload;
     },
+    addPlayer: (state, action: PayloadAction<PlayerState>) => {
+      state.players.push(action.payload);
+    },
     updateHostId: (state, action: PayloadAction<string>) => {
       state.hostId = action.payload;
     },
@@ -25,4 +28,4 @@ const playersSlice = createSlice({
 });
 
 export default playersSlice.reducer;
-export const { updatePlayers, updateHostId, updatePlayersState } = playersSlice.actions;
+export const { updatePlayers, updateHostId, updatePlayersState, addPlayer } = playersSlice.actions;

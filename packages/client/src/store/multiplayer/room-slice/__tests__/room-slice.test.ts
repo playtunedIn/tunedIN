@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { RoomState } from '../room-slice.types';
-import reducer, { updateRoomErrorCode, updateRoomId, updateRoomState } from '../room-slice';
+import reducer, { updateRoomErrorCode, updateRoomId, updateRoomState, updateRoomStatus } from '../room-slice';
 import { ROOM_STATUS } from '@store/multiplayer/room-slice/room-slice.constants';
 
 describe('Room Slice', () => {
@@ -39,6 +39,15 @@ describe('Room Slice', () => {
     it('should assign an entirely new state', () => {
       const newState: RoomState = { roomId: 'new room', roomStatus: ROOM_STATUS.IN_QUESTION };
       expect(reducer(initialState, updateRoomState(newState))).toEqual(newState);
+    });
+  });
+
+  describe('updateRoomStatus', () => {
+    it('should update room status', () => {
+      expect(reducer(initialState, updateRoomStatus(ROOM_STATUS.CANCELED))).toEqual({
+        ...initialState,
+        roomStatus: ROOM_STATUS.CANCELED,
+      });
     });
   });
 });
