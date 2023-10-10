@@ -76,5 +76,5 @@ export const answerQuestionTransaction = async (
       throw new Error(REDIS_ERROR_CODES.TRANSACTION_KEY_CHANGE);
     }
 
-    return players;
+    return { players, question };
   });

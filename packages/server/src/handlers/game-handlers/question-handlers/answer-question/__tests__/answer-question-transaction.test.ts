@@ -198,6 +198,6 @@ describe('Answer Question Transaction', () => {
         MOCK_ANSWER_INDEX,
         MOCK_ANSWER_TIMESTAMP
       )
-    ).resolves.toEqual(expectedUpdatedPlayers);
+    ).resolves.toEqual({ players: expectedUpdatedPlayers, question });
   });
 });

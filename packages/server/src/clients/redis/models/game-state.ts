@@ -31,7 +31,7 @@ export interface PlayerState {
 export interface PlayerRoundResult {
   name: string;
   score: number;
-  answer: number[] | null;
+  answers: number[] | null;
 }
 
 export interface GameState {

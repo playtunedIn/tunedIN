@@ -2,11 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { RedisJSON } from '@redis/json/dist/commands';
 
 import { QUESTIONS_QUERY, QUESTION_INDEX_QUERY, gameStatePublisherClient } from '../../../../../clients/redis';
+import type { Question } from '../../../../../clients/redis/models/game-state';
 import { ROOM_STATUS } from '../../../../../clients/redis/models/game-state';
 import { REDIS_ERROR_CODES } from '../../../../../errors';
 import { createMockQuestions } from '../../../../../testing/mocks/spotify-client.mock';
 import { createMockPlayers, createMockPublisherPayload } from '../../../../../testing/mocks/redis-client.mock';
-import { UPDATE_ROOM_STATUS_RESPONSE } from '../../../../responses';
+import { UPDATE_QUESTION } from '../../../../responses';
 import * as cancelGame from '../../../cancel-game/cancel-game';
 import * as questionRoundResults from '../question-round-results';
 import { QUESTION_ROUND_TIME_LIMIT, questionRoundHandler } from '../question-round';
@@ -74,25 +75,27 @@ describe('Question Round Handler', () => {
 
     expect(gameStatePublisherClient.publish).toHaveBeenCalledWith(
       MOCK_ROOM_ID,
-      createMockPublisherPayload(UPDATE_ROOM_STATUS_RESPONSE, {
+      createMockPublisherPayload(UPDATE_QUESTION, {
         roomStatus: ROOM_STATUS.IN_QUESTION,
         question: {
           question: questions[MOCK_QUESTION_INDEX].question,
           choices: questions[MOCK_QUESTION_INDEX].choices,
           expirationTimestamp: MOCK_CURRENT_TIME.getTime() + QUESTION_ROUND_TIME_LIMIT,
         },
+        questionIndex: MOCK_QUESTION_INDEX,
       })
     );
     expect(global.setTimeout).toHaveBeenCalled();
   });
 
   describe('Question Round Timeout', () => {
+    let MOCK_QUESTIONS: Question[];
     beforeEach(async () => {
       vi.spyOn(global, 'setTimeout');
 
-      const questions = createMockQuestions();
+      MOCK_QUESTIONS = createMockQuestions();
       vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-        [QUESTIONS_QUERY]: [questions],
+        [QUESTIONS_QUERY]: [MOCK_QUESTIONS],
         [QUESTION_INDEX_QUERY]: [MOCK_QUESTION_INDEX],
       } as unknown as RedisJSON);
       vi.spyOn(gameStatePublisherClient.json, 'set').mockResolvedValueOnce('OK');
@@ -101,13 +104,14 @@ describe('Question Round Handler', () => {
 
       expect(gameStatePublisherClient.publish).toHaveBeenCalledWith(
         MOCK_ROOM_ID,
-        createMockPublisherPayload(UPDATE_ROOM_STATUS_RESPONSE, {
+        createMockPublisherPayload(UPDATE_QUESTION, {
           roomStatus: ROOM_STATUS.IN_QUESTION,
           question: {
-            question: questions[MOCK_QUESTION_INDEX].question,
-            choices: questions[MOCK_QUESTION_INDEX].choices,
+            question: MOCK_QUESTIONS[MOCK_QUESTION_INDEX].question,
+            choices: MOCK_QUESTIONS[MOCK_QUESTION_INDEX].choices,
             expirationTimestamp: MOCK_CURRENT_TIME.getTime() + QUESTION_ROUND_TIME_LIMIT,
           },
+          questionIndex: MOCK_QUESTION_INDEX,
         })
       );
       expect(global.setTimeout).toHaveBeenCalled();
@@ -150,7 +154,8 @@ describe('Question Round Handler', () => {
       expect(questionRoundResults.questionRoundResultsHandler).toHaveBeenCalledWith(
         MOCK_ROOM_ID,
         players,
-        MOCK_QUESTION_INDEX
+        MOCK_QUESTION_INDEX,
+        MOCK_QUESTIONS[MOCK_QUESTION_INDEX]
       );
     });
   });

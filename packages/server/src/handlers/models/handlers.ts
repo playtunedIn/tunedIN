@@ -3,6 +3,7 @@ import { createRoomHandler } from '../room-handlers/create-room/create-room';
 import { joinRoomHandler } from '../room-handlers/join-room/join-room';
 import { unsubscribeRoomHandler } from '../subscribed-message-handlers';
 import { startGameHandler } from '../room-handlers/start-game/start-game';
+import { answerQuestionHandler } from '../game-handlers/question-handlers/answer-question/answer-question';
 
 export interface SocketMessage {
   type: keyof typeof messageHandlers;
@@ -18,6 +19,7 @@ export const messageHandlers = {
   createRoom: createRoomHandler,
   joinRoom: joinRoomHandler,
   startGame: startGameHandler,
+  answerQuestion: answerQuestionHandler,
   unsubscribeRoom: unsubscribeRoomHandler,
   recoverRoomSession: recoverRoomSessionHandler,
 };

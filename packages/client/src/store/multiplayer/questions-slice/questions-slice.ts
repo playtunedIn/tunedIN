@@ -12,8 +12,14 @@ const questionsSlice = createSlice({
   name: 'questions',
   initialState,
   reducers: {
-    addQuestion: (state, action: PayloadAction<ReceivedQuestion>) => {
-      state.questions.push(action.payload);
+    addQuestion: (state, action: PayloadAction<{ question: ReceivedQuestion; questionIndex: number }>) => {
+      const { question, questionIndex } = action.payload;
+      state.questions[questionIndex] = question;
+    },
+    updateQuestionAnswers: (state, action: PayloadAction<{ answers: number[]; questionIndex: number }>) => {
+      const { questionIndex, answers } = action.payload;
+
+      state.questions[questionIndex].answers = answers;
     },
     updateQuestionsState: (_, action: PayloadAction<QuestionsState>) => {
       return action.payload;
@@ -22,4 +28,4 @@ const questionsSlice = createSlice({
 });
 
 export default questionsSlice.reducer;
-export const { addQuestion, updateQuestionsState } = questionsSlice.actions;
+export const { addQuestion, updateQuestionsState, updateQuestionAnswers } = questionsSlice.actions;

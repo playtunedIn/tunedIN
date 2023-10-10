@@ -29,13 +29,17 @@ export const ADD_PLAYER_RESPONSE = 'addPlayerResponse';
 export const REMOVE_PLAYER_RESPONSE = 'removePlayerResponse';
 export const PLAYER_ANSWERED_QUESTION_RESPONSE = 'playerAnsweredQuestionResponse';
 export const UPDATE_ROOM_STATUS_RESPONSE = 'updateRoomStatusResponse';
+export const UPDATE_ROUND_RESULTS = 'updateRoundResultsResponse';
+export const UPDATE_QUESTION = 'updateQuestionResponse';
 
 export type SubscribedMessageHandlerResponse =
   | typeof ADD_PLAYER_RESPONSE
   | typeof REMOVE_PLAYER_RESPONSE
   | typeof PLAYER_ANSWERED_QUESTION_RESPONSE
   | typeof UPDATE_ROOM_STATUS_RESPONSE
-  | typeof GET_QUESTIONS_ERROR_RESPONSE;
+  | typeof GET_QUESTIONS_ERROR_RESPONSE
+  | typeof UPDATE_ROUND_RESULTS
+  | typeof UPDATE_QUESTION;
 
 export interface SubscribedMessagePayload {
   userId?: string;

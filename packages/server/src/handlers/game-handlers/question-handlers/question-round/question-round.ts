@@ -15,7 +15,7 @@ import {
 import { REDIS_ERROR_CODES } from '../../../../errors';
 import { allPlayersAnswered, sanitizeQuestion } from '../../../../utils/room-helpers';
 import { publishMessageHandler } from '../../../subscribed-message-handlers';
-import { UPDATE_ROOM_STATUS_RESPONSE } from '../../../responses';
+import { UPDATE_QUESTION } from '../../../responses';
 import { cancelGameHandler } from '../../cancel-game/cancel-game';
 import { questionRoundResultsHandler } from './question-round-results';
 
@@ -44,14 +44,18 @@ export const questionRoundHandler = async (roomId: string) => {
   }
 
   const sanitizedQuestion = sanitizeQuestion(question);
-  publishMessageHandler(roomId, UPDATE_ROOM_STATUS_RESPONSE, {
+  publishMessageHandler(roomId, UPDATE_QUESTION, {
     roomStatus: ROOM_STATUS.IN_QUESTION,
     question: sanitizedQuestion,
+    questionIndex,
   });
-  setTimeout(() => questionRoundTimeoutHandler(roomId, questionIndex), questionExpirationTimestamp - Date.now());
+  setTimeout(
+    () => questionRoundTimeoutHandler(roomId, questionIndex, question),
+    questionExpirationTimestamp - Date.now()
+  );
 };
 
-const questionRoundTimeoutHandler = async (roomId: string, questionIndex: number) => {
+const questionRoundTimeoutHandler = async (roomId: string, questionIndex: number, question: Question) => {
   let players: PlayerState[];
   try {
     players = await query<PlayerState[]>(roomId, PLAYERS_QUERY, gameStatePublisherClient);
@@ -60,6 +64,6 @@ const questionRoundTimeoutHandler = async (roomId: string, questionIndex: number
   }
 
   if (!allPlayersAnswered(players, questionIndex)) {
-    questionRoundResultsHandler(roomId, players, questionIndex);
+    questionRoundResultsHandler(roomId, players, questionIndex, question);
   }
 };

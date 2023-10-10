@@ -5,6 +5,7 @@ import { wrapMultiplayerProvider } from '@testing/helpers/multiplayer-helpers';
 import { setupStore } from '@store/store';
 import { ROOM_STATUS } from '@store/multiplayer/room-slice/room-slice.constants';
 import { useJoinRoomResponseHandlers, type JoinRoomResponse } from '../join-room-handlers';
+import { setName } from '@store/multiplayer/players-slice/players-slice';
 
 describe('Join Room Handlers', () => {
   const mockJoinRoomResponse: JoinRoomResponse = {
@@ -34,6 +35,7 @@ describe('Join Room Handlers', () => {
     });
     expect(store.getState().players).toEqual({
       players: mockJoinRoomResponse.players,
+      name: '',
       hostId: mockJoinRoomResponse.hostId,
     });
     expect(store.getState().questions).toEqual({
@@ -46,6 +48,7 @@ describe('Join Room Handlers', () => {
 
   it('updates room error code on failure', () => {
     const store = setupStore();
+    store.dispatch(setName('Joe'));
     const { result, unmount } = renderHook(() => useJoinRoomResponseHandlers(), {
       wrapper: wrapMultiplayerProvider({ store }),
     });
@@ -53,6 +56,7 @@ describe('Join Room Handlers', () => {
     result.current.joinRoomErrorResponseHandler({ errorCode: 'test' });
 
     expect(store.getState().room.roomErrorCode).toEqual('test');
+    expect(store.getState().players.name).toEqual('');
 
     unmount();
   });
