@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { PlayerState, PlayersState } from '@store/multiplayer/players-slice/players-slice.types';
-import reducer, { updateHostId, updatePlayers, updatePlayersState } from '../players-slice';
+import reducer, { addPlayer, updateHostId, updatePlayers, updatePlayersState } from '../players-slice';
 
 describe('Players Slice', () => {
   let initialState: PlayersState;
@@ -50,6 +50,20 @@ describe('Players Slice', () => {
       };
 
       expect(reducer(initialState, updatePlayersState(newState))).toEqual(newState);
+    });
+  });
+
+  describe('addPlayer', () => {
+    it('increases players array by one', () => {
+      const newPlayer = {
+        name: 'Joe Smith',
+        score: 0,
+        answers: [],
+      };
+      expect(reducer(initialState, addPlayer(newPlayer))).toEqual({
+        ...initialState,
+        players: [newPlayer],
+      });
     });
   });
 });
