@@ -17,8 +17,8 @@ import { getSelf } from './clients/spotify/spotify-client';
 import type { TunedInJwtPayload } from './utils/auth';
 import { unsubscribeRoomHandler } from './handlers/subscribed-message-handlers';
 import { getCookie, verifyToken } from './utils/auth';
-import { getGameQuestions } from './questionGeneratingService/question-generating-service';
 
+import { getGameQuestions } from './questionGeneratingService/question-generating-service';
 //JAMIE testing my questions
 const jamie = {
   name: 'jamie',
@@ -29,7 +29,6 @@ const shayne = {
   token: '123',
 };
 console.log('JAMIE testing result in app: ', getGameQuestions([jamie, shayne], 1));
-
 const WS_HEARTBEAT_INTERVAL = parseInt(process.env.WS_HEARTBEAT_INTERVAL || '30000');
 
 const IGNORE_HEARTBEAT_INTERVAL =

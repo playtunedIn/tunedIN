@@ -1,8 +1,6 @@
 import type { AnsweredQuestion, QuestionData } from './types/question-types';
 import { questionFunctions } from './questions/questions';
-import { jamieProfileData, shayneProfileData } from './mock/spotify-api/get-current-users-profile';
-import { jamiePlaylistData, shaynePlaylistData } from './mock/spotify-api/get-current-users-playlist';
-import { jamieTrackData, shayneTrackData } from './mock/spotify-api/get-recently-played-tracks';
+import { usersSpotifyData } from '../testing/mocks/question-generating-service/users';
 
 interface User {
   name: string;
@@ -10,64 +8,33 @@ interface User {
 }
 
 function getSpotifyData(users: User[]): QuestionData[] {
-  const theUsers = users;
-  console.log(theUsers);
-  //hardcoding for now to be the mock data
-  const resultJamie: QuestionData = {
-    player: 'jamie',
-    spotify_data: {
-      get_current_users_profile: jamieProfileData,
-      get_current_users_playlist: jamiePlaylistData,
-      get_recently_played_tracks: jamieTrackData,
-    },
-  };
-  const resultShayne: QuestionData = {
-    player: 'shayne',
-    spotify_data: {
-      get_current_users_profile: shayneProfileData,
-      get_current_users_playlist: shaynePlaylistData,
-      get_recently_played_tracks: shayneTrackData,
-    },
-  };
-
-  return [resultJamie, resultShayne];
+  console.log(users); //just placeholder, since mocking function rn
+  return usersSpotifyData;
 }
 
-function getRandomNumbers(max: number, total: number): number[] {
+function getUniqueRandNums(max: number, total: number): number[] {
   if (total > max) {
-    throw new Error('Total cannot be greater than max'); //decide what we want to do in these scenerios, probably just use max?
+    total = max;
   }
 
-  const numbers: number[] = [];
+  const uniqueNumbers = new Set<number>();
 
-  // Fill the array with numbers from 0 to max (exclusive)
-  for (let i = 0; i < max; i++) {
-    numbers.push(i);
+  while (uniqueNumbers.size < total) {
+    const randomNum = Math.floor(Math.random() * max);
+    uniqueNumbers.add(randomNum);
   }
-
-  // Shuffle the array using Fisher-Yates algorithm
-  for (let i = max - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
-  }
-
-  // Take the first 'total' numbers
-  return numbers.slice(0, total);
+  return Array.from(uniqueNumbers);
 }
 
 export function getGameQuestions(users: User[], numQuestions: number): AnsweredQuestion[] {
   const results = [];
 
-  // get the spotify data for each player
   const questionData = getSpotifyData(users);
 
   // turn question function obj into an arry
   const questionFunctionsArr: ((data: QuestionData[]) => AnsweredQuestion)[] = Object.values(questionFunctions);
 
-  console.log('JAMIE the question functions array is: ', questionFunctionsArr);
-
-  // get random numbers
-  const randNums = getRandomNumbers(questionFunctionsArr.length, numQuestions);
+  const randNums = getUniqueRandNums(questionFunctionsArr.length, numQuestions);
 
   // for each random number, call the associated function in the array of question functions
   for (let i = 0; i < randNums.length; i++) {
