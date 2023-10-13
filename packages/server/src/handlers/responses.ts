@@ -1,15 +1,19 @@
 // Root level message handlers responses
+export const CREATE_ROOM_RESPONSE = 'createRoomResponse';
+export const CREATE_ROOM_ERROR_RESPONSE = 'createRoomErrorResponse';
 export const JOIN_ROOM_RESPONSE = 'joinRoomResponse';
 export const JOIN_ROOM_ERROR_RESPONSE = 'joinRoomErrorResponse';
 export const RECOVER_ROOM_SESSION_RESPONSE = 'recoverRoomSessionResponse';
 export const RECOVER_ROOM_SESSION_ERROR_RESPONSE = 'recoverRoomSessionErrorResponse';
 export const SUBSCRIBED_RESPONSE = 'subscribedResponse';
-export const START_GAME_ERROR_RESPONSE = 'startRoomErrorResponse';
+export const START_GAME_ERROR_RESPONSE = 'startGameErrorResponse';
 export const GET_QUESTIONS_ERROR_RESPONSE = 'getQuestionsErrorResponse';
 export const ANSWER_QUESTION_RESPONSE = 'answerQuestionResponse';
 export const ANSWER_QUESTION_ERROR_RESPONSE = 'answerQuestionErrorResponse';
 
 export type MessageHandlerResponse =
+  | typeof CREATE_ROOM_RESPONSE
+  | typeof CREATE_ROOM_ERROR_RESPONSE
   | typeof JOIN_ROOM_RESPONSE
   | typeof JOIN_ROOM_ERROR_RESPONSE
   | typeof RECOVER_ROOM_SESSION_RESPONSE

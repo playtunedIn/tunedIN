@@ -9,8 +9,7 @@ import https from 'https';
 import { readFileSync } from 'fs';
 
 import { setupOauthRoutes } from './handlers/auth/oauth-handler';
-import { messageHandler } from './handlers/message-handler';
-import { heartbeat } from './handlers/websocket/websocket-handlers';
+import { heartbeat, messageHandler } from './handlers/websocket/websocket-handlers';
 import { gameStateSubscriberClient, gameStatePublisherClient, playerStatePublisherClient } from './clients/redis';
 import { authenticateToken } from './middleware/authenticate';
 import { getSelf } from './clients/spotify/spotify-client';
@@ -130,6 +129,7 @@ const startServer = async () => {
    */
   wsServer.on('connection', (ws: WebSocket, _: Request, userToken: TunedInJwtPayload) => {
     ws.userToken = userToken;
+    ws.isAlive = true;
 
     ws.on('message', (data: string) => {
       messageHandler(ws, data);

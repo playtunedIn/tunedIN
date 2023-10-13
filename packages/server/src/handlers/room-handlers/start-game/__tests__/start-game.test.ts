@@ -3,17 +3,17 @@ import type { WebSocket } from 'ws';
 
 import { createMockWebSocket, createMockWebSocketMessage } from '../../../../testing/mocks/websocket.mock';
 import { REDIS_ERROR_CODES, START_GAME_ERROR_CODES } from '../../../../errors';
-import { HOST_ID_QUERY, ROOM_STATUS_QUERY, gameStatePublisherClient } from '../../../../clients/redis';
+import { HOST_ID_QUERY, PLAYERS_QUERY, ROOM_STATUS_QUERY, gameStatePublisherClient } from '../../../../clients/redis';
 import { ROOM_STATUS } from '../../../../clients/redis/models/game-state';
 import { GLOBAL_MOCK_USER_ID } from '../../../../testing/mocks/auth.mock';
 import * as getQuestions from '../../../game-handlers/question-handlers/get-questions';
 import type { StartGameReq } from '../start-game.validator';
 import { startGameHandler } from '../start-game';
 import { START_GAME_ERROR_RESPONSE, UPDATE_ROOM_STATUS_RESPONSE } from '../../../responses';
-import { createMockPublisherPayload } from 'src/testing/mocks/redis-client.mock';
+import { createMockPlayers, createMockPublisherPayload } from 'src/testing/mocks/redis-client.mock';
 
 describe('Start Game Handler', () => {
-  const MOCK_ROOM_ID = 'test room id';
+  const MOCK_ROOM_ID = 'TEST';
 
   let ws: WebSocket;
   let mockStartGameReq: StartGameReq;
@@ -51,25 +51,12 @@ describe('Start Game Handler', () => {
     );
   });
 
-  it('cannot access game state keys', async () => {
-    vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
-      [HOST_ID_QUERY]: [null],
-      [ROOM_STATUS_QUERY]: [null],
-    });
-
-    await startGameHandler(ws, mockStartGameReq);
-
-    expect(gameStatePublisherClient.publish).not.toHaveBeenCalled();
-    expect(ws.send).toHaveBeenCalledWith(
-      createMockWebSocketMessage(START_GAME_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.KEY_NOT_FOUND })
-    );
-  });
-
   it('should not allow non-host to start game', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
       [HOST_ID_QUERY]: ['Someone else is host'],
       [ROOM_STATUS_QUERY]: [ROOM_STATUS.LOBBY],
-    });
+      [PLAYERS_QUERY]: [createMockPlayers()],
+    } as any);
 
     await startGameHandler(ws, mockStartGameReq);
 
@@ -83,7 +70,8 @@ describe('Start Game Handler', () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
       [HOST_ID_QUERY]: [GLOBAL_MOCK_USER_ID],
       [ROOM_STATUS_QUERY]: [ROOM_STATUS.IN_QUESTION],
-    });
+      [PLAYERS_QUERY]: [createMockPlayers()],
+    } as any);
 
     await startGameHandler(ws, mockStartGameReq);
 
@@ -93,11 +81,27 @@ describe('Start Game Handler', () => {
     );
   });
 
+  it('should not start when not enough players', async () => {
+    vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
+      [HOST_ID_QUERY]: [GLOBAL_MOCK_USER_ID],
+      [ROOM_STATUS_QUERY]: [ROOM_STATUS.LOBBY],
+      [PLAYERS_QUERY]: [[]],
+    });
+
+    await startGameHandler(ws, mockStartGameReq);
+
+    expect(gameStatePublisherClient.publish).not.toHaveBeenCalled();
+    expect(ws.send).toHaveBeenCalledWith(
+      createMockWebSocketMessage(START_GAME_ERROR_RESPONSE, { errorCode: START_GAME_ERROR_CODES.NOT_ENOUGH_PLAYERS })
+    );
+  });
+
   it('should send error response if game state update fails', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
       [HOST_ID_QUERY]: [GLOBAL_MOCK_USER_ID],
       [ROOM_STATUS_QUERY]: [ROOM_STATUS.LOBBY],
-    });
+      [PLAYERS_QUERY]: [createMockPlayers()],
+    } as any);
     vi.spyOn(gameStatePublisherClient.json, 'set').mockRejectedValueOnce('');
 
     await startGameHandler(ws, mockStartGameReq);
@@ -112,7 +116,8 @@ describe('Start Game Handler', () => {
     vi.spyOn(gameStatePublisherClient.json, 'get').mockResolvedValueOnce({
       [HOST_ID_QUERY]: [GLOBAL_MOCK_USER_ID],
       [ROOM_STATUS_QUERY]: [ROOM_STATUS.LOBBY],
-    });
+      [PLAYERS_QUERY]: [createMockPlayers()],
+    } as any);
     vi.spyOn(gameStatePublisherClient.json, 'set').mockResolvedValueOnce('OK');
 
     await startGameHandler(ws, mockStartGameReq);

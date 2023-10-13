@@ -10,7 +10,7 @@ import {
   queryMultiple,
 } from '../../../../clients/redis';
 import { QUESTION_ROUND_ERROR_CODES, REDIS_ERROR_CODES } from '../../../../errors';
-import { calculateScore } from '../../../../utils/room-helpers';
+import { areValidAnswers, calculateScore } from '../../../../utils/room-helpers';
 
 const ANSWER_QUESTION_TRANSACTION_ATTEMPTS = 10;
 
@@ -18,7 +18,7 @@ export const answerQuestionTransaction = async (
   roomId: string,
   userId: string,
   questionIndex: number,
-  answerIndex: number,
+  answerIndexes: number[],
   answerTimeStamp: number
 ) =>
   executeTransaction(ANSWER_QUESTION_TRANSACTION_ATTEMPTS, async () => {
@@ -34,8 +34,8 @@ export const answerQuestionTransaction = async (
     const question: Question = response[questionQuery] as Question;
     const players = response[PLAYERS_QUERY] as PlayerState[];
 
-    if (answerIndex >= question.choices.length) {
-      throw new Error(QUESTION_ROUND_ERROR_CODES.ANSWER_OUT_OF_RANGE);
+    if (!areValidAnswers(answerIndexes, question)) {
+      throw new Error(QUESTION_ROUND_ERROR_CODES.INVALID_ANSWERS);
     }
 
     if (!question.expirationTimestamp) {
@@ -46,7 +46,7 @@ export const answerQuestionTransaction = async (
       throw new Error(QUESTION_ROUND_ERROR_CODES.QUESTION_EXPIRED);
     }
 
-    const playerIndex = players.findIndex(player => player.playerId === userId);
+    const playerIndex = players.findIndex(player => player.userId === userId);
 
     /**
      * player is passed by reference since the array players is an array of objects.
@@ -57,13 +57,13 @@ export const answerQuestionTransaction = async (
       throw new Error(QUESTION_ROUND_ERROR_CODES.PLAYER_NOT_FOUND);
     }
 
-    if (player.answers[answerIndex] !== null) {
+    if (player.answers[questionIndex] !== null) {
       throw new Error(QUESTION_ROUND_ERROR_CODES.QUESTION_ALREADY_ANSWERED);
     }
 
-    const score = calculateScore(question.expirationTimestamp, answerTimeStamp, question.answer, answerIndex);
+    const score = calculateScore(question.expirationTimestamp, answerTimeStamp, question.answers, answerIndexes);
 
-    player.answers[questionIndex] = answerIndex;
+    player.answers[questionIndex] = answerIndexes;
     player.score += score;
 
     const playerQuery = createPlayerQuery(playerIndex);

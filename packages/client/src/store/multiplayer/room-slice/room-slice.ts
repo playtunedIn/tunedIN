@@ -1,13 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
-export interface RoomState {
-  roomId: string;
-  roomErrorCode?: string;
-}
+import { ROOM_STATUS } from '@store/multiplayer/room-slice/room-slice.constants';
+import type { RoomState, RoomStatus } from '@store/multiplayer/room-slice/room-slice.types';
 
 const initialState: RoomState = {
   roomId: '',
+  roomStatus: ROOM_STATUS.NOT_IN_ROOM,
 };
 
 const roomSlice = createSlice({
@@ -20,6 +19,9 @@ const roomSlice = createSlice({
     updateRoomErrorCode: (state, action: PayloadAction<string | undefined>) => {
       state.roomErrorCode = action.payload;
     },
+    updateRoomStatus: (state, action: PayloadAction<RoomStatus>) => {
+      state.roomStatus = action.payload;
+    },
     updateRoomState: (_, action: PayloadAction<RoomState>) => {
       return action.payload;
     },
@@ -27,4 +29,4 @@ const roomSlice = createSlice({
 });
 
 export default roomSlice.reducer;
-export const { updateRoomId, updateRoomErrorCode, updateRoomState } = roomSlice.actions;
+export const { updateRoomId, updateRoomErrorCode, updateRoomState, updateRoomStatus } = roomSlice.actions;

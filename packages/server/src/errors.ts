@@ -10,12 +10,18 @@ export const REDIS_ERROR_CODES = {
   CORRUPT_JSON_PARSE: 'MULT-006',
 } as const;
 
+//Create room error codes are from 100 - 199
+export const CREATE_ROOM_ERROR_CODES = {
+  GENERATE_ID_ERROR: 'MULT-100',
+};
+
 // Join room error codes are reserved from 200 - 299
 export const JOIN_ROOM_ERROR_CODES = {
   INVALID_ROOM_REQ: 'MULT-200',
   ROOM_NOT_FOUND: 'MULT-201',
   ROOM_FULL: 'MULT-202',
   PLAYER_ALREADY_IN_ROOM: 'MULT-203',
+  NAME_TAKEN: 'MULT-204',
 } as const;
 
 // Start room error code are reserved from 300 - 399
@@ -24,6 +30,7 @@ export const START_GAME_ERROR_CODES = {
   NOT_HOST: 'MULT-301',
   ROOM_NOT_IN_LOBBY: 'MULT-302',
   GET_QUESTIONS_FAILED: 'MULT-303',
+  NOT_ENOUGH_PLAYERS: 'MULT-304',
 };
 
 // Question round codes are reserved from 400-499
@@ -31,7 +38,7 @@ export const QUESTION_ROUND_ERROR_CODES = {
   INVALID_REQ: 'MULT-400',
   QUESTION_NOT_STARTED: 'MULT-401',
   QUESTION_EXPIRED: 'MULT-402',
-  ANSWER_OUT_OF_RANGE: 'MULT-403',
+  INVALID_ANSWERS: 'MULT-403',
   PLAYER_NOT_FOUND: 'MULT-404',
   QUESTION_ALREADY_ANSWERED: 'MULT-405',
 };

@@ -1,22 +1,28 @@
 import { useContext } from 'react';
 
 import { SocketContext } from './MultiplayerProvider';
+import type { WebSocketMessageTypes } from './handlers/socket-handlers.constants';
 import { SOCKET_READY_STATES } from './handlers/socket-handlers.constants';
 
 export const useSocket = () => {
   const { socket, status, setStatus } = useContext(SocketContext);
 
-  const sendMessage = (message: Record<string, unknown>) => {
-    let messageStr: string;
+  const sendMessage = (type: WebSocketMessageTypes, data?: Record<string, unknown>) => {
+    const payload = {
+      type,
+      data,
+    };
+
+    let payloadStr: string;
     try {
-      messageStr = JSON.stringify(message);
+      payloadStr = JSON.stringify(payload);
     } catch (error) {
       console.error('Failed to stringify object: ', error);
       return;
     }
 
     try {
-      socket.send(messageStr);
+      socket.send(payloadStr);
     } catch (error) {
       console.error('Failed to send socket message: ', error);
     }

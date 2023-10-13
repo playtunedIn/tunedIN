@@ -13,23 +13,25 @@ export interface Question {
   expirationTimestamp?: number;
   question: string;
   choices: string[];
-  answer: number; // Index in choices for correct answer.
+  answers: number[]; // Indexes in choices for correct answer.
 }
 
+export type SanitizedQuestion = Omit<Question, 'answers'>;
+
 export interface PlayerState {
-  playerId: string;
+  userId: string;
   name: string;
   score: number;
   /**
    * Player's answer to each question (null if they did not answer question)
    */
-  answers: (number | null)[];
+  answers: (number[] | null)[];
 }
 
 export interface PlayerRoundResult {
   name: string;
   score: number;
-  answer: number | null;
+  answer: number[] | null;
 }
 
 export interface GameState {
@@ -39,6 +41,10 @@ export interface GameState {
   players: PlayerState[];
   questionIndex: number;
   questions: Question[];
+}
+
+export interface SanitizedGameState extends Omit<GameState, 'questions'> {
+  questions: SanitizedQuestion[];
 }
 
 export interface PlayerRoomSession {

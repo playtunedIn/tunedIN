@@ -13,7 +13,7 @@ import {
   queryMultiple,
 } from '../../../../clients/redis';
 import { REDIS_ERROR_CODES } from '../../../../errors';
-import { allPlayersAnswered } from '../../../../utils/room-helpers';
+import { allPlayersAnswered, sanitizeQuestion } from '../../../../utils/room-helpers';
 import { publishMessageHandler } from '../../../subscribed-message-handlers';
 import { UPDATE_ROOM_STATUS_RESPONSE } from '../../../responses';
 import { cancelGameHandler } from '../../cancel-game/cancel-game';
@@ -43,11 +43,10 @@ export const questionRoundHandler = async (roomId: string) => {
     return cancelGameHandler(roomId, REDIS_ERROR_CODES.COMMAND_FAILURE);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { answer, ...questionWithoutAnswer } = question;
+  const sanitizedQuestion = sanitizeQuestion(question);
   publishMessageHandler(roomId, UPDATE_ROOM_STATUS_RESPONSE, {
     roomStatus: ROOM_STATUS.IN_QUESTION,
-    question: questionWithoutAnswer,
+    question: sanitizedQuestion,
   });
   setTimeout(() => questionRoundTimeoutHandler(roomId, questionIndex), questionExpirationTimestamp - Date.now());
 };

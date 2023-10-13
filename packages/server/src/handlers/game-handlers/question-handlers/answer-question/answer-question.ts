@@ -21,12 +21,12 @@ export const answerQuestionHandler = async (ws: WebSocket, data: AnswerQuestionR
   }
 
   const { name, userId } = ws.userToken;
-  const { roomId, questionIndex, answerIndex } = data;
+  const { roomId, questionIndex, answerIndexes } = data;
   const answerTimeStamp = Date.now();
 
   let players: PlayerState[];
   try {
-    players = await answerQuestionTransaction(roomId, userId, questionIndex, answerIndex, answerTimeStamp);
+    players = await answerQuestionTransaction(roomId, userId, questionIndex, answerIndexes, answerTimeStamp);
   } catch (err) {
     return sendResponse(ws, ANSWER_QUESTION_ERROR_RESPONSE, { errorCode: (err as Error).message });
   }
