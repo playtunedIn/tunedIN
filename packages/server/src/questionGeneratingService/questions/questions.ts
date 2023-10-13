@@ -3,7 +3,7 @@ import type { QuestionData } from '../types/question-types';
 import { findIndicesOfLargestElements } from '../utils/helper-functions';
 import * as questionConsts from './question-consts';
 
-function mainstreamJunkie(data: QuestionData[]): AnsweredQuestion {
+export function mainstreamJunkie(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.mainstreamJunkie.QUESTION_NAME;
   const description = questionConsts.mainstreamJunkie.QUESTION_DESCRIPTION;
   const answerType = questionConsts.mainstreamJunkie.ANSWER_TYPE;
@@ -11,7 +11,7 @@ function mainstreamJunkie(data: QuestionData[]): AnsweredQuestion {
 
   //compare each player's most recently listened to track
   let mostPopular = -1;
-  let players = [''];
+  let players: string[] = [];
 
   for (let i = 0; i < answerOpts.length; i++) {
     const recentTracks = data[i].spotifyData.get_recently_played_tracks;
@@ -40,7 +40,7 @@ function mainstreamJunkie(data: QuestionData[]): AnsweredQuestion {
   return answeredQuestion;
 }
 
-function hiddenGemHunter(data: QuestionData[]): AnsweredQuestion {
+export function hiddenGemHunter(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.hiddenGemHunter.QUESTION_NAME;
   const description = questionConsts.hiddenGemHunter.QUESTION_DESCRIPTION;
   const answerType = questionConsts.hiddenGemHunter.ANSWER_TYPE;
@@ -48,7 +48,7 @@ function hiddenGemHunter(data: QuestionData[]): AnsweredQuestion {
 
   //compare each player's most recently listened to track
   let leastPopular = 101;
-  let players = [''];
+  let players: string[] = [];
 
   for (let i = 0; i < answerOpts.length; i++) {
     const recentTracks = data[i].spotifyData.get_recently_played_tracks;
@@ -77,7 +77,7 @@ function hiddenGemHunter(data: QuestionData[]): AnsweredQuestion {
   return answeredQuestion;
 }
 
-function theArtistScout(data: QuestionData[]): AnsweredQuestion {
+export function theArtistScout(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.theArtistScout.QUESTION_NAME;
   const description = questionConsts.theArtistScout.QUESTION_DESCRIPTION;
   const answerType = questionConsts.theArtistScout.ANSWER_TYPE;
@@ -111,7 +111,7 @@ function theArtistScout(data: QuestionData[]): AnsweredQuestion {
   return answeredQuestion;
 }
 
-function multifacetedMelophile(data: QuestionData[]): AnsweredQuestion {
+export function multifacetedMelophile(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.multifacetedMelophile.QUESTION_NAME;
   const description = questionConsts.multifacetedMelophile.QUESTION_DESCRIPTION;
   const answerType = questionConsts.multifacetedMelophile.ANSWER_TYPE;
@@ -120,7 +120,7 @@ function multifacetedMelophile(data: QuestionData[]): AnsweredQuestion {
 
   const randomIndex = Math.floor(Math.random() * data.length);
   const player = data[randomIndex].player;
-  const artists = [];
+  const artists: string[] = [];
 
   const recentTracks = data[randomIndex].spotifyData.get_recently_played_tracks;
 
@@ -149,7 +149,7 @@ function multifacetedMelophile(data: QuestionData[]): AnsweredQuestion {
   return answeredQuestion;
 }
 
-function theXRatedPlayer(data: QuestionData[]): AnsweredQuestion {
+export function theXRatedPlayer(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.theXRatedPlayer.QUESTION_NAME;
   const description = questionConsts.theXRatedPlayer.QUESTION_DESCRIPTION;
   const answerType = questionConsts.theXRatedPlayer.ANSWER_TYPE;
@@ -192,7 +192,7 @@ function questionName(data: QuestionData[]): AnsweredQuestion {
     const title = questionConsts.;
     const description =  questionConsts.;
     const answerType = questionConsts.;
-    let correctAnswer = [];
+    const correctAnswer: string[] = [];
 
     //logic to set the extra description (IF NEEDED)
     const extraDescr = ""
@@ -219,10 +219,10 @@ function questionName(data: QuestionData[]): AnsweredQuestion {
 
 */
 
-export const questionFunctions = {
-  mainstreamJunkie: mainstreamJunkie,
-  hiddenGemHunter: hiddenGemHunter,
-  theArtistScout: theArtistScout,
-  multifacetedMelophile: multifacetedMelophile,
-  theXRatedPlayer: theXRatedPlayer,
-};
+export const questionFunctions = [
+  mainstreamJunkie,
+  hiddenGemHunter,
+  theArtistScout,
+  multifacetedMelophile,
+  theXRatedPlayer,
+];

@@ -31,14 +31,11 @@ export function getGameQuestions(users: User[], numQuestions: number): AnsweredQ
 
   const questionData = getSpotifyData(users);
 
-  // turn question function obj into an arry
-  const questionFunctionsArr: ((data: QuestionData[]) => AnsweredQuestion)[] = Object.values(questionFunctions);
-
-  const randNums = getUniqueRandNums(questionFunctionsArr.length, numQuestions);
+  const randNums = getUniqueRandNums(questionFunctions.length, numQuestions);
 
   // for each random number, call the associated function in the array of question functions
   for (let i = 0; i < randNums.length; i++) {
-    results.push(questionFunctionsArr[randNums[i]](questionData));
+    results.push(questionFunctions[randNums[i]](questionData));
   }
 
   return results;

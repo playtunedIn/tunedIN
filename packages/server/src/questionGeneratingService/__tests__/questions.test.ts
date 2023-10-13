@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { getSpotifyData } from '../../testing/mocks/question-generating-service/users';
-import { questionFunctions } from '../questions/questions';
+import * as questionFunctions from '../questions/questions';
 import type { QuestionData } from '../types/question-types';
 import { findIndicesOfLargestElements } from '../utils/helper-functions';
 
@@ -30,7 +30,7 @@ describe('Questions', () => {
       spotifyData[1].spotifyData.get_recently_played_tracks.items = [];
 
       const result = questionFunctions.mainstreamJunkie(spotifyData);
-      const expectedResult = [''];
+      const expectedResult: string[] = [];
       expect(result.correctAnswer).toEqual(expectedResult);
     });
   });
@@ -54,7 +54,7 @@ describe('Questions', () => {
       spotifyData[1].spotifyData.get_recently_played_tracks.items = [];
 
       const result = questionFunctions.hiddenGemHunter(spotifyData);
-      const expectedResult = [''];
+      const expectedResult: string[] = [];
       expect(result.correctAnswer).toEqual(expectedResult);
     });
   });
