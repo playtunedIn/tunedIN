@@ -10,7 +10,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "react-jsx",
+    "jsx": "react-native",
 
     /* Linting */
     "strict": true,
@@ -25,6 +25,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
+      "react-native": ["node_modules/react-native-web"],
       "@assets/*": ["./src/assets/*"],
       "@components/*": ["./src/components/*"],
       "@hooks/*": ["./src/hooks/*"],

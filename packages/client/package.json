@@ -1,6 +1,7 @@
 {
   "name": "client",
   "description": "Frontend for TunedIN.",
+  "main": "node_modules/expo/AppEntry.js",
   "private": true,
   "type": "module",
   "scripts": {
@@ -17,16 +18,24 @@
     "lint:types": "tsc --noEmit",
     "______LIFECYCLE COMMANDS______": "",
     "generate-cert": "../../scripts/generateDevSSLCert.sh",
-    "git:pre-push": "pnpm run test"
+    "git:pre-push": "pnpm run test",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.5",
+    "@types/react-native": "^0.72.3",
+    "expo": "~49.0.13",
+    "expo-status-bar": "~1.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-native": "0.72.5",
     "react-redux": "^8.1.2",
     "react-router-dom": "^6.14.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.20.0",
     "@testing-library/react": "^14.0.0",
     "@testing-library/react-hooks": "^8.0.1",
     "@types/react": "^18.0.37",
