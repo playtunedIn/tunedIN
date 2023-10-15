@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 import { MultiplayerProvider } from '@hooks/multiplayer';
 import TempCreateRoomButton from '@components/TempCreateRoomButton';
 import reactLogo from '@assets/react.svg';
@@ -15,6 +14,7 @@ function App() {
       <>
         <SocketStatus />
         <TempCreateRoomButton />
+        <h1>I GOT IT</h1>
         <div data-testid="app-root">
           <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
             <img src={viteLogo} className="logo" alt="Vite logo" />
