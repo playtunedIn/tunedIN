@@ -1,5 +1,5 @@
 import { useState } from 'react';
-
+import { registerRootComponent } from 'expo';
 import { MultiplayerProvider } from '@hooks/multiplayer';
 import TempCreateRoomButton from '@components/TempCreateRoomButton';
 import reactLogo from '@assets/react.svg';
@@ -7,7 +7,7 @@ import viteLogo from '/vite.svg';
 import './App.css';
 import SocketStatus from '@components/common/SocketStatus';
 
-function App() {
+export default function App() {
   const [count, setCount] = useState(0);
 
   return (
@@ -39,4 +39,4 @@ function App() {
   );
 }
 
-export default App;
+registerRootComponent(App);
