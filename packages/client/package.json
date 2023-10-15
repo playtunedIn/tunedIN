@@ -1,6 +1,8 @@
 {
   "name": "client",
   "description": "Frontend for TunedIN.",
+  "main": "src/App.tsx",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -23,8 +25,10 @@
     "@expo/webpack-config": "^19.0.0",
     "@reduxjs/toolkit": "^1.9.5",
     "expo": "^49.0.13",
+    "expo-status-bar": "^1.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-native": "^0.72.6",
     "react-native-web": "~0.19.6",
     "react-redux": "^8.1.2",
     "react-router-dom": "^6.14.1"
