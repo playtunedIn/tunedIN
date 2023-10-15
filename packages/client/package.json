@@ -22,6 +22,7 @@
     "git:pre-push": "pnpm run test"
   },
   "dependencies": {
+    "@babel/core": "^7.23.2",
     "@expo/webpack-config": "^19.0.0",
     "@reduxjs/toolkit": "^1.9.5",
     "expo": "^49.0.13",
