@@ -6,7 +6,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "dev": "concurrently \"pnpm -F server dev\" \"pnpm -F client dev\"",
+    "dev": "concurrently \"pnpm -F server dev\" \"pnpm -F client start-expo\"",
     "______CI COMMANDS_____________": "",
     "lint": "pnpm --filter \"[origin/main]...\" --if-present lint",
     "test": "pnpm --filter \"[origin/main]...\" --if-present test",

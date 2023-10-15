@@ -1,6 +1,8 @@
 {
   "name": "client",
   "description": "Frontend for TunedIN.",
+  "main": "node_modules/expo/AppEntry.js",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -17,7 +19,11 @@
     "lint:types": "tsc --noEmit",
     "______LIFECYCLE COMMANDS______": "",
     "generate-cert": "../../scripts/generateDevSSLCert.sh",
-    "git:pre-push": "pnpm run test"
+    "git:pre-push": "pnpm run test",
+    "start-expo": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.5",
@@ -28,13 +34,13 @@
   },
   "devDependencies": {
     "@testing-library/react": "^14.0.0",
-    "@testing-library/react-hooks": "^8.0.1",
     "@types/react": "^18.0.37",
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.59.0",
     "@typescript-eslint/parser": "^5.59.0",
     "@vitejs/plugin-react": "^4.0.0",
     "@vitest/coverage-v8": "^0.33.0",
+    "@babel/core": "^7.20.0",
     "cross-env": "^7.0.3",
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^8.8.0",
@@ -43,7 +49,10 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
+    "expo": "~49.0.13",
+    "expo-status-bar": "~1.6.0",
     "jsdom": "^22.1.0",
+    "react-native": "0.72.5",
     "stylelint": "^15.9.0",
     "stylelint-config-css-modules": "^4.2.0",
     "stylelint-config-recess-order": "^4.2.0",

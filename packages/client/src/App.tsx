@@ -1,20 +1,22 @@
-import { useState } from 'react';
-
+// import { useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View } from 'react-native';
 import { MultiplayerProvider } from '@hooks/multiplayer';
-import TempCreateRoomButton from '@components/TempCreateRoomButton';
-import reactLogo from '@assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
 import SocketStatus from '@components/common/SocketStatus';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0);
+export default function App() {
+  // const [count, setCount] = useState(0);
 
   return (
     <MultiplayerProvider>
       <>
         <SocketStatus />
-        <TempCreateRoomButton />
+        <View style={styles.container}>
+          <Text>Open up App.js to start working on your app!</Text>
+          <StatusBar style="auto" />
+        </View>
+        {/* <TempCreateRoomButton />
         <div data-testid="app-root">
           <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
             <img src={viteLogo} className="logo" alt="Vite logo" />
@@ -34,9 +36,17 @@ function App() {
           </p>
         </div>
         <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
+      </> */}
       </>
     </MultiplayerProvider>
   );
 }
 
-export default App;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
