@@ -53,6 +53,7 @@ export default ({ mode }: UserConfig) => {
 
         // Catch-all/root alias (keep at bottom)
         src: path.resolve(__dirname, './src'),
+        'react-native': 'react-native-web',
       },
     },
   });

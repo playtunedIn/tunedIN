@@ -6,7 +6,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --mode=dev --host=local.playtunedin-test.com",
+    "dev": "vite expo --mode=dev --host=local.playtunedin-test.com",
     "build": "vite build --mode=prod",
     "start": "vite preview --mode=prod --host=local.playtunedin-test.com",
     "______TESTING_________________": "",
@@ -19,7 +19,11 @@
     "lint:types": "tsc --noEmit",
     "______LIFECYCLE COMMANDS______": "",
     "generate-cert": "../../scripts/generateDevSSLCert.sh",
-    "git:pre-push": "pnpm run test"
+    "git:pre-push": "pnpm run test",
+    "expo": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
   },
   "dependencies": {
     "@babel/core": "^7.23.2",
