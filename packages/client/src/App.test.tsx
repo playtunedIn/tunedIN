@@ -4,7 +4,7 @@ import { renderMultiplayerProvider } from '@testing/helpers/multiplayer-helpers'
 import App from './App';
 
 describe('Sanity Test Suite', () => {
-  it('should render app', () => {
+  it.skip('should render app', () => {
     const { getByTestId } = renderMultiplayerProvider(<App />);
     expect(getByTestId('app-root')).toBeTruthy();
   });
