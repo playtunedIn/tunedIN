@@ -5,7 +5,7 @@ import App from './App';
 
 describe('Sanity Test Suite', () => {
   it('should render app', () => {
-    const { getByTestId } = renderMultiplayerProvider(<App />);
-    expect(getByTestId('app-root')).toBeTruthy();
+    const { getByText } = renderMultiplayerProvider(<App />);
+    expect(getByText('LETS PLAY TUNEDIN')).toBeTruthy();
   });
 });
