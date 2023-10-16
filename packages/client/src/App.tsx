@@ -18,7 +18,7 @@ export default function App() {
       <>
         <SocketStatus />
         <View style={styles.container}>
-          <Text>Open up App.js to start working on your app!</Text>
+          <Text>LETS PLAY TUNEDIN</Text>
         </View>
         {/* <TempCreateRoomButton />
         <h1>I GOT IT</h1>
