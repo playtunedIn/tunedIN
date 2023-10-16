@@ -1,19 +1,26 @@
-import { useState } from 'react';
-import { MultiplayerProvider } from '@hooks/multiplayer';
-import TempCreateRoomButton from '@components/TempCreateRoomButton';
-import reactLogo from '@assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
-import SocketStatus from '@components/common/SocketStatus';
+// import { useState } from 'react';
+// import { MultiplayerProvider } from '@hooks/multiplayer';
+// import TempCreateRoomButton from '@components/TempCreateRoomButton';
+// import reactLogo from '@assets/react.svg';
+// import viteLogo from '/vite.svg';
+// import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0);
+import { MultiplayerProvider } from '@hooks/multiplayer';
+import { StyleSheet, Text, View } from 'react-native';
+import SocketStatus from '@components/common/SocketStatus';
+import './App.css';
+
+export default function App() {
+  // const [count, setCount] = useState(0);
 
   return (
     <MultiplayerProvider>
       <>
         <SocketStatus />
-        <TempCreateRoomButton />
+        <View style={styles.container}>
+          <Text>Open up App.js to start working on your app!</Text>
+        </View>
+        {/* <TempCreateRoomButton />
         <h1>I GOT IT</h1>
         <div data-testid="app-root">
           <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
@@ -34,9 +41,17 @@ function App() {
           </p>
         </div>
         <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
+      </> */}
       </>
     </MultiplayerProvider>
   );
 }
 
-export default App;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
