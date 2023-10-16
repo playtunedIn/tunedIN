@@ -7,6 +7,20 @@ import { defineConfig, loadEnv, UserConfig } from 'vite';
 import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
+const extensions = [
+  ".web.tsx",
+  ".tsx",
+  ".web.ts",
+  ".ts",
+  ".web.jsx",
+  ".jsx",
+  ".web.js",
+  ".js",
+  ".css",
+  ".json",
+  ".mjs",
+];
+
 export default ({ mode }: UserConfig) => {
   process.env = { ...process.env, ...loadEnv(mode ?? '', process.cwd()) };
 
@@ -44,6 +58,7 @@ export default ({ mode }: UserConfig) => {
       setupFiles: './setup-tests.ts',
     },
     resolve: {
+      extensions,
       alias: {
         '@assets': path.resolve(__dirname, './src/assets'),
         '@components': path.resolve(__dirname, './src/components'),
@@ -56,5 +71,14 @@ export default ({ mode }: UserConfig) => {
         src: path.resolve(__dirname, './src'),
       },
     },
+    optimizeDeps: {
+      esbuildOptions: {
+        resolveExtensions: extensions,
+        // https://github.com/vitejs/vite-plugin-react/issues/192#issuecomment-1627384670
+        jsx: "automatic",
+        loader: { ".js": "jsx" },
+
+      },
+    }
   });
 };
