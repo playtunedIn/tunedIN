@@ -51,6 +51,7 @@ export default ({ mode }: UserConfig) => {
         '@store': path.resolve(__dirname, './src/store'),
         '@testing': path.resolve(__dirname, './src/testing'),
 
+        'react-native': 'react-native-web',
         // Catch-all/root alias (keep at bottom)
         src: path.resolve(__dirname, './src'),
       },
