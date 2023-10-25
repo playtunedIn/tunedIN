@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "start-expo": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
     "dev": "vite --mode=dev --host=local.playtunedin-test.com",
     "build": "vite build --mode=prod",
     "start": "vite preview --mode=prod --host=local.playtunedin-test.com",
@@ -20,7 +24,10 @@
     "git:pre-push": "pnpm run test"
   },
   "dependencies": {
+    "@expo/webpack-config": "^19.0.0",
     "@reduxjs/toolkit": "^1.9.5",
+    "expo": "^49.0.16",
+    "expo-status-bar": "^1.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-native": "^0.72.6",
