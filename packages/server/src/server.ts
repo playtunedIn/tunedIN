@@ -43,7 +43,7 @@ const startServer = async () => {
    */
   const app = express();
   app.use(cookieParser());
-  app.use(cors({ origin: 'https://local.playtunedin-test.com:8080' }));
+  app.use(cors({ origin: 'https://localhost:19006' }));
 
   app.get('/test', function (_: Request, res: Response) {
     res.send({ test: 'good' });
