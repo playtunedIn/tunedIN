@@ -119,11 +119,11 @@ export const setupOauthRoutes = (app: any) => {
             body.expires_in
           );
 
-          res.cookie('TUNEDIN_TOKEN', jwt, {
-            secure: process.env.NODE_ENV !== 'development',
-            httpOnly: true,
-            expires: new Date(Date.now() + body.expires_in * 1000),
-          });
+          // res.cookie('TUNEDIN_TOKEN', jwt, {
+          //   secure: process.env.NODE_ENV !== 'development',
+          //   httpOnly: true,
+          //   expires: new Date(Date.now() + body.expires_in * 1000),
+          // });
 
           res.redirect(
             POST_LOGIN_URL +

@@ -9,7 +9,8 @@ import { REDIS_ERROR_CODES, CREATE_ROOM_ERROR_CODES } from '../../../errors';
 
 export const createRoomHandler = async (ws: WebSocket) => {
   const roomId = generateUniqueRoomId();
-
+  const hostId = ws.userToken.userId;
+  const hostName = ws.userToken.name;
   let roomExists: boolean;
   try {
     roomExists = (await gameStatePublisherClient.exists(roomId)) > 0;
@@ -21,7 +22,7 @@ export const createRoomHandler = async (ws: WebSocket) => {
     return sendResponse(ws, CREATE_ROOM_ERROR_RESPONSE, { errorCode: CREATE_ROOM_ERROR_CODES.GENERATE_ID_ERROR });
   }
 
-  const defaultGameStateJson = generateDefaultGameState(roomId);
+  const defaultGameStateJson = generateDefaultGameState(roomId, hostId, hostName);
 
   try {
     await gameStatePublisherClient.json.set(roomId, ROOT_QUERY, defaultGameStateJson as unknown as RedisJSON);
