@@ -15,7 +15,6 @@ import { encrypt } from '../../utils/crypto';
 import { getSelf } from '../../clients/spotify/spotify-client';
 import type { Request, Response } from 'express';
 import type { TunedInJwtPayload } from 'src/utils/auth';
-import { getSpotifyData, getGameQuestions } from '../../../src/questionGeneratingService/question-generating-service';
 
 const CLIENT_ID = process.env.CLIENT_ID || ''; // Your client id
 const CLIENT_SECRET = process.env.CLIENT_SECRET || ''; // Your secret
@@ -106,19 +105,6 @@ export const setupOauthRoutes = (app: any) => {
         const body = (await tokenResponse.json()) as OauthResponse;
         const access_token = body.access_token;
         const profileBody = await getSelf(access_token);
-        console.log("JAMIE's profile body: ", profileBody);
-        //delete this later
-        //JAMIE testing my questions
-        const jamie = {
-          name: 'jamie',
-          token: access_token,
-        };
-
-        const jamieResult = await getSpotifyData([jamie]);
-        console.log('JAMIE testing result in app: ', jamieResult[0].spotifyData);
-
-        const jamieQuestions = await getGameQuestions([jamie], 3);
-        console.log('JAMIE THE QUESTIONS: ', jamieQuestions);
 
         const encryptedAccessToken = encrypt(access_token);
         const encryptedRefreshToken = encrypt(body.refresh_token);
