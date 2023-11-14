@@ -41,7 +41,7 @@ pnpm install
 add an entry for local tunedin:
 
 ```
-127.0.0.1 local.playtunedin-test.com
+127.0.0.1 localhost
 ```
 
 6. Generate Server SSL Certs:
@@ -86,8 +86,8 @@ Spotify data. Follow the on-screen instructions to play the game and have fun!
 
 To access the following services in your local environment use the following links:
 
-- client - https://local.playtunedin-test.com:8080/
-- server - https://local.playtunedin-test.com:3001/
+- client - https://localhost:16009/
+- server - https://localhost:3001/
 
 ### FAQ
 
