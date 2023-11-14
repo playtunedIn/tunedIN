@@ -32,7 +32,6 @@ export const getSelf = async (token: string): Promise<Profile> => {
 };
 
 export async function fetchUserProfile(user: User) {
-  console.log('JAMIE inside fetch user profile');
   const options = {
     method: 'GET',
     headers: { Authorization: 'Bearer ' + user.token },
