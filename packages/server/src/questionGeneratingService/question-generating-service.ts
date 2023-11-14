@@ -1,55 +1,6 @@
-import type { AnsweredQuestion, QuestionData } from './types/question-types';
+import type { AnsweredQuestion, QuestionData, User } from './types/question-types';
 import { questionFunctions } from './questions/questions';
-
-interface User {
-  name: string;
-  token: string;
-}
-
-async function fetchUserProfile(user: User) {
-  const options = {
-    method: 'GET',
-    headers: { Authorization: 'Bearer ' + user.token },
-    json: true,
-  };
-  const response = await fetch('https://api.spotify.com/v1/me', options);
-
-  if (response.ok) {
-    return await response.json();
-  } else {
-    throw new Error(`Request USER PROFILE failed with status: ${response.status}`);
-  }
-}
-
-async function fetchUserPlaylists(user: User) {
-  const options = {
-    method: 'GET',
-    headers: { Authorization: 'Bearer ' + user.token },
-    json: true,
-  };
-  const response = await fetch('https://api.spotify.com/v1/me/playlists', options);
-
-  if (response.ok) {
-    return await response.json();
-  } else {
-    throw new Error(`Request USER PLAYLIST failed with status: ${response.status}`);
-  }
-}
-
-async function fetchRecentlyPlayedTracks(user: User) {
-  const options = {
-    method: 'GET',
-    headers: { Authorization: 'Bearer ' + user.token },
-    json: true,
-  };
-  const response = await fetch('https://api.spotify.com/v1/me/player/recently-played', options);
-
-  if (response.ok) {
-    return await response.json();
-  } else {
-    throw new Error(`Request RECENTLY PLAYED failed with status: ${response.status}`);
-  }
-}
+import { fetchUserPlaylists, fetchRecentlyPlayedTracks, fetchUserProfile } from '../clients/spotify/spotify-client';
 
 export async function getSpotifyData(users: User[]): Promise<QuestionData[]> {
   const resultingData = [];
