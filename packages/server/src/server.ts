@@ -43,7 +43,7 @@ const startServer = async () => {
    */
   const app = express();
   app.use(cookieParser());
-  app.use(cors({ origin: 'https://local.playtunedin-test.com:19006' }));
+  app.use(cors({ origin: 'https://localhost:19006' }));
 
   app.get('/test', function (_: Request, res: Response) {
     res.send({ test: 'good' });
@@ -115,8 +115,8 @@ const startServer = async () => {
       let userToken: TunedInJwtPayload;
       try {
         userToken = await verifyToken(tokenValue);
-      } catch {
-        console.log('Error verifying token');
+      } catch (e) {
+        console.log('Error verifying token', e);
         ws.close(4001);
         return;
       }
