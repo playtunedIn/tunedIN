@@ -14,7 +14,7 @@ export const verifyToken = (token: string): Promise<TunedInJwtPayload> => {
       process.env.JWT_SIGNING_HASH as Secret,
       (err: VerifyErrors | null, payload: Jwt | JwtPayload | string | undefined) => {
         if (err || !payload) {
-          reject();
+          reject(err);
         }
         const user = payload as TunedInJwtPayload;
         resolve(user);
