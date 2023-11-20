@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "build": "tsc",
-    "dev": "pnpm start:services && cross-env HTTPS=true HOST=local.playtunedin-test.com PORT=3001 NODE_ENV=development nodemon --exec \"pnpm run clean && pnpm run build && pnpm run start:dev\" --watch src -e ts",
+    "dev": "pnpm start:services && cross-env HTTPS=true HOST=localhost PORT=3001 NODE_ENV=development nodemon --exec \"pnpm run clean && pnpm run build && pnpm run start:dev\" --watch src -e ts",
     "start": "node dist/src/server.js",
     "start:dev": "node --require dotenv/config dist/src/server.js",
     "start:services": "docker compose down && docker compose up --remove-orphans -d",
