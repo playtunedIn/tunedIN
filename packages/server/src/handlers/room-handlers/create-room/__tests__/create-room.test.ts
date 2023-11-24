@@ -7,6 +7,7 @@ import { CREATE_ROOM_ERROR_RESPONSE, CREATE_ROOM_RESPONSE } from 'src/handlers/r
 import { CREATE_ROOM_ERROR_CODES, REDIS_ERROR_CODES } from 'src/errors';
 import * as roomHelpers from '../../../../utils/room-helpers';
 import { ROOM_STATUS, type GameState } from 'src/clients/redis/models/game-state';
+import { GLOBAL_MOCK_NAME, GLOBAL_MOCK_USER_ID } from 'src/testing/mocks/auth.mock';
 
 describe('Create Room Handler', () => {
   let ws: WebSocket;
@@ -45,8 +46,15 @@ describe('Create Room Handler', () => {
   it('should create room', async () => {
     const expectedDefaultGameState: GameState = {
       roomId: '4JTY',
-      hostId: '',
-      players: [],
+      hostId: GLOBAL_MOCK_USER_ID,
+      players: [
+        {
+          userId: GLOBAL_MOCK_USER_ID,
+          name: GLOBAL_MOCK_NAME,
+          score: 0,
+          answers: [],
+        },
+      ],
       questions: [],
       roomStatus: ROOM_STATUS.LOBBY,
       questionIndex: 0,
