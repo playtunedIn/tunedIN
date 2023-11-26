@@ -20,7 +20,8 @@ const CLIENT_ID = process.env.CLIENT_ID || ''; // Your client id
 const CLIENT_SECRET = process.env.CLIENT_SECRET || ''; // Your secret
 const JWT_SIGNING_HASH = process.env.JWT_SIGNING_HASH || '';
 const REDIRECT_URI = process.env.REDIRECT_URI || ''; // Your redirect uri
-const POST_LOGIN_URL = process.env.POST_LOGIN_URL || ''; // After success auth
+const POST_LOGIN_URL = process.env.POST_LOGIN_URL || ''; // After success
+const SCOPE = 'user-read-recently-played user-read-private user-read-email'; //to allow hitting recent tracks endpoint
 
 const stateKey = 'spotify_auth_state';
 
@@ -58,13 +59,12 @@ export const setupOauthRoutes = (app: any) => {
     res.cookie(stateKey, state);
 
     // your application requests authorization
-    const scope = 'user-read-private user-read-email';
     res.redirect(
       'https://accounts.spotify.com/authorize?' +
         querystring.stringify({
           response_type: 'code',
           client_id: CLIENT_ID,
-          scope: scope,
+          scope: SCOPE,
           redirect_uri: REDIRECT_URI,
           state: state,
         })
