@@ -3,6 +3,7 @@ import { ROOM_STATUS } from '@store/multiplayer/room-slice/room-slice.constants'
 
 export const mockInitialStoreState: RootState = {
   players: {
+    name: '',
     players: [],
     hostId: '',
   },

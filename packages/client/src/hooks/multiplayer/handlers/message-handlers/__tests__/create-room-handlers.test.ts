@@ -36,6 +36,7 @@ describe('Create Room Handlers', () => {
     expect(store.getState().players).toEqual({
       players: mockCreateRoomResponse.players,
       hostId: mockCreateRoomResponse.hostId,
+      name: '',
     });
     expect(store.getState().questions).toEqual({
       questions: mockCreateRoomResponse.questions,

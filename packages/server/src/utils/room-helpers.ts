@@ -57,7 +57,7 @@ export const areValidAnswers = (answerIndexes: number[], question: Question): bo
 };
 
 export const getRoundLeaderboard = (players: PlayerState[], questionIndex: number): PlayerRoundResult[] =>
-  players.map(player => ({ name: player.name, score: player.score, answer: player.answers[questionIndex] }));
+  players.map(player => ({ name: player.name, score: player.score, answers: player.answers[questionIndex] }));
 
 export const allPlayersAnswered = (players: PlayerState[], questionIndex: number) =>
   !players.some(player => player.answers[questionIndex] === null);

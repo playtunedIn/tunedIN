@@ -11,14 +11,19 @@ import { ROOM_STATUS } from '../../../../clients/redis/models/game-state';
 import { REDIS_ERROR_CODES } from '../../../../errors';
 import { endGameHandler } from '../../end-game/end-game';
 import { questionRoundHandler } from './question-round';
-import { UPDATE_ROOM_STATUS_RESPONSE } from '../../../responses';
+import { UPDATE_ROUND_RESULTS } from '../../../responses';
 import { publishMessageHandler } from '../../../subscribed-message-handlers';
 import { cancelGameHandler } from '../../cancel-game/cancel-game';
 import { getRoundLeaderboard } from '../../../../utils/room-helpers';
 
 const LEADERBOARD_DISPLAY_TIMEOUT = 7000;
 
-export const questionRoundResultsHandler = async (roomId: string, players: PlayerState[], questionIndex: number) => {
+export const questionRoundResultsHandler = async (
+  roomId: string,
+  players: PlayerState[],
+  questionIndex: number,
+  question: Question
+) => {
   const roundLeaderboard = getRoundLeaderboard(players, questionIndex);
 
   try {
@@ -27,9 +32,11 @@ export const questionRoundResultsHandler = async (roomId: string, players: Playe
     return cancelGameHandler(roomId, REDIS_ERROR_CODES.COMMAND_FAILURE);
   }
 
-  publishMessageHandler(roomId, UPDATE_ROOM_STATUS_RESPONSE, {
+  publishMessageHandler(roomId, UPDATE_ROUND_RESULTS, {
     roomStatus: ROOM_STATUS.SHOW_LEADERBOARD,
     results: roundLeaderboard,
+    questionIndex,
+    answers: question.answers,
   });
 
   setTimeout(() => questionRoundResultsTimeoutHandler(roomId), LEADERBOARD_DISPLAY_TIMEOUT);

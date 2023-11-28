@@ -1,6 +1,6 @@
 import { useAppDispatch } from '@hooks/store/app-store';
-import { updatePlayersState } from '@store/multiplayer/players-slice/players-slice';
-import type { PlayerState } from '@store/multiplayer/players-slice/players-slice.types';
+import { setName, updatePlayersState } from '@store/multiplayer/players-slice/players-slice';
+import type { ReceivedPlayerState } from '@store/multiplayer/players-slice/players-slice.types';
 import { updateQuestionsState } from '@store/multiplayer/questions-slice/questions-slice';
 import type { ReceivedQuestion } from '@store/multiplayer/questions-slice/questions-slice.types';
 import { updateRoomErrorCode, updateRoomState } from '@store/multiplayer/room-slice/room-slice';
@@ -10,7 +10,7 @@ export interface JoinRoomResponse {
   roomId: string;
   hostId: string;
   roomStatus: RoomStatus;
-  players: PlayerState[];
+  players: ReceivedPlayerState[];
   questionIndex: number;
   questions: ReceivedQuestion[];
 }
@@ -23,29 +23,30 @@ export const useJoinRoomResponseHandlers = () => {
   const dispatch = useAppDispatch();
 
   const joinRoomResponseHandler = (data: JoinRoomResponse) => {
+    const { roomId, hostId, roomStatus, players, questionIndex, questions } = data;
+
     dispatch(
       updateRoomState({
-        roomId: data.roomId,
-        roomStatus: data.roomStatus,
+        roomId,
+        roomStatus,
       })
     );
-
     dispatch(
       updatePlayersState({
-        hostId: data.hostId,
-        players: data.players,
+        hostId,
+        players,
       })
     );
-
     dispatch(
       updateQuestionsState({
-        questions: data.questions,
-        questionIndex: data.questionIndex,
+        questions,
+        questionIndex,
       })
     );
   };
 
   const joinRoomErrorResponseHandler = (data: JoinRoomErrorResponse) => {
+    dispatch(setName(''));
     dispatch(updateRoomErrorCode(data.errorCode));
   };
 
