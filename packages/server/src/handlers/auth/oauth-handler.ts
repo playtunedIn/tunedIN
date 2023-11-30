@@ -16,6 +16,8 @@ import { getSelf } from '../../clients/spotify/spotify-client';
 import type { Request, Response } from 'express';
 import type { TunedInJwtPayload } from 'src/utils/auth';
 
+const DAY_IN_SECONDS = 86400;
+
 const CLIENT_ID = process.env.CLIENT_ID || ''; // Your client id
 const CLIENT_SECRET = process.env.CLIENT_SECRET || ''; // Your secret
 const JWT_SIGNING_HASH = process.env.JWT_SIGNING_HASH || '';
@@ -142,8 +144,7 @@ export const setupOauthRoutes = (app: any) => {
     }
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  app.get('/refresh_token', async function (req: any, res: any) {
+  app.get('/refresh_token', async function (req: Request, res: Response) {
     // requesting access token from refresh token
     const refresh_token = req.query.refresh_token;
     const authOptions = {
@@ -164,4 +165,33 @@ export const setupOauthRoutes = (app: any) => {
       });
     }
   });
+
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('handling');
+    app.get('/gen-mock-token', async function (req: Request, res: Response) {
+      console.log('in handler');
+      const expiresIn = DAY_IN_SECONDS * 30; // 30 days
+      const uid = Date.now().toString();
+      const jwt = generateAccessToken(
+        {
+          spotifyToken: encrypt('fake') || '',
+          refresh: encrypt('fake') || '',
+          userId: uid, // mock token uses timestamp as unique-enough id
+          name: `fake ${uid}`,
+        },
+        expiresIn
+      );
+      res.cookie('TUNEDIN_TOKEN', jwt, {
+        httpOnly: true,
+        expires: new Date(Date.now() + expiresIn * 1000), // millisecond timestamp
+      });
+      console.log({ jwt });
+      res.redirect(
+        POST_LOGIN_URL +
+          querystring.stringify({
+            token: jwt,
+          })
+      );
+    });
+  }
 };

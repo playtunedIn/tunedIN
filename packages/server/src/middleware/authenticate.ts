@@ -10,6 +10,7 @@ export const authenticateToken = (req: any, res: any, next: () => void) => {
     .then(payload => {
       const user = payload as TunedInJwtPayload;
       req.user = user;
+
       req.token = decrypt(user.spotifyToken);
       next();
     })
