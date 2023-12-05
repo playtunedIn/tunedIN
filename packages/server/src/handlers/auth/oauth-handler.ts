@@ -16,16 +16,15 @@ import { getSelf } from '../../clients/spotify/spotify-client';
 import type { Request, Response } from 'express';
 import type { TunedInJwtPayload } from 'src/utils/auth';
 
-const DAY_IN_SECONDS = 86400;
-
 const CLIENT_ID = process.env.CLIENT_ID || ''; // Your client id
 const CLIENT_SECRET = process.env.CLIENT_SECRET || ''; // Your secret
 const JWT_SIGNING_HASH = process.env.JWT_SIGNING_HASH || '';
 const REDIRECT_URI = process.env.REDIRECT_URI || ''; // Your redirect uri
 const POST_LOGIN_URL = process.env.POST_LOGIN_URL || ''; // After success
-const SCOPE = 'user-read-recently-played user-read-private user-read-email'; //to allow hitting recent tracks endpoint
 
-const stateKey = 'spotify_auth_state';
+const DAY_IN_SECONDS = 86400;
+const SCOPE = 'user-read-recently-played user-read-private user-read-email'; //to allow hitting recent tracks endpoint
+const STATE_KEY = 'spotify_auth_state';
 
 type OauthResponse = {
   access_token: string;
@@ -58,7 +57,7 @@ function generateAccessToken(data: TunedInJwtPayload, expirySeconds: number): st
 export const setupOauthRoutes = (app: any) => {
   app.get('/login', function (_: Request, res: Response) {
     const state = generateRandomString(16);
-    res.cookie(stateKey, state);
+    res.cookie(STATE_KEY, state);
 
     // your application requests authorization
     res.redirect(
@@ -79,7 +78,7 @@ export const setupOauthRoutes = (app: any) => {
 
     const code = req.query.code;
     const state = req.query.state;
-    const storedState = req.cookies ? req.cookies[stateKey] : null;
+    const storedState = req.cookies ? req.cookies[STATE_KEY] : null;
     if (!code) {
       console.log('no code received');
     } else if (state === null || state !== storedState) {
@@ -89,7 +88,7 @@ export const setupOauthRoutes = (app: any) => {
       //     error: 'state_mismatch'
       //   }));
     } else {
-      res.clearCookie(stateKey);
+      res.clearCookie(STATE_KEY);
       const params = new URLSearchParams();
       params.append('code', code.toString());
       params.append('redirect_uri', REDIRECT_URI);
