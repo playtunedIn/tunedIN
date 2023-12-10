@@ -21,9 +21,10 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET || ''; // Your secret
 const JWT_SIGNING_HASH = process.env.JWT_SIGNING_HASH || '';
 const REDIRECT_URI = process.env.REDIRECT_URI || ''; // Your redirect uri
 const POST_LOGIN_URL = process.env.POST_LOGIN_URL || ''; // After success
-const SCOPE = 'user-read-recently-played user-read-private user-read-email'; //to allow hitting recent tracks endpoint
 
-const stateKey = 'spotify_auth_state';
+const DAY_IN_SECONDS = 86400;
+const SCOPE = 'user-read-recently-played user-read-private user-read-email'; //to allow hitting recent tracks endpoint
+const STATE_KEY = 'spotify_auth_state';
 
 type OauthResponse = {
   access_token: string;
@@ -56,7 +57,7 @@ function generateAccessToken(data: TunedInJwtPayload, expirySeconds: number): st
 export const setupOauthRoutes = (app: any) => {
   app.get('/login', function (_: Request, res: Response) {
     const state = generateRandomString(16);
-    res.cookie(stateKey, state);
+    res.cookie(STATE_KEY, state);
 
     // your application requests authorization
     res.redirect(
@@ -77,7 +78,7 @@ export const setupOauthRoutes = (app: any) => {
 
     const code = req.query.code;
     const state = req.query.state;
-    const storedState = req.cookies ? req.cookies[stateKey] : null;
+    const storedState = req.cookies ? req.cookies[STATE_KEY] : null;
     if (!code) {
       console.log('no code received');
     } else if (state === null || state !== storedState) {
@@ -87,7 +88,7 @@ export const setupOauthRoutes = (app: any) => {
       //     error: 'state_mismatch'
       //   }));
     } else {
-      res.clearCookie(stateKey);
+      res.clearCookie(STATE_KEY);
       const params = new URLSearchParams();
       params.append('code', code.toString());
       params.append('redirect_uri', REDIRECT_URI);
@@ -142,8 +143,7 @@ export const setupOauthRoutes = (app: any) => {
     }
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  app.get('/refresh_token', async function (req: any, res: any) {
+  app.get('/refresh_token', async function (req: Request, res: Response) {
     // requesting access token from refresh token
     const refresh_token = req.query.refresh_token;
     const authOptions = {
@@ -164,4 +164,33 @@ export const setupOauthRoutes = (app: any) => {
       });
     }
   });
+
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('handling');
+    app.get('/gen-mock-token', async function (req: Request, res: Response) {
+      console.log('in handler');
+      const expiresIn = DAY_IN_SECONDS * 30; // 30 days
+      const uid = Date.now().toString();
+      const jwt = generateAccessToken(
+        {
+          spotifyToken: encrypt('fake') || '',
+          refresh: encrypt('fake') || '',
+          userId: uid, // mock token uses timestamp as unique-enough id
+          name: `fake ${uid}`,
+        },
+        expiresIn
+      );
+      res.cookie('TUNEDIN_TOKEN', jwt, {
+        httpOnly: true,
+        expires: new Date(Date.now() + expiresIn * 1000), // millisecond timestamp
+      });
+      console.log({ jwt });
+      res.redirect(
+        POST_LOGIN_URL +
+          querystring.stringify({
+            token: jwt,
+          })
+      );
+    });
+  }
 };
