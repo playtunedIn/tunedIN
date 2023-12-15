@@ -4,7 +4,8 @@ export interface QuestionsState {
 }
 
 export interface ReceivedQuestion {
-  expirationTimestamp?: number;
+  expirationTimestamp: number;
   question: string;
   choices: string[];
+  answers?: number[];
 }

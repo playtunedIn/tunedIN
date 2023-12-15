@@ -6,8 +6,8 @@ import { wrapMultiplayerProvider } from '@testing/helpers/multiplayer-helpers';
 import { useUpdateRoomHandlers } from '@hooks/multiplayer/handlers/message-handlers/subscriber-updates/update-room';
 import { ROOM_STATUS } from '@store/multiplayer/room-slice/room-slice.constants';
 
-describe('Update Players Handlers', () => {
-  it('should add player', () => {
+describe('Update Room Handlers', () => {
+  it('should update room status', () => {
     const store = setupStore();
     const { result, unmount } = renderHook(() => useUpdateRoomHandlers(), {
       wrapper: wrapMultiplayerProvider({ store }),

@@ -1,6 +1,6 @@
 import type { WebSocket } from 'ws';
 
-import type { PlayerState } from '../../../../clients/redis/models/game-state';
+import type { PlayerState, Question } from '../../../../clients/redis/models/game-state';
 import { QUESTION_ROUND_ERROR_CODES } from '../../../../errors';
 import { sendResponse } from '../../../../utils/websocket-response';
 import { isValidSchema } from '../../../message.validator';
@@ -24,17 +24,17 @@ export const answerQuestionHandler = async (ws: WebSocket, data: AnswerQuestionR
   const { roomId, questionIndex, answerIndexes } = data;
   const answerTimeStamp = Date.now();
 
-  let players: PlayerState[];
+  let transactionResults: { players: PlayerState[]; question: Question };
   try {
-    players = await answerQuestionTransaction(roomId, userId, questionIndex, answerIndexes, answerTimeStamp);
+    transactionResults = await answerQuestionTransaction(roomId, userId, questionIndex, answerIndexes, answerTimeStamp);
   } catch (err) {
     return sendResponse(ws, ANSWER_QUESTION_ERROR_RESPONSE, { errorCode: (err as Error).message });
   }
 
-  sendResponse(ws, ANSWER_QUESTION_RESPONSE, {});
+  sendResponse(ws, ANSWER_QUESTION_RESPONSE, { questionIndex, answerIndexes });
   await publishMessageHandler(roomId, PLAYER_ANSWERED_QUESTION_RESPONSE, { name }, userId);
 
-  if (allPlayersAnswered(players, questionIndex)) {
-    questionRoundResultsHandler(roomId, players, questionIndex);
+  if (allPlayersAnswered(transactionResults.players, questionIndex)) {
+    questionRoundResultsHandler(roomId, transactionResults.players, questionIndex, transactionResults.question);
   }
 };

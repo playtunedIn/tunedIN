@@ -7,15 +7,16 @@ import { REDIS_ERROR_CODES } from '../../../../../errors';
 import * as cancelGame from '../../../cancel-game/cancel-game';
 import * as endGame from '../../../end-game/end-game';
 import { questionRoundResultsHandler } from '../question-round-results';
-import { UPDATE_ROOM_STATUS_RESPONSE } from '../../../../responses';
+import { UPDATE_ROUND_RESULTS } from '../../../../responses';
 import { ROOM_STATUS } from '../../../../../clients/redis/models/game-state';
 import { getRoundLeaderboard } from '../../../../../utils/room-helpers';
-import { createMockQuestions } from 'src/testing/mocks/spotify-client.mock';
+import { createMockQuestion, createMockQuestions } from '../../../../../testing/mocks/spotify-client.mock';
 import * as questionRound from '../question-round';
 
 describe('Question Round Results Handler', () => {
   const MOCK_ROOM_ID = 'test room id';
   const MOCK_PLAYERS = createMockPlayers();
+  const MOCK_QUESTION = createMockQuestion();
   const MOCK_QUESTION_INDEX = 0;
 
   beforeEach(() => {
@@ -34,7 +35,7 @@ describe('Question Round Results Handler', () => {
   it('fails when it update redis room status fails', async () => {
     vi.spyOn(gameStatePublisherClient.json, 'set').mockRejectedValueOnce('');
 
-    await questionRoundResultsHandler(MOCK_ROOM_ID, MOCK_PLAYERS, MOCK_QUESTION_INDEX);
+    await questionRoundResultsHandler(MOCK_ROOM_ID, MOCK_PLAYERS, MOCK_QUESTION_INDEX, MOCK_QUESTION);
 
     expect(cancelGame.cancelGameHandler).toHaveBeenCalledWith(MOCK_ROOM_ID, REDIS_ERROR_CODES.COMMAND_FAILURE);
     expect(gameStatePublisherClient.publish).not.toHaveBeenCalled();
@@ -44,14 +45,16 @@ describe('Question Round Results Handler', () => {
     vi.spyOn(global, 'setTimeout');
     vi.spyOn(gameStatePublisherClient.json, 'set').mockResolvedValueOnce('OK');
 
-    await questionRoundResultsHandler(MOCK_ROOM_ID, MOCK_PLAYERS, MOCK_QUESTION_INDEX);
+    await questionRoundResultsHandler(MOCK_ROOM_ID, MOCK_PLAYERS, MOCK_QUESTION_INDEX, MOCK_QUESTION);
 
     expect(cancelGame.cancelGameHandler).not.toHaveBeenCalled();
     expect(gameStatePublisherClient.publish).toHaveBeenCalledWith(
       MOCK_ROOM_ID,
-      createMockPublisherPayload(UPDATE_ROOM_STATUS_RESPONSE, {
+      createMockPublisherPayload(UPDATE_ROUND_RESULTS, {
         roomStatus: ROOM_STATUS.SHOW_LEADERBOARD,
         results: getRoundLeaderboard(MOCK_PLAYERS, MOCK_QUESTION_INDEX),
+        questionIndex: MOCK_QUESTION_INDEX,
+        answers: MOCK_QUESTION.answers,
       })
     );
     expect(global.setTimeout).toHaveBeenCalled();
@@ -65,14 +68,16 @@ describe('Question Round Results Handler', () => {
       vi.spyOn(global, 'setTimeout');
       vi.spyOn(gameStatePublisherClient.json, 'set').mockResolvedValueOnce('OK');
 
-      await questionRoundResultsHandler(MOCK_ROOM_ID, MOCK_PLAYERS, MOCK_QUESTION_INDEX);
+      await questionRoundResultsHandler(MOCK_ROOM_ID, MOCK_PLAYERS, MOCK_QUESTION_INDEX, MOCK_QUESTION);
 
       expect(cancelGame.cancelGameHandler).not.toHaveBeenCalled();
       expect(gameStatePublisherClient.publish).toHaveBeenCalledWith(
         MOCK_ROOM_ID,
-        createMockPublisherPayload(UPDATE_ROOM_STATUS_RESPONSE, {
+        createMockPublisherPayload(UPDATE_ROUND_RESULTS, {
           roomStatus: ROOM_STATUS.SHOW_LEADERBOARD,
           results: getRoundLeaderboard(MOCK_PLAYERS, MOCK_QUESTION_INDEX),
+          questionIndex: MOCK_QUESTION_INDEX,
+          answers: MOCK_QUESTION.answers,
         })
       );
       expect(global.setTimeout).toHaveBeenCalled();

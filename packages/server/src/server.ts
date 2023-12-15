@@ -43,7 +43,7 @@ const startServer = async () => {
    */
   const app = express();
   app.use(cookieParser());
-  app.use(cors({ origin: 'https://local.playtunedin-test.com:8080' }));
+  app.use(cors({ origin: 'https://localhost:19006' }));
 
   app.get('/test', function (_: Request, res: Response) {
     res.send({ test: 'good' });
@@ -115,8 +115,8 @@ const startServer = async () => {
       let userToken: TunedInJwtPayload;
       try {
         userToken = await verifyToken(tokenValue);
-      } catch {
-        console.log('Error verifying token');
+      } catch (e) {
+        console.log('Error verifying token', e);
         ws.close(4001);
         return;
       }
@@ -130,7 +130,7 @@ const startServer = async () => {
   wsServer.on('connection', (ws: WebSocket, _: Request, userToken: TunedInJwtPayload) => {
     ws.userToken = userToken;
     ws.isAlive = true;
-
+    console.log('connected');
     ws.on('message', (data: string) => {
       messageHandler(ws, data);
     });
@@ -140,6 +140,7 @@ const startServer = async () => {
     ws.on('pong', () => heartbeat(ws));
 
     ws.on('close', () => {
+      console.log('closing socket');
       unsubscribeRoomHandler(ws);
       ws.close();
     });

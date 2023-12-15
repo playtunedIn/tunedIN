@@ -19,7 +19,7 @@ CERT_NAME='localhost (Dev SSL Cert)'
 ORG_NAME='TunedIN Test'
 
 DNS_1='playtunedin-test.com'
-DNS_2='local.playtunedin-test.com'
+DNS_2='localhost'
 
 # Ask user permission to run the script
 CONTINUE="n/a"

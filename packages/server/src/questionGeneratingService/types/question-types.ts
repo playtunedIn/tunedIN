@@ -13,3 +13,8 @@ export interface AnsweredQuestion {
   answerType: string;
   correctAnswer: string[];
 }
+
+export interface User {
+  name: string;
+  token: string;
+}

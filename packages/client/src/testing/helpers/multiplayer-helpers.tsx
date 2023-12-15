@@ -8,6 +8,8 @@ import { MultiplayerProvider } from '@hooks/multiplayer';
 import { rootReducer } from '@store/store';
 import type { AppStore, RootState } from '@store/store';
 import { mockInitialStoreState } from './multiplayer-helpers.constants';
+import type { ReceivedQuestion } from '@store/multiplayer/questions-slice/questions-slice.types';
+import type { PlayerState } from '@store/multiplayer/players-slice/players-slice.types';
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
   preloadedState?: PreloadedState<RootState>;
@@ -34,3 +36,16 @@ export const renderMultiplayerProvider = (
 
 export const wrapMultiplayerProvider = ({ preloadedState, store }: ExtendedRenderOptions = {}) =>
   getMultiplayerProviders({ preloadedState, store });
+
+export const createMockQuestion = (): ReceivedQuestion => ({
+  expirationTimestamp: 999999999999,
+  question: "Which player's favorite artist is Taylor Swift?",
+  choices: ['Emil', 'Matt', 'Jamie', 'Trevor'],
+});
+
+export const createMockPlayer = (): PlayerState => ({
+  name: 'Joe Smith',
+  score: 0,
+  answers: [[0]],
+  answeredCurrentQuestion: false,
+});

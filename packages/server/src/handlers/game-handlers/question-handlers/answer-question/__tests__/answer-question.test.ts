@@ -15,10 +15,12 @@ import {
 import * as questionRoundResultsHandler from '../../question-round/question-round-results';
 import { answerQuestionHandler } from '../answer-question';
 import * as answerQuestionTransaction from '../answer-question-transaction';
+import { createMockQuestion } from '../../../../../testing/mocks/spotify-client.mock';
 
 describe('Answer Question Handler', () => {
   const MOCK_ROOM_ID = 'TEST';
   const MOCK_QUESTION_INDEX = 0;
+  const MOCK_ANSWER_INDEXES = [0];
 
   let ws: WebSocket;
   let mockAnswerQuestionReq: AnswerQuestionReq;
@@ -27,7 +29,7 @@ describe('Answer Question Handler', () => {
     mockAnswerQuestionReq = {
       roomId: MOCK_ROOM_ID,
       questionIndex: MOCK_QUESTION_INDEX,
-      answerIndexes: [0],
+      answerIndexes: MOCK_ANSWER_INDEXES,
     };
 
     vi.spyOn(questionRoundResultsHandler, 'questionRoundResultsHandler');
@@ -62,11 +64,19 @@ describe('Answer Question Handler', () => {
   });
 
   it('does not end the round when not everyone has answered question', async () => {
-    vi.spyOn(answerQuestionTransaction, 'answerQuestionTransaction').mockResolvedValueOnce(createMockPlayers());
+    vi.spyOn(answerQuestionTransaction, 'answerQuestionTransaction').mockResolvedValueOnce({
+      players: createMockPlayers(),
+      question: createMockQuestion(),
+    });
 
     await answerQuestionHandler(ws, mockAnswerQuestionReq);
 
-    expect(ws.send).toHaveBeenCalledWith(createMockWebSocketMessage(ANSWER_QUESTION_RESPONSE, {}));
+    expect(ws.send).toHaveBeenCalledWith(
+      createMockWebSocketMessage(ANSWER_QUESTION_RESPONSE, {
+        questionIndex: MOCK_QUESTION_INDEX,
+        answerIndexes: MOCK_ANSWER_INDEXES,
+      })
+    );
     expect(gameStatePublisherClient.publish).toHaveBeenCalledWith(
       MOCK_ROOM_ID,
       createMockPublisherPayload(PLAYER_ANSWERED_QUESTION_RESPONSE, { name: GLOBAL_MOCK_NAME }, GLOBAL_MOCK_USER_ID)
@@ -75,16 +85,22 @@ describe('Answer Question Handler', () => {
   });
 
   it('calls round result handler when everyone has answered question', async () => {
+    const question = createMockQuestion();
     const players = createMockPlayers();
     // set question to answered (not null)
     players[0].answers = [[0]];
     players[1].answers = [[0]];
 
-    vi.spyOn(answerQuestionTransaction, 'answerQuestionTransaction').mockResolvedValueOnce(players);
+    vi.spyOn(answerQuestionTransaction, 'answerQuestionTransaction').mockResolvedValueOnce({ players, question });
 
     await answerQuestionHandler(ws, mockAnswerQuestionReq);
 
-    expect(ws.send).toHaveBeenCalledWith(createMockWebSocketMessage(ANSWER_QUESTION_RESPONSE, {}));
+    expect(ws.send).toHaveBeenCalledWith(
+      createMockWebSocketMessage(ANSWER_QUESTION_RESPONSE, {
+        questionIndex: MOCK_QUESTION_INDEX,
+        answerIndexes: MOCK_ANSWER_INDEXES,
+      })
+    );
     expect(gameStatePublisherClient.publish).toHaveBeenCalledWith(
       MOCK_ROOM_ID,
       createMockPublisherPayload(PLAYER_ANSWERED_QUESTION_RESPONSE, { name: GLOBAL_MOCK_NAME }, GLOBAL_MOCK_USER_ID)
@@ -92,7 +108,8 @@ describe('Answer Question Handler', () => {
     expect(questionRoundResultsHandler.questionRoundResultsHandler).toHaveBeenCalledWith(
       MOCK_ROOM_ID,
       players,
-      MOCK_QUESTION_INDEX
+      MOCK_QUESTION_INDEX,
+      question
     );
   });
 });

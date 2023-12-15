@@ -57,15 +57,22 @@ export const areValidAnswers = (answerIndexes: number[], question: Question): bo
 };
 
 export const getRoundLeaderboard = (players: PlayerState[], questionIndex: number): PlayerRoundResult[] =>
-  players.map(player => ({ name: player.name, score: player.score, answer: player.answers[questionIndex] }));
+  players.map(player => ({ name: player.name, score: player.score, answers: player.answers[questionIndex] }));
 
 export const allPlayersAnswered = (players: PlayerState[], questionIndex: number) =>
   !players.some(player => player.answers[questionIndex] === null);
 
-export const generateDefaultGameState = (roomId: string): GameState => ({
+export const generateDefaultGameState = (roomId: string, hostId: string, hostName: string): GameState => ({
   roomId: roomId,
-  hostId: '',
-  players: [],
+  hostId: hostId,
+  players: [
+    {
+      userId: hostId,
+      name: hostName,
+      score: 0,
+      answers: [],
+    },
+  ],
   questions: [],
   roomStatus: ROOM_STATUS.LOBBY,
   questionIndex: 0,
