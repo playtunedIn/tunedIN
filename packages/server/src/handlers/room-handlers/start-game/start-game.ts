@@ -1,4 +1,4 @@
-import type { WebSocket } from 'ws';
+ import type { WebSocket } from 'ws';
 
 import { REDIS_ERROR_CODES, START_GAME_ERROR_CODES } from '../../../errors';
 import { isValidSchema } from '../../message.validator';
@@ -27,6 +27,10 @@ export const startGameHandler = async (ws: WebSocket, data: StartGameReq) => {
 
   const { userId } = ws.userToken;
   const { roomId } = data;
+  const user = {
+    name: ws.userToken.name,
+    token: ws.userToken.spotifyToken
+  };
 
   let response: Record<RedisQuery, unknown>;
   try {
@@ -47,9 +51,9 @@ export const startGameHandler = async (ws: WebSocket, data: StartGameReq) => {
     return sendResponse(ws, START_GAME_ERROR_RESPONSE, { errorCode: START_GAME_ERROR_CODES.ROOM_NOT_IN_LOBBY });
   }
 
-  if (players.length < MIN_PLAYERS_TO_START) {
-    return sendResponse(ws, START_GAME_ERROR_RESPONSE, { errorCode: START_GAME_ERROR_CODES.NOT_ENOUGH_PLAYERS });
-  }
+  // if (players.length < MIN_PLAYERS_TO_START) {
+  //   return sendResponse(ws, START_GAME_ERROR_RESPONSE, { errorCode: START_GAME_ERROR_CODES.NOT_ENOUGH_PLAYERS });
+  // }
 
   try {
     await gameStatePublisherClient.json.set(roomId, ROOM_STATUS_QUERY, ROOM_STATUS.LOADING_GAME);
@@ -61,5 +65,5 @@ export const startGameHandler = async (ws: WebSocket, data: StartGameReq) => {
     roomStatus: ROOM_STATUS.LOADING_GAME,
   });
 
-  getQuestionsHandler(roomId);
+  getQuestionsHandler(roomId, user);
 };

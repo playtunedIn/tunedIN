@@ -10,9 +10,12 @@ export const ROOM_STATUS = {
 export type RoomStatus = (typeof ROOM_STATUS)[keyof typeof ROOM_STATUS];
 
 export interface Question {
-  expirationTimestamp?: number;
+  expirationTimestamp?: number; //Todo Implement timer feature
   question: string;
+  description: string;
+  descriptionExtra?: string | string[];
   choices: string[];
+  answerType: string;
   answers: number[]; // Indexes in choices for correct answer.
 }
 

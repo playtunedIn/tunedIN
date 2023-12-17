@@ -42,10 +42,12 @@ function getUniqueRandNums(max: number, total: number): number[] {
 }
 
 export async function getGameQuestions(users: User[], numQuestions: number): Promise<AnsweredQuestion[]> {
+  console.log('1. working');
   const results = [];
 
   try {
     const questionData = await getSpotifyData(users);
+    console.log({questionData});
 
     const randNums = getUniqueRandNums(questionFunctions.length, numQuestions);
 
