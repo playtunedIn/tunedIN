@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-const secret = process.env.JWT_SIGNING_HASH || '';
+const secret = process.env.JWT_SIGNING_HASH || 'lsdjhf4';
 if (secret === '') {
   throw new Error('JWT_SIGNING_HASH not found');
 }
