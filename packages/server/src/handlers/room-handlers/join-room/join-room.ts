@@ -7,6 +7,7 @@ import { publishMessageHandler, subscribeRoomHandler } from '../../subscribed-me
 import type { JoinRoomReq } from './join-room.validator';
 import { JOIN_ROOM_SCHEMA_NAME } from './join-room.validator';
 import type { SanitizedGameState } from 'src/clients/redis/models/game-state';
+import { storePlayerDetailsHandler } from '../../game-handlers/player-handlers/store-player-handler/store-player-handler';
 import { sendResponse } from '../../../utils/websocket-response';
 import { ADD_PLAYER_RESPONSE, JOIN_ROOM_ERROR_RESPONSE, JOIN_ROOM_RESPONSE } from '../../responses';
 import { createNewPlayerState } from '../../../utils/room-helpers';
@@ -39,7 +40,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   } catch (err) {
     return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: (err as Error).message });
   }
-
+  await storePlayerDetailsHandler(ws.userToken);
   await subscribeRoomHandler(ws, data.roomId);
   await publishMessageHandler(data.roomId, ADD_PLAYER_RESPONSE, { player: newPlayer }, userId);
 
