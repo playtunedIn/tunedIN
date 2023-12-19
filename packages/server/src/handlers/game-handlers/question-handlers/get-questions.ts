@@ -12,11 +12,8 @@ import { getGameQuestions } from '../../../questionGeneratingService/question-ge
 export const getQuestionsHandler = async (roomId: string, user: User) => {
   let questions: Question[];
   try {
-    // TODO: Integrate with actual question fetching services
-    // questions = await getQuestions();
 
      const spotifyQuestions = await getGameQuestions([user], 3);
-     console.log('working?')
 
       questions = spotifyQuestions.map(question => {
         return {
