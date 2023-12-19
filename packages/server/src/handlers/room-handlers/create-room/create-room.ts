@@ -30,6 +30,13 @@ export const createRoomHandler = async (ws: WebSocket) => {
   } catch {
     return sendResponse(ws, CREATE_ROOM_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.COMMAND_FAILURE });
   }
-  await storePlayerDetailsHandler(ws.userToken);
+
+  try {
+    await storePlayerDetailsHandler(ws);
+  } catch {
+    return sendResponse(ws, CREATE_ROOM_ERROR_RESPONSE, {
+      errorCode: CREATE_ROOM_ERROR_CODES.STORE_PLAYER_TOKEN_HANDLER_FAILED,
+    });
+  }
   sendResponse(ws, CREATE_ROOM_RESPONSE, defaultGameStateJson);
 };

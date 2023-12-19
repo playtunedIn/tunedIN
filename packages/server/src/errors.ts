@@ -8,11 +8,13 @@ export const REDIS_ERROR_CODES = {
   KEY_NOT_FOUND: 'MULT-004',
   CORRUPT_STRINGIFY: 'MULT-005',
   CORRUPT_JSON_PARSE: 'MULT-006',
+  STORE_PLAYER_TOKEN_FAILURE: 'MULT-007',
 } as const;
 
 //Create room error codes are from 100 - 199
 export const CREATE_ROOM_ERROR_CODES = {
   GENERATE_ID_ERROR: 'MULT-100',
+  STORE_PLAYER_TOKEN_HANDLER_FAILED: 'MULT-101',
 };
 
 // Join room error codes are reserved from 200 - 299
@@ -22,6 +24,8 @@ export const JOIN_ROOM_ERROR_CODES = {
   ROOM_FULL: 'MULT-202',
   PLAYER_ALREADY_IN_ROOM: 'MULT-203',
   NAME_TAKEN: 'MULT-204',
+  STORE_PLAYER_TOKEN_HANDLER_FAILED: 'MULT-205',
+  TRANSACTION_FAILURE: 'MULT-206',
 } as const;
 
 // Start room error code are reserved from 300 - 399
