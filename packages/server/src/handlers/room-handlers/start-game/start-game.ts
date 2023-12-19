@@ -77,10 +77,5 @@ export const startGameHandler = async (ws: WebSocket, data: StartGameReq) => {
     return sendResponse(ws, START_GAME_ERROR_RESPONSE, { errorCode: START_GAME_ERROR_CODES.GET_QUESTIONS_FAILED });
   }
 
-  try {
-    sendResponse(ws, START_GAME_RESPONSE, roomState);
-  } catch (error) {
-    console.log('get gamestate error');
-  }
-  
+  sendResponse(ws, START_GAME_RESPONSE, roomState);
 };
