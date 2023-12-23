@@ -7,6 +7,7 @@ import { ROOT_QUERY, gameStatePublisherClient } from '../../../clients/redis';
 import { generateDefaultGameState, generateUniqueRoomId } from '../../../utils/room-helpers';
 import { REDIS_ERROR_CODES, CREATE_ROOM_ERROR_CODES } from '../../../errors';
 import { subscribeRoomHandler } from '../../../handlers/subscribed-message-handlers';
+import { storePlayerDetailsHandler } from '../../game-handlers/player-handlers/store-player-handler/store-player-handler';
 
 export const createRoomHandler = async (ws: WebSocket) => {
   const roomId = generateUniqueRoomId();
@@ -31,6 +32,6 @@ export const createRoomHandler = async (ws: WebSocket) => {
     return sendResponse(ws, CREATE_ROOM_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.COMMAND_FAILURE });
   }
   await subscribeRoomHandler(ws, roomId);
-
+  await storePlayerDetailsHandler(ws.userToken);
   sendResponse(ws, CREATE_ROOM_RESPONSE, defaultGameStateJson);
 };
