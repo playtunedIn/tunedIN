@@ -1,4 +1,3 @@
-
 import type { GameState, PlayerState } from 'src/clients/redis/models/game-state';
 import { sanitizeRoomState } from '../../../utils/room-helpers';
 import { REDIS_ERROR_CODES } from '../../../errors';
@@ -37,16 +36,16 @@ export const leaveRoomTransaction = (roomId: string, userId: string) =>
 
     return sanitizeRoomState(roomState);
   });
-  export const leaveRoomPlayerTransaction = (userId: string) =>
+export const leaveRoomPlayerTransaction = (userId: string) =>
   executeTransaction(LEAVE_ROOM_TRANSACTION_ATTEMPTS, async () => {
     await playerStatePublisherClient.watch(userId);
 
     const playerState = await query<PlayerState>(userId, ROOT_QUERY, playerStatePublisherClient);
-    const transaction = gameStatePublisherClient.multi();
+    const transaction = playerStatePublisherClient.multi();
     const newPlayerState = {
       ...playerState,
-      roomId: null
-    }
+      roomId: null,
+    };
     transaction.json.set(userId, ROOT_QUERY, newPlayerState);
 
     const result = await transaction.exec();

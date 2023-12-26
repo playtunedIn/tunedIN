@@ -55,6 +55,6 @@ export const unsubscribeRoomHandler = async (ws: WebSocket) => {
   if (ws.channelListener) {
     await gameStateSubscriberClient.unsubscribe(ws.channelListener.channel, ws.channelListener.listener);
     // TODO: This send may be unnecessary but leaving it for now
-    ws.send('unsubscribed');
+    ws.send(JSON.stringify({ type: 'unsubscribed' }));
   }
 };

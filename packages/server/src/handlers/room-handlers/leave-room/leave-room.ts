@@ -9,8 +9,8 @@ import { LEAVE_ROOM_ERROR_RESPONSE, LEAVE_ROOM_RESPONSE, REMOVE_PLAYER_RESPONSE 
 import type { GameState, PlayerRoomSession } from '../../../clients/redis/models/game-state';
 import { leaveRoomPlayerTransaction, leaveRoomTransaction } from './leave-room-transaction';
 
-export const exitRoomHandler = async (ws: WebSocket) => {
-
+export const leaveRoomHandler = async (ws: WebSocket) => {
+  console.log('in leave room');
   const { userId } = ws.userToken;
 
   let playerSession: PlayerRoomSession;
@@ -21,8 +21,9 @@ export const exitRoomHandler = async (ws: WebSocket) => {
   }
 
   const roomId = playerSession?.roomId;
-  if (roomId) {
-    return sendResponse(ws, LEAVE_ROOM_ERROR_RESPONSE, { errorCode: "Player not in any room" });
+  console.log({ playerSession });
+  if (!roomId) {
+    return sendResponse(ws, LEAVE_ROOM_ERROR_RESPONSE, { errorCode: 'Player not in any room' });
   }
 
   let gameState: GameState;
@@ -33,7 +34,7 @@ export const exitRoomHandler = async (ws: WebSocket) => {
   }
 
   if (!gameState) {
-    return sendResponse(ws, LEAVE_ROOM_ERROR_RESPONSE, { errorCode: "Room not found" });
+    return sendResponse(ws, LEAVE_ROOM_ERROR_RESPONSE, { errorCode: 'Room not found' });
   }
 
   let updatedRoomState: SanitizedGameState;
@@ -47,7 +48,6 @@ export const exitRoomHandler = async (ws: WebSocket) => {
   } catch (err) {
     return sendResponse(ws, LEAVE_ROOM_ERROR_RESPONSE, { errorCode: (err as Error).message });
   }
-
 
   await unsubscribeRoomHandler(ws);
   await publishMessageHandler(roomId, REMOVE_PLAYER_RESPONSE, { playerId: userId }, userId);

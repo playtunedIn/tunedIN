@@ -40,7 +40,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   } catch (err) {
     return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: (err as Error).message });
   }
-  await storePlayerDetailsHandler(ws.userToken);
+  await storePlayerDetailsHandler(ws.userToken, data.roomId);
   await subscribeRoomHandler(ws, data.roomId);
   await publishMessageHandler(data.roomId, ADD_PLAYER_RESPONSE, { player: newPlayer }, userId);
 
