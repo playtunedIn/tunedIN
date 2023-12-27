@@ -34,12 +34,14 @@ export const playlistMastermind = {
   ANSWER_TYPE: 'player',
 };
 
+//returns a photo, let's do that post MVP
 export const albumArtAficionado = {
   QUESTION_NAME: 'Album Art Aficionado',
   QUESTION_DESCRIPTION: 'Who made a playlist and chose this as the album conver?',
   ANSWER_TYPE: 'player',
 };
 
+//doesn't seem actually possible, (we could do something like x number of songs on a playlist though)
 export const mixtapeMagician = {
   QUESTION_NAME: 'Mixtape Magician',
   QUESTION_DESCRIPTION: 'Who made the playlist with the following songs on it?',
@@ -52,32 +54,36 @@ export const theMostPopular = {
   ANSWER_TYPE: 'player',
 };
 
+//saving for later
 export const birthdateHarmonizer = {
   QUESTION_NAME: 'Birthdate Harmonizer',
   QUESTION_DESCRIPTION: 'Which player was born in the same month and year as this album was released?',
   ANSWER_TYPE: 'player',
 };
 
+//saving for later
 export const theArtistAdmirer = {
   QUESTION_NAME: 'The Artist Admirer',
   QUESTION_DESCRIPTION: 'Who has this artist in their queue right now?',
   ANSWER_TYPE: 'player',
 };
 
+//saving for later
 export const nextInLineListener = {
   QUESTION_NAME: 'Next in Line Listener',
   QUESTION_DESCRIPTION: 'Who has this song queued up next?',
   ANSWER_TYPE: 'player',
 };
 
+//saving for later
 export const planningAhead = {
   QUESTION_NAME: 'Planning Ahead',
   QUESTION_DESCRIPTION: 'Who has the most songs queued up?',
   ANSWER_TYPE: 'player',
 };
 
-export const coverArtCrusader = {
-  QUESTION_NAME: 'Cover Art Crusader',
+export const albumCrusader = {
+  QUESTION_NAME: 'Album Crusader',
   QUESTION_DESCRIPTION: 'Who recently listened to a song from this album?',
   ANSWER_TYPE: 'player',
 };
@@ -88,12 +94,14 @@ export const pennyPinchingPlayer = {
   ANSWER_TYPE: 'player',
 };
 
+//CAN'T do this, spotify API was wrong....
 export const popularityMagnet = {
   QUESTION_NAME: 'Popularity Magnet',
   QUESTION_DESCRIPTION: 'Who recently listened to the most popular artist?',
   ANSWER_TYPE: 'player',
 };
 
+//CAN'T do this, spotify API was wrong....
 export const indieExplorer = {
   QUESTION_NAME: 'Indie Explorer',
   QUESTION_DESCRIPTION: 'Who recently listened to the least popular artist',
@@ -117,3 +125,5 @@ export const artistOnMyMind = {
   QUESTION_DESCRIPTION: 'Who listened to this artist recently?',
   ANSWER_TYPE: 'player',
 };
+
+//Jamie's playlist with the following songs is titled what?
