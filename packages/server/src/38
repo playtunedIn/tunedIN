@@ -33,10 +33,8 @@ const startServer = async () => {
       gameStateSubscriberClient.connect(),
       playerStatePublisherClient.connect(),
     ]);
-  } catch (e) {
+  } catch {
     // TODO: Add tracking here
-    console.log({ e });
-    console.log("Catching the err'err'err at line 38");
     process.exit(1);
   }
 

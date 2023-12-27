@@ -40,7 +40,10 @@ COPY --from=production-deps /server/node_modules /server/node_modules
 COPY --from=build /server/packages/server/dist /server/dist
 COPY --from=build /server/packages/server/package.json /server/package.json
 RUN export JWT_SIGNING_HASH=ae4c5a1987fa5315227c807a35d91011d380db8f0b04da549beeba0777334330b6fe44e74a46007cd94ac4970ce9d37eaf436d3c2bde0721683b692d323c8d6e
+RUN export REDIS_HOSTNAME=redis://redis:6379
 
+EXPOSE 3001
+EXPOSE 3000
 EXPOSE $APPLICATION_PORT
 
 CMD ["pnpm", "start"]
