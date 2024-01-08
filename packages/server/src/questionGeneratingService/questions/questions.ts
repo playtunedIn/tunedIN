@@ -223,41 +223,6 @@ export function playlistMastermind(data: QuestionData[]): AnsweredQuestion {
   return answeredQuestion;
 }
 
-//export const albumArtAficionado = {
-//   QUESTION_NAME: 'Album Art Aficionado',
-//   QUESTION_DESCRIPTION: 'Who made a playlist and chose this as the album conver?',
-//   ANSWER_TYPE: 'player',
-// };
-
-// function albumArtAficionado(data: QuestionData[]): AnsweredQuestion {
-
-//   const title = questionConsts.albumArtAficionado.QUESTION_NAME;
-//   const description =  questionConsts.albumArtAficionado.QUESTION_DESCRIPTION;
-//   const answerType = questionConsts.albumArtAficionado.ANSWER_TYPE;
-//   const correctAnswer: string[] = [];
-
-//   //logic to set the extra description (IF NEEDED)
-//   const extraDescr = ""
-
-//   //logic to set the answer options
-//   const answerOpts = [""]
-
-//   //logic to set the correct answer
-//   correctAnswer = [""]
-
-//   //put all together
-//   const answeredQuestion = {
-//       questionTitle: title,
-//       questionDescription: description,
-//       questionDescriptionExtra: extraDescr, //DELETE IF NOT NEEDED
-//       answerOptions: answerOpts,
-//       answerType: answerType,
-//       correctAnswer: correctAnswer
-//   }
-
-//   return answeredQuestion;
-// }
-
 export function theMostPopular(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.theMostPopular.QUESTION_NAME;
   const description = questionConsts.theMostPopular.QUESTION_DESCRIPTION;
@@ -365,42 +330,6 @@ export function pennyPinchingPlayer(data: QuestionData[]): AnsweredQuestion {
 
   return answeredQuestion;
 }
-
-// function popularityMagnet(data: QuestionData[]): AnsweredQuestion {
-//   const title = questionConsts.popularityMagnet.QUESTION_NAME;
-//   const description = questionConsts.popularityMagnet.QUESTION_DESCRIPTION;
-//   const answerType = questionConsts.popularityMagnet.ANSWER_TYPE;
-//   const answerOpts = data.map(questionData => questionData.player);
-//   let correctAnswer: string[] = [];
-
-//   //compare each player's most recently listened to artist
-//   let mostPopular = -1;
-
-//   for (let i = 0; i < answerOpts.length; i++) {
-//     const recentTracks = data[i].spotifyData.get_recently_played_tracks;
-
-//     if (recentTracks && recentTracks.items.length > 0) {
-//       const popularity = recentTracks.items[0].track.artists[0].popularity;
-//       if (popularity > mostPopular) {
-//         correctAnswer = [answerOpts[i]]; //clear array, replace w this player
-//         mostPopular = popularity;
-//       } else if (popularity == mostPopular) {
-//         correctAnswer.push(answerOpts[i]); //multiple players now mostPopular
-//       }
-//     }
-//   }
-
-//   //put all together
-//   const answeredQuestion = {
-//     questionTitle: title,
-//     questionDescription: description,
-//     answerOptions: answerOpts,
-//     answerType: answerType,
-//     correctAnswer: correctAnswer,
-//   };
-
-//   return answeredQuestion;
-// }
 
 export function collaborationConnoisseur(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.collaborationConnoisseur.QUESTION_NAME;
@@ -597,12 +526,10 @@ export const questionFunctions = [
   theXRatedPlayer,
   playlistMastermind,
   playlistMastermind,
-  //albumArtAficionado,
   theMostPopular,
   albumCrusader,
   albumCrusader,
   pennyPinchingPlayer,
-  //popularityMagnet,
   collaborationConnoisseur,
   songSpy,
   songSpy,
