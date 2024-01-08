@@ -32,7 +32,7 @@ export const createRoomHandler = async (ws: WebSocket) => {
   }
 
   try {
-    await storePlayerDetailsHandler(ws);
+    await storePlayerDetailsHandler(roomId, ws);
   } catch {
     return sendResponse(ws, CREATE_ROOM_ERROR_RESPONSE, {
       errorCode: CREATE_ROOM_ERROR_CODES.STORE_PLAYER_TOKEN_HANDLER_FAILED,

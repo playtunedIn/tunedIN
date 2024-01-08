@@ -42,7 +42,7 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   }
 
   try {
-    await storePlayerDetailsHandler(ws);
+    await storePlayerDetailsHandler(roomId, ws);
   } catch {
     return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, {
       errorCode: JOIN_ROOM_ERROR_CODES.STORE_PLAYER_TOKEN_HANDLER_FAILED,

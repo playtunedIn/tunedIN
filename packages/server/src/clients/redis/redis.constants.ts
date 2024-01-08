@@ -5,11 +5,19 @@ export const REDIS_DB_MAP = {
 } as const;
 
 export const ROOT_QUERY = '$';
+
+//GameState Queries
 export const QUESTIONS_QUERY = '$.questions';
 export const PLAYERS_QUERY = '$.players';
 export const QUESTION_INDEX_QUERY = '$.questionIndex';
 export const HOST_ID_QUERY = '$.hostId';
 export const ROOM_STATUS_QUERY = '$.roomStatus';
+
+//TokenState Queries
+export const TOKEN_QUERY = '$.spotifyToken';
+export const REFRESH_TOKEN_QUERY = '$.refresh';
+export const USER_NAME_QUERY = '$.name';
+export const TOKEN_EXPIRATION_QUERY = '$.exp';
 
 export const createQuestionQuery = (questionIndex: number) => `$.questions[${questionIndex}]` as const;
 export const createPlayerQuery = (playerIndex: number) => `$.players[${playerIndex}]` as const;
