@@ -185,7 +185,7 @@ export function theXRatedPlayer(data: QuestionData[]): AnsweredQuestion {
   return answeredQuestion;
 }
 
-function playlistMastermind(data: QuestionData[]): AnsweredQuestion {
+export function playlistMastermind(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.playlistMastermind.QUESTION_NAME;
   const description = questionConsts.playlistMastermind.QUESTION_DESCRIPTION;
   const answerType = questionConsts.playlistMastermind.ANSWER_TYPE;
@@ -258,7 +258,7 @@ function playlistMastermind(data: QuestionData[]): AnsweredQuestion {
 //   return answeredQuestion;
 // }
 
-function theMostPopular(data: QuestionData[]): AnsweredQuestion {
+export function theMostPopular(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.theMostPopular.QUESTION_NAME;
   const description = questionConsts.theMostPopular.QUESTION_DESCRIPTION;
   const answerType = questionConsts.theMostPopular.ANSWER_TYPE;
@@ -294,7 +294,7 @@ function theMostPopular(data: QuestionData[]): AnsweredQuestion {
   return answeredQuestion;
 }
 
-function albumCrusader(data: QuestionData[]): AnsweredQuestion {
+export function albumCrusader(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.albumCrusader.QUESTION_NAME;
   const description = questionConsts.albumCrusader.QUESTION_DESCRIPTION;
   const answerType = questionConsts.albumCrusader.ANSWER_TYPE;
@@ -331,7 +331,7 @@ function albumCrusader(data: QuestionData[]): AnsweredQuestion {
   return answeredQuestion;
 }
 
-function pennyPinchingPlayer(data: QuestionData[]): AnsweredQuestion {
+export function pennyPinchingPlayer(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.pennyPinchingPlayer.QUESTION_NAME;
   const description = questionConsts.pennyPinchingPlayer.QUESTION_DESCRIPTION;
   const answerType = questionConsts.pennyPinchingPlayer.ANSWER_TYPE;
@@ -402,25 +402,30 @@ function pennyPinchingPlayer(data: QuestionData[]): AnsweredQuestion {
 //   return answeredQuestion;
 // }
 
-function collaborationConnoisseur(data: QuestionData[]): AnsweredQuestion {
+export function collaborationConnoisseur(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.collaborationConnoisseur.QUESTION_NAME;
   const description = questionConsts.collaborationConnoisseur.QUESTION_DESCRIPTION;
   const answerType = questionConsts.collaborationConnoisseur.ANSWER_TYPE;
   const answerOpts = data.map(questionData => questionData.player);
+  answerOpts.push('No player recently listened to songs ft. more than one artist');
   const correctAnswer: string[] = [];
 
   //loop through all players, get recent 3 tracks, if at least one of the songs has more than 1 artist, add to answer array
-  for (let i = 0; i < answerOpts.length; i++) {
+  for (let i = 0; i < answerOpts.length - 1; i++) {
     const recentTracks = data[i].spotifyData.get_recently_played_tracks;
 
     if (recentTracks && recentTracks.items.length > 2) {
-      for (let j = 0; j < 4; j++) {
+      for (let j = 0; j < 3; j++) {
         if (data[i].spotifyData.get_recently_played_tracks.items[j].track.artists.length > 1) {
           correctAnswer.push(data[i].player);
           break;
         }
       }
     }
+  }
+
+  if (correctAnswer.length === 0) {
+    correctAnswer.push('No player recently listened to songs ft. more than one artist');
   }
 
   //put all together
@@ -435,7 +440,7 @@ function collaborationConnoisseur(data: QuestionData[]): AnsweredQuestion {
   return answeredQuestion;
 }
 
-function songSpy(data: QuestionData[]): AnsweredQuestion {
+export function songSpy(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.songSpy.QUESTION_NAME;
   const description = questionConsts.songSpy.QUESTION_DESCRIPTION;
   const answerType = questionConsts.songSpy.ANSWER_TYPE;
@@ -473,7 +478,7 @@ function songSpy(data: QuestionData[]): AnsweredQuestion {
   return answeredQuestion;
 }
 
-function artistOnMyMind(data: QuestionData[]): AnsweredQuestion {
+export function artistOnMyMind(data: QuestionData[]): AnsweredQuestion {
   const title = questionConsts.artistOnMyMind.QUESTION_NAME;
   const description = questionConsts.artistOnMyMind.QUESTION_DESCRIPTION;
   const answerType = questionConsts.artistOnMyMind.ANSWER_TYPE;
@@ -492,7 +497,7 @@ function artistOnMyMind(data: QuestionData[]): AnsweredQuestion {
       Math.random() * data[randomIndex].spotifyData.get_recently_played_tracks.items.length
     );
     const randPlayerSongArtist =
-      data[randomIndex].spotifyData.get_recently_played_tracks.items[randomSongIndex].track.artists[0].name;
+      data[randomIndex].spotifyData.get_recently_played_tracks.items[randomSongIndex].track.artists[0].name; //only taking first artist (even if collab)
 
     extraDescr = randPlayerSongArtist;
   }
@@ -504,6 +509,43 @@ function artistOnMyMind(data: QuestionData[]): AnsweredQuestion {
     questionTitle: title,
     questionDescription: description,
     questionDescriptionExtra: extraDescr,
+    answerOptions: answerOpts,
+    answerType: answerType,
+    correctAnswer: correctAnswer,
+  };
+
+  return answeredQuestion;
+}
+
+export function albumCollector(data: QuestionData[]): AnsweredQuestion {
+  const title = questionConsts.albumCollector.QUESTION_NAME;
+  const description = questionConsts.albumCollector.QUESTION_DESCRIPTION;
+  const answerType = questionConsts.albumCollector.ANSWER_TYPE;
+  const answerOpts = data.map(questionData => questionData.player);
+  const correctAnswer: string[] = [];
+  const extraDescr = new Set<string>();
+
+  //pick a random player
+  const randomIndex = Math.floor(Math.random() * data.length);
+  correctAnswer.push(data[randomIndex].player);
+
+  //loop through all players, get recent 3 tracks, push unique albums to extra description
+  const recentTracks = data[randomIndex].spotifyData.get_recently_played_tracks;
+  if (recentTracks && recentTracks.items.length > 2) {
+    for (let j = 0; j < 3; j++) {
+      extraDescr.add(recentTracks.items[j].track.album.name);
+    }
+  }
+
+  if (extraDescr.size === 0) {
+    extraDescr.add('This player has not listened to enough songs recently (less than 3)');
+  }
+
+  //put all together
+  const answeredQuestion = {
+    questionTitle: title,
+    questionDescription: description,
+    questionDescriptionExtra: Array.from(extraDescr),
     answerOptions: answerOpts,
     answerType: answerType,
     correctAnswer: correctAnswer,
@@ -567,4 +609,5 @@ export const questionFunctions = [
   songSpy,
   artistOnMyMind,
   artistOnMyMind,
+  albumCollector,
 ];

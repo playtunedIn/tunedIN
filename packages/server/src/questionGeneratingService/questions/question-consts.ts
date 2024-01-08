@@ -121,9 +121,27 @@ export const songSpy = {
 };
 
 export const artistOnMyMind = {
-  QUESTION_NAME: 'Artist on my Mind ',
+  QUESTION_NAME: 'Artist on my Mind',
   QUESTION_DESCRIPTION: 'Who listened to this artist recently?',
   ANSWER_TYPE: 'player',
 };
 
-//Jamie's playlist with the following songs is titled what?
+export const albumCollector = {
+  QUESTION_NAME: 'Album Collector',
+  QUESTION_DESCRIPTION: 'Who listened to songs from the following albums recently?',
+  ANSWER_TYPE: 'player',
+};
+
+export const spotOnDescription = {
+  QUESTION_NAME: 'Spot on Description',
+  QUESTION_DESCRIPTION: 'Who has a playlist with the following description?',
+  ANSWER_TYPE: 'player',
+};
+
+//some non answer type = player:
+
+//x's playlist with the following songs is titled what? (how do we want to generate the fake answers?)
+
+//x has how many followers? (use random num generator +-20 of the users actual number)
+
+//What day was X players last time listening to a song?
