@@ -15,12 +15,10 @@ const LEAVE_ROOM_TRANSACTION_ATTEMPTS = 10;
 export const leaveRoomTransaction = (roomId: string, userId: string) =>
   executeTransaction(LEAVE_ROOM_TRANSACTION_ATTEMPTS, async () => {
     await gameStatePublisherClient.watch(roomId);
-
     const roomState = await query<GameState>(roomId, ROOT_QUERY, gameStatePublisherClient);
 
     const playerIndex = roomState.players.findIndex(player => player.userId === userId);
     roomState.players.splice(playerIndex);
-
     const transaction = gameStatePublisherClient.multi();
     transaction.json.arrPop(roomId, createPlayerQuery(playerIndex));
 
@@ -28,7 +26,6 @@ export const leaveRoomTransaction = (roomId: string, userId: string) =>
     if (!roomState.players.length) {
       transaction.json.del(roomId, ROOT_QUERY);
     }
-
     const result = await transaction.exec();
     if (result === null) {
       throw new Error(REDIS_ERROR_CODES.TRANSACTION_KEY_CHANGE);
@@ -36,10 +33,9 @@ export const leaveRoomTransaction = (roomId: string, userId: string) =>
 
     return sanitizeRoomState(roomState);
   });
-export const leaveRoomPlayerTransaction = (userId: string) =>
-  executeTransaction(LEAVE_ROOM_TRANSACTION_ATTEMPTS, async () => {
+export const leaveRoomPlayerTransaction = (userId: string) => {
+  return executeTransaction(LEAVE_ROOM_TRANSACTION_ATTEMPTS, async () => {
     await playerStatePublisherClient.watch(userId);
-
     const playerState = await query<PlayerState>(userId, ROOT_QUERY, playerStatePublisherClient);
     const transaction = playerStatePublisherClient.multi();
     const newPlayerState = {
@@ -55,3 +51,4 @@ export const leaveRoomPlayerTransaction = (userId: string) =>
 
     return newPlayerState;
   });
+};

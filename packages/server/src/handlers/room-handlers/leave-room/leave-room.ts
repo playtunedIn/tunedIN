@@ -10,7 +10,6 @@ import type { GameState, PlayerRoomSession } from '../../../clients/redis/models
 import { leaveRoomPlayerTransaction, leaveRoomTransaction } from './leave-room-transaction';
 
 export const leaveRoomHandler = async (ws: WebSocket) => {
-  console.log('in leave room');
   const { userId } = ws.userToken;
 
   let playerSession: PlayerRoomSession;
@@ -21,7 +20,6 @@ export const leaveRoomHandler = async (ws: WebSocket) => {
   }
 
   const roomId = playerSession?.roomId;
-  console.log({ playerSession });
   if (!roomId) {
     return sendResponse(ws, LEAVE_ROOM_ERROR_RESPONSE, { errorCode: 'Player not in any room' });
   }
