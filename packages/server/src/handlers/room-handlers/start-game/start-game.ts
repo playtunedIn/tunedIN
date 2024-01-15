@@ -18,11 +18,16 @@ import {
   queryMultiple,
 } from '../../../clients/redis';
 import type { Question } from '../../../clients/redis/models/game-state';
-import { type PlayerState, ROOM_STATUS, type RoomStatus, type GameState } from '../../../clients/redis/models/game-state';
+import {
+  type PlayerState,
+  ROOM_STATUS,
+  type RoomStatus,
+  type GameState,
+} from '../../../clients/redis/models/game-state';
 import { publishMessageHandler } from '../../subscribed-message-handlers';
 import { getQuestionsHandler } from '../../game-handlers/question-handlers/get-questions';
 
-const MIN_PLAYERS_TO_START = 2;
+// const MIN_PLAYERS_TO_START = 2;
 
 export const startGameHandler = async (ws: WebSocket, data: StartGameReq) => {
   if (!isValidSchema(data, START_GAME_SCHEMA_NAME)) {
@@ -34,7 +39,11 @@ export const startGameHandler = async (ws: WebSocket, data: StartGameReq) => {
 
   let response: Record<RedisQuery, unknown>;
   try {
-    response = await queryMultiple(roomId, [ROOT_QUERY, HOST_ID_QUERY, ROOM_STATUS_QUERY, PLAYERS_QUERY], gameStatePublisherClient);
+    response = await queryMultiple(
+      roomId,
+      [ROOT_QUERY, HOST_ID_QUERY, ROOM_STATUS_QUERY, PLAYERS_QUERY],
+      gameStatePublisherClient
+    );
   } catch (err) {
     return sendResponse(ws, START_GAME_ERROR_RESPONSE, { errorCode: (err as Error).message });
   }
@@ -78,9 +87,8 @@ export const startGameHandler = async (ws: WebSocket, data: StartGameReq) => {
     const questionsFromRedis = questionsFromRedisRaw as Question[];
     roomState.questions = questionsFromRedis;
   } catch (err) {
-    console.log({err});
+    console.log({ err });
   }
-  
-  
+
   sendResponse(ws, START_GAME_RESPONSE, roomState);
 };
