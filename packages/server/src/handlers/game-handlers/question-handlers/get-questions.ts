@@ -28,8 +28,7 @@ export const getQuestionsHandler = async (ws: WebSocket, roomId: string, players
         errorCode: QUESTION_GENERATOR_CODES.GET_QUESTION_HANDLER_ERROR,
       });
     }
-    const spotifyQuestions = await getGameQuestions(users, 10);
-    console.log('spotify questions', spotifyQuestions);
+    const spotifyQuestions = await getGameQuestions(users, 3);
 
     questions = spotifyQuestions.map(question => {
       return {
