@@ -3,6 +3,8 @@ export const CREATE_ROOM_RESPONSE = 'createRoomResponse';
 export const CREATE_ROOM_ERROR_RESPONSE = 'createRoomErrorResponse';
 export const JOIN_ROOM_RESPONSE = 'joinRoomResponse';
 export const JOIN_ROOM_ERROR_RESPONSE = 'joinRoomErrorResponse';
+export const LEAVE_ROOM_RESPONSE = 'leaveRoomResponse';
+export const LEAVE_ROOM_ERROR_RESPONSE = 'leaveRoomErrorResponse';
 export const RECOVER_ROOM_SESSION_RESPONSE = 'recoverRoomSessionResponse';
 export const RECOVER_ROOM_SESSION_ERROR_RESPONSE = 'recoverRoomSessionErrorResponse';
 export const SUBSCRIBED_RESPONSE = 'subscribedResponse';
@@ -16,6 +18,8 @@ export type MessageHandlerResponse =
   | typeof CREATE_ROOM_ERROR_RESPONSE
   | typeof JOIN_ROOM_RESPONSE
   | typeof JOIN_ROOM_ERROR_RESPONSE
+  | typeof LEAVE_ROOM_RESPONSE
+  | typeof LEAVE_ROOM_ERROR_RESPONSE
   | typeof RECOVER_ROOM_SESSION_RESPONSE
   | typeof RECOVER_ROOM_SESSION_ERROR_RESPONSE
   | typeof SUBSCRIBED_RESPONSE

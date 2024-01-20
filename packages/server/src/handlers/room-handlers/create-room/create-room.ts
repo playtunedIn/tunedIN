@@ -32,6 +32,6 @@ export const createRoomHandler = async (ws: WebSocket) => {
     return sendResponse(ws, CREATE_ROOM_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.COMMAND_FAILURE });
   }
   await subscribeRoomHandler(ws, roomId);
-  await storePlayerDetailsHandler(ws.userToken);
+  await storePlayerDetailsHandler(ws.userToken, roomId);
   sendResponse(ws, CREATE_ROOM_RESPONSE, defaultGameStateJson);
 };
