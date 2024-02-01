@@ -6,6 +6,7 @@ import { CREATE_ROOM_ERROR_RESPONSE, CREATE_ROOM_RESPONSE } from '../../response
 import { ROOT_QUERY, gameStatePublisherClient } from '../../../clients/redis';
 import { generateDefaultGameState, generateUniqueRoomId } from '../../../utils/room-helpers';
 import { REDIS_ERROR_CODES, CREATE_ROOM_ERROR_CODES } from '../../../errors';
+import { subscribeRoomHandler } from '../../../handlers/subscribed-message-handlers';
 import { storePlayerDetailsHandler } from '../../game-handlers/player-handlers/store-player-handler/store-player-handler';
 
 export const createRoomHandler = async (ws: WebSocket) => {

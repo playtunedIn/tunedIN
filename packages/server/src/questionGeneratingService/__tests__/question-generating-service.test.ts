@@ -20,7 +20,7 @@ describe('Question generating service', () => {
   });
 
   it('should generate the max number of available questions if requested more questions than available', async () => {
-    const result = await questionGeneratingService.getGameQuestions(users, 8);
-    expect(result).toHaveLength(5);
+    const result = await questionGeneratingService.getGameQuestions(users, 23);
+    expect(result).toHaveLength(19);
   });
 });
