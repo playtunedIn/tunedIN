@@ -1,7 +1,7 @@
 version: '3'
 services:
   redis:
-    image: redis:latest
+    image: 'redis/redis-stack-server:7.2.0-v2'
     ports:
       - "6379:6379"
 
