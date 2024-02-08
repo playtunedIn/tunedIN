@@ -38,9 +38,16 @@ export const joinRoomHandler = async (ws: WebSocket, data: JoinRoomReq) => {
   try {
     sanitizedRoomState = await joinRoomTransaction(roomId, newPlayer);
   } catch (err) {
-    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: (err as Error).message });
+    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, { errorCode: JOIN_ROOM_ERROR_CODES.TRANSACTION_FAILURE });
   }
-  await storePlayerDetailsHandler(ws.userToken, data.roomId);
+
+  try {
+    await storePlayerDetailsHandler(roomId, ws);
+  } catch {
+    return sendResponse(ws, JOIN_ROOM_ERROR_RESPONSE, {
+      errorCode: JOIN_ROOM_ERROR_CODES.STORE_PLAYER_TOKEN_HANDLER_FAILED,
+    });
+  }
   await subscribeRoomHandler(ws, data.roomId);
   await publishMessageHandler(data.roomId, ADD_PLAYER_RESPONSE, { player: newPlayer }, userId);
 

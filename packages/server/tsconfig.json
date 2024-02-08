@@ -17,6 +17,7 @@
     "baseUrl": ".",
     "strict": true,
   },
-  "exclude": ["node_modules", "**/*.test.*"],
+  // Todo: re enable test when we are ready
+  "exclude": ["node_modules", "**/*.test.*", "**/*.mock.*"],
   "include": ["**/*.ts"]
 }

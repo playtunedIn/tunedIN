@@ -7,6 +7,8 @@ import type {
   SanitizedQuestion,
 } from 'src/clients/redis/models/game-state';
 import { ROOM_STATUS } from '../clients/redis/models/game-state';
+import { type TokenState } from '../clients/redis/models/token-state';
+import type { WebSocket } from 'ws';
 
 export const ROOM_ID_LENGTH = 4;
 
@@ -76,6 +78,14 @@ export const generateDefaultGameState = (roomId: string, hostId: string, hostNam
   questions: [],
   roomStatus: ROOM_STATUS.LOBBY,
   questionIndex: 0,
+});
+
+export const generateDefaultTokenState = (roomId: string, ws: WebSocket): TokenState => ({
+  userId: ws.userToken.userId,
+  name: ws.userToken.name,
+  roomId: roomId,
+  authToken: ws.userToken.spotifyToken,
+  refreshToken: ws.userToken.refresh
 });
 
 export function generateUniqueRoomId(): string {

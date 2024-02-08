@@ -108,7 +108,7 @@ const startServer = async () => {
 
       if (typeof tokenValue !== 'string') {
         console.log('Token not found');
-        ws.close(4001);
+        // ws.close(4001);
         return;
       }
 

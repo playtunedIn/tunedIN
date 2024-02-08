@@ -1,9 +1,9 @@
 import type { WebSocket } from 'ws';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { joinRoomHandler } from 'src/handlers/room-handlers/join-room/join-room';
+import { joinRoomHandler } from '../join-room';
 import { createMockWebSocket, createMockWebSocketMessage } from '../../../../testing/mocks/websocket.mock';
-import { JOIN_ROOM_ERROR_RESPONSE, JOIN_ROOM_RESPONSE } from 'src/handlers/responses';
+import { JOIN_ROOM_ERROR_RESPONSE, JOIN_ROOM_RESPONSE } from '../../../responses';
 import { JOIN_ROOM_ERROR_CODES, REDIS_ERROR_CODES } from '../../../../errors';
 import type { JoinRoomReq } from '../join-room.validator';
 import { gameStatePublisherClient } from '../../../../clients/redis';

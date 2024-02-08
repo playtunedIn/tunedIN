@@ -29,6 +29,7 @@ export function mainstreamJunkie(data: QuestionData[]): AnsweredQuestion {
 
   const correctAnswer = players;
 
+  // TODO: Refactor const name, title name, questionDescription and questionDescriptionExtra. Confusing names. Create a model to avoid duplicate code.
   const answeredQuestion = {
     questionTitle: title,
     questionDescription: description,

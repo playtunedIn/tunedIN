@@ -1,17 +1,17 @@
 import type { RedisJSON } from '@redis/json/dist/commands';
+import type { WebSocket } from 'ws';
 
-import type { TunedInJwtPayload } from 'src/utils/auth';
 import { ROOT_QUERY, playerStatePublisherClient } from '../../../../clients/redis';
+import { sendResponse } from '../../../../utils/websocket-response';
 import { REDIS_ERROR_CODES } from '../../../../errors';
+import { PLAYER_HANDLER_ERROR_RESPONSE } from '../../../responses';
+import { generateDefaultTokenState } from '../../../../utils/room-helpers';
 
-export const storePlayerDetailsHandler = async (user: TunedInJwtPayload, roomId: string) => {
-    const userWithRoom = {
-        roomId,
-        ...user
-    }
+export const storePlayerDetailsHandler = async (roomId: string, ws: WebSocket) => {
+  const tokenState = generateDefaultTokenState(roomId, ws);
   try {
-    await playerStatePublisherClient.json.set(user.userId, ROOT_QUERY, userWithRoom as unknown as RedisJSON);
+    await playerStatePublisherClient.json.set(ws.userToken.userId, ROOT_QUERY, tokenState as unknown as RedisJSON);
   } catch {
-    throw new Error(REDIS_ERROR_CODES.COMMAND_FAILURE);
+    sendResponse(ws, PLAYER_HANDLER_ERROR_RESPONSE, { errorCode: REDIS_ERROR_CODES.STORE_PLAYER_TOKEN_FAILURE });
   }
 };
