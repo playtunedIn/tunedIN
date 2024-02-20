@@ -34,10 +34,10 @@ jobs:
         with:
           terraform_version: 1.2.5
 
-      - name: Terraform fmt
-        id: fmt
-        run: terraform fmt -check
-        continue-on-error: true
+      # - name: Terraform fmt
+      #   id: fmt
+      #   run: terraform fmt -check
+      #   continue-on-error: true
 
       - name: Terraform Init
         id: init
@@ -100,3 +100,22 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # - name: Automatic Tagging of Releases
+      #   id: increment-git-tag
+      #   run: |
+      #     bash ./build/git_update.sh -v major
+
+      - name: Build, Tag, and Push the Image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: 078744127834.dkr.ecr.us-east-1.amazonaws.com/tunedin-image-repository
+          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
